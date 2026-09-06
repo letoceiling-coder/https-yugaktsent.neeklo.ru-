@@ -2,6 +2,7 @@ import React from 'react';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import contactMap from '@/assets/contact-map.jpg';
 import { useSiteSettings, settingOptional } from '@/redesign/hooks/useSiteSettings';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import { telHref, yandexMapsHref } from '@/lib/contact-links';
 
 const SOCIAL_DEFS = [
@@ -13,6 +14,7 @@ const SOCIAL_DEFS = [
 
 const ContactsSection = React.forwardRef<HTMLElement>((_, ref) => {
   const { data: s } = useSiteSettings();
+  const { shortName } = useSiteBrand();
 
   const phone = settingOptional(s, 'phone_main');
   const phoneTel = phone ? telHref(phone) : undefined;
@@ -39,7 +41,7 @@ const ContactsSection = React.forwardRef<HTMLElement>((_, ref) => {
     <section ref={ref} id="contacts" className="py-8 sm:py-12">
       <div className="max-w-[1400px] mx-auto px-4">
         <h2 className="text-base sm:text-xl font-bold mb-4 sm:mb-6">
-          Свяжитесь с <span className="text-primary">LiveGrid</span>
+          Свяжитесь с <span className="text-primary">{shortName}</span>
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           <div className="space-y-4 sm:space-y-5">
@@ -100,7 +102,7 @@ const ContactsSection = React.forwardRef<HTMLElement>((_, ref) => {
             ) : null}
           </div>
           <div className="relative rounded-xl overflow-hidden min-h-[240px] sm:min-h-[300px]">
-            <img src={contactImage} alt="Расположение офиса LiveGrid" className="w-full h-full object-cover" loading="lazy" />
+            <img src={contactImage} alt={`Расположение офиса ${shortName}`} className="w-full h-full object-cover" loading="lazy" />
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 via-transparent to-transparent" />
             {showOverlay ? (
               <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm rounded-lg px-3 py-2 max-w-[min(100%-2rem,320px)]">

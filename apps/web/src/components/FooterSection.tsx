@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { setting, settingOptional, useSiteSettings } from '@/redesign/hooks/useSiteSettings';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import { telHref, yandexMapsHref, yandexMapWidgetSrc } from '@/lib/contact-links';
 import {
   FOOTER_CATALOG_LINKS,
@@ -41,14 +42,16 @@ const FooterNavColumn = ({
 const FooterOfficeMap = ({
   widgetSrc,
   mapsUrl,
+  officeTitle,
 }: {
   widgetSrc: string;
   mapsUrl: string;
+  officeTitle: string;
 }) => (
   <div className="mt-6 sm:mt-8">
     <div className="h-[300px] w-full overflow-hidden rounded-xl border border-primary-foreground/15 bg-primary-foreground/5">
       <iframe
-        title="Офис LiveGrid на Яндекс Картах"
+        title={officeTitle}
         src={widgetSrc}
         className="h-full w-full border-0"
         loading="lazy"
@@ -68,6 +71,7 @@ const FooterOfficeMap = ({
 
 const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
   const { data: s } = useSiteSettings();
+  const { shortName, logoUrl, tagline } = useSiteBrand();
 
   const phoneMain = setting(s, 'phone_main', FOOTER_DEFAULT_PHONE);
   const phoneHref = telHref(phoneMain);
@@ -105,11 +109,14 @@ const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 lg:gap-10">
           {/* Brand + contacts */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <Link to="/" className="inline-flex min-h-11 items-center gap-2.5 mb-2">
-              <img src="/logo.svg" alt="" className="w-8 h-8 object-contain" aria-hidden />
-              <span className="font-bold text-base">Live Grid</span>
+            <Link to="/" className="inline-flex min-h-11 items-center mb-2">
+              <img
+                src={logoUrl}
+                alt={shortName}
+                className="h-10 w-auto max-w-[220px] object-contain object-left"
+              />
             </Link>
-            <p className="text-sm opacity-70 mb-4">Платформа недвижимости</p>
+            <p className="text-sm opacity-70 mb-4">{tagline}</p>
 
             <div className="space-y-0.5">
               <a
@@ -147,13 +154,17 @@ const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
           <FooterNavColumn title="Компания" links={FOOTER_COMPANY_LINKS} />
         </div>
 
-        <FooterOfficeMap widgetSrc={mapWidgetSrc} mapsUrl={mapsUrl} />
+        <FooterOfficeMap
+          widgetSrc={mapWidgetSrc}
+          mapsUrl={mapsUrl}
+          officeTitle={`Офис ${shortName} на Яндекс Картах`}
+        />
       </div>
 
       <div className="border-t border-primary-foreground/10">
         <div className="max-w-[1400px] mx-auto px-4 py-5 sm:py-6">
           <p className="text-xs sm:text-sm opacity-50">
-            © {copyrightYear} LiveGrid
+            © {copyrightYear} {shortName}
             <span className="opacity-40 mx-2" aria-hidden>
               ·
             </span>

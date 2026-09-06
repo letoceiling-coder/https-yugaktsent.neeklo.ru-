@@ -58,6 +58,8 @@ function mapFinishing(name: string | undefined | null): string {
 export function mapListingToChessboardInput(row: ListingRow): ChessboardApartmentInput | null {
   const apt = row.apartment;
   if (!apt) return null;
+  const floor = apt.floor;
+  if (floor == null || floor <= 0 || floor > 200) return null;
   const area = num(apt.areaTotal);
   if (area <= 0) return null;
   const price = num(row.price);

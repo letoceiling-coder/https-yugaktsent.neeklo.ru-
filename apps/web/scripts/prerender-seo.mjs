@@ -196,6 +196,7 @@ async function main() {
   }
 
   const siteUrl = trimSlash(process.env.VITE_PUBLIC_SITE_URL || process.env.PUBLIC_SITE_URL || 'https://livegrid.ru');
+  const siteBrand = (process.env.VITE_DEFAULT_BRAND || process.env.SITE_BRAND || 'Агентство недвижимости').trim();
   const sitemapIndexUrl = `${siteUrl}/api/v1/sitemap/sitemap-index.xml`;
   const apiBase = trimSlash(process.env.PRERENDER_API_BASE || `${siteUrl}/api/v1`);
   const maxComplex = Math.max(1, Math.min(5000, Number(process.env.PRERENDER_MAX_COMPLEX) || 500));
@@ -207,8 +208,8 @@ async function main() {
   }
   const baseHtml = fs.readFileSync(indexPath, 'utf8');
 
-  const homeTitle = 'Недвижимость в России | LiveGrid';
-  const homeDesc = 'Каталог жилых комплексов и квартир: фильтры, карты, избранное и подборки.';
+  const homeTitle = `${siteBrand} — новостройки и недвижимость`;
+  const homeDesc = 'Каталог жилых комплексов и квартир: фильтры, карта, избранное и подборки.';
   fs.writeFileSync(
     indexPath,
     patchHtmlHead(baseHtml, {
@@ -220,7 +221,7 @@ async function main() {
   );
 
   writeHtml('catalog', baseHtml, {
-    title: 'Каталог недвижимости | LiveGrid',
+    title: `Каталог недвижимости | ${siteBrand}`,
     description: 'Подбор ЖК и квартир по цене, району, метро и другим параметрам.',
     canonical: `${siteUrl}/catalog`,
   });
@@ -236,7 +237,7 @@ async function main() {
   for (const c of complexes) {
     const desc = plainFromMaybeHtml(c.description, 200) || `ЖК ${c.name}: квартиры, планировки, инфраструктура.`;
     writeHtml(`complex/${c.slug}`, baseHtml, {
-      title: `${c.name} — ЖК | LiveGrid`,
+      title: `${c.name} — ЖК | ${siteBrand}`,
       description: desc,
       canonical: `${siteUrl}/complex/${encodeURIComponent(c.slug)}`,
     });

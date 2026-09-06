@@ -55,7 +55,7 @@ import {
 import { buildCatalogFilterUrl } from '@/redesign/lib/catalog-filter-links';
 import { roomCategoryFromRooms } from '@/redesign/lib/complex-room-groups';
 import { recordBrowseHistory } from '@/shared/lib/record-browse-history';
-import { blockHref } from '@/shared/lib/browse-history-local';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 
 declare global {
   interface Window { ymaps: any; }
@@ -84,12 +84,16 @@ const RedesignComplex = () => {
   const { isBlockFavorite, toggleBlock } = useFavorites();
   const { isCompared, toggle: toggleCompare, count: compareCount } = useCompare();
   const { ready: ymapsReady } = useYandexMapsReady();
+  const { shortName } = useSiteBrand();
   const mockComplex = useMemo(() => getComplexBySlug(slug || ''), [slug]);
   const resolvedSlug = useMemo(() => {
     const raw = (slug || '').trim();
     if (!raw) return raw;
     return COMPLEX_SLUG_ALIASES[raw] ?? raw;
   }, [slug]);
+
+  const [chessboardEnabled, setChessboardEnabled] = useState(false);
+  const chessboardSectionRef = useRef<HTMLElement | null>(null);
 
   const apiBlockQuery = useQuery({
     queryKey: ['block', 'slug', resolvedSlug],
@@ -102,7 +106,7 @@ const RedesignComplex = () => {
     queryKey: ['listings', 'block', apiBlockQuery.data?.id],
     queryFn: () =>
       apiGet<{ data: ApiListingRow[] }>(
-        `/listings?block_id=${apiBlockQuery.data!.id}&statuses=ACTIVE,RESERVED,SOLD&is_published=true&per_page=500`,
+        `/listings?block_id=${apiBlockQuery.data!.id}&statuses=ACTIVE,RESERVED,SOLD&is_published=true&per_page=48`,
       ),
     enabled: Boolean(apiBlockQuery.data?.id),
   });
@@ -113,7 +117,7 @@ const RedesignComplex = () => {
       apiGetOrNull<ChessboardBlockResponse>(
         `/blocks/${encodeURIComponent(resolvedSlug || '')}/chessboard`,
       ),
-    enabled: Boolean(resolvedSlug) && Boolean(apiBlockQuery.data?.id),
+    enabled: Boolean(resolvedSlug) && Boolean(apiBlockQuery.data?.id) && chessboardEnabled,
     staleTime: 60_000,
   });
 
@@ -140,7 +144,7 @@ const RedesignComplex = () => {
     if (!complex) return null;
     const priceHint =
       ` ${formatPriceFrom(complex.priceFrom)}`;
-    const desc = `${complex.name}${priceHint} — ${complex.district || complex.address}. Квартиры, планировки и шахматка на LiveGrid.`.slice(
+    const desc = `${complex.name}${priceHint} — ${complex.district || complex.address}. Квартиры, планировки и шахматка на ${shortName}.`.slice(
       0,
       160,
     );
@@ -158,7 +162,7 @@ const RedesignComplex = () => {
         address: complex.address || complex.district,
       },
     };
-  }, [complex, location.pathname]);
+  }, [complex, location.pathname, shortName]);
   useEntitySeoMeta(entitySeo);
 
   useEffect(() => {
@@ -290,7 +294,23 @@ const RedesignComplex = () => {
 
   const hasApartments = scopedApartments.length > 0;
   const hasLayouts = layouts.length > 0;
-  const hasChess = buildings.some((b) => b.apartments.length > 0);
+  const hasChess =
+    (apiBlockQuery.data?._count?.listings ?? 0) > 0 ||
+    buildings.some((b) => b.apartments.length > 0);
+
+  useEffect(() => {
+    if (chessboardEnabled || !hasChess) return;
+    const el = chessboardSectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) setChessboardEnabled(true);
+      },
+      { rootMargin: '400px' },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [chessboardEnabled, hasChess, complex?.id]);
   const hasDescription = Boolean(complex?.description?.trim());
   const hasInfra = (complex?.infrastructure.length ?? 0) > 0;
   const hasMap =
@@ -342,6 +362,7 @@ const RedesignComplex = () => {
     (id: string) => {
       const sectionId =
         id === 'chess' ? 'chessboard' : id === 'apartments' ? 'layouts' : id;
+      if (sectionId === 'chessboard') setChessboardEnabled(true);
       setActiveSection(sectionId);
       const el = document.getElementById(sectionId);
       if (!el) return;
@@ -600,10 +621,14 @@ const RedesignComplex = () => {
             </section>
           ) : null}
 
-          {hasChess && fromApi && (activeChessMatrix || chessboardQuery.isLoading || chessboardQuery.isError) ? (
-            <section id="chessboard" className="scroll-mt-32">
+          {hasChess && fromApi ? (
+            <section ref={chessboardSectionRef} id="chessboard" className="scroll-mt-32">
               {sectionHeading('Шахматка', activeBuilding?.name || 'Расположение квартир по этажам')}
-              {chessboardQuery.isError ? (
+              {!chessboardEnabled ? (
+                <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+                  Прокрутите к разделу или выберите «Шахматка» в меню — данные подгрузятся автоматически
+                </div>
+              ) : chessboardQuery.isError ? (
                 <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center text-sm text-muted-foreground">
                   Не удалось загрузить шахматку. Обновите страницу.
                 </div>

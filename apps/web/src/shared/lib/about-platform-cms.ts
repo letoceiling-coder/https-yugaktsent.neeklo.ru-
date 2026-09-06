@@ -54,22 +54,22 @@ export function aboutPlatformIcon(id: string): LucideIcon {
 }
 
 export const DEFAULT_ABOUT_PLATFORM_SETTINGS: AboutPlatformSettings = {
-  eyebrow: 'Платформа недвижимости нового поколения',
-  title: 'Live Grid — единая платформа для поиска и управления недвижимостью',
+  eyebrow: 'О компании',
+  title: 'ЮгАкцент — недвижимость в Анапе',
   description:
-    'Агрегируем новостройки, вторичку и коммерцию в одном каталоге. Удобный поиск, карта и сопровождение сделки — без лишнего шума.',
-  primaryButtonText: 'Зарегистрироваться',
-  primaryButtonUrl: '/login',
-  secondaryButtonText: 'Помощь с подбором',
-  secondaryButtonUrl: '/catalog',
+    'Мы — команда экспертов, для которых недвижимость Анапы не просто работа, а профессия и стиль жизни. С 2017 года «ЮгАкцент» помогает семьям, инвесторам и предпринимателям находить объекты, в которые хочется вернуться. За каждым положительным отзывом — часы работы: телефонные переговоры, показы, юридические проверки, сопровождение сделки от аванса до ключей.',
+  primaryButtonText: 'Узнать подробнее',
+  primaryButtonUrl: '/about',
+  secondaryButtonText: '',
+  secondaryButtonUrl: '',
   imageUrl: '',
-  imageAlt: 'Платформа Live Grid',
+  imageAlt: 'ЮгАкцент — агентство недвижимости в Анапе',
   imageUrlMobile: '',
   backgroundVariant: 'muted',
   stats: [
     { id: 's1', value: '—', label: 'квартир в каталоге', icon: 'layers', enabled: true, order: 0 },
     { id: 's2', value: '—', label: 'жилых комплексов', icon: 'building2', enabled: true, order: 1 },
-    { id: 's3', value: '—', label: 'регионов на платформе', icon: 'map-pin', enabled: true, order: 2 },
+    { id: 's3', value: '—', label: 'новостроек в Анапе', icon: 'map-pin', enabled: true, order: 2 },
   ],
 };
 

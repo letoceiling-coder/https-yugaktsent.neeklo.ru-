@@ -467,8 +467,34 @@ model FeedRegion {
   news          News[]
   telegramNewsChannels NewsTelegramChannel[]
   savedSearches SavedSearch[]
+  feedLinks     FeedLink[]
 
   @@map("feed_regions")
+}
+
+model FeedLink {
+  id           Int       @id @default(autoincrement())
+  regionId     Int       @map("region_id")
+  name         String
+  feedUrl      String    @map("feed_url")
+  blockName    String?   @map("block_name")
+  provider     String    @default("profitbase")
+  isEnabled    Boolean   @default(true) @map("is_enabled")
+  sortOrder    Int       @default(0) @map("sort_order")
+  lastSyncedAt DateTime? @map("last_synced_at")
+  lastSyncStatus String?   @map("last_sync_status")
+  lastSyncTotal  Int?      @map("last_sync_total")
+  lastSyncCreated Int?     @map("last_sync_created")
+  lastSyncUpdated Int?     @map("last_sync_updated")
+  lastSyncErrors Int?      @map("last_sync_errors")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  region FeedRegion @relation(fields: [regionId], references: [id], onDelete: Cascade)
+
+  @@unique([feedUrl])
+  @@index([regionId, isEnabled])
+  @@map("feed_links")
 }
 
 model District {

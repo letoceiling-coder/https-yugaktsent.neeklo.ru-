@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
+import { withoutLegacyBrand } from '@/shared/lib/site-brand-text';
 
-const SITE_NAME = 'LiveGrid';
 const SITE_URL = (import.meta.env.VITE_PUBLIC_SITE_URL as string | undefined)?.replace(/\/+$/, '') || 'https://livegrid.ru';
 
 export type EntitySeoInput = {
@@ -40,24 +41,29 @@ const ENTITY_JSON_LD_ID = 'lg-entity-seo-jsonld';
  * Client-side only; no SSR rewrite.
  */
 export function useEntitySeoMeta(input: EntitySeoInput | null) {
+  const { shortName } = useSiteBrand();
+
   useEffect(() => {
     if (!input) return;
 
-    const fullTitle = `${input.title} | ${SITE_NAME}`;
+    const siteName = shortName;
+    const title = withoutLegacyBrand(input.title, siteName);
+    const description = withoutLegacyBrand(input.description, siteName);
+    const fullTitle = `${title} | ${siteName}`;
     const canonical = `${SITE_URL}${input.pathname}`;
     const image = input.imageUrl?.trim() || `${SITE_URL}/og-default.jpg`;
 
     document.title = fullTitle;
-    setMeta('description', input.description);
+    setMeta('description', description);
     setMeta('robots', 'index, follow');
     setMeta('og:title', fullTitle, true);
-    setMeta('og:description', input.description, true);
+    setMeta('og:description', description, true);
     setMeta('og:url', canonical, true);
     setMeta('og:type', 'website', true);
     setMeta('og:image', image, true);
     setMeta('twitter:card', 'summary_large_image');
     setMeta('twitter:title', fullTitle);
-    setMeta('twitter:description', input.description);
+    setMeta('twitter:description', description);
     setMeta('twitter:image', image);
     setCanonical(canonical);
 
@@ -75,5 +81,5 @@ export function useEntitySeoMeta(input: EntitySeoInput | null) {
     return () => {
       document.getElementById(ENTITY_JSON_LD_ID)?.remove();
     };
-  }, [input?.title, input?.description, input?.pathname, input?.imageUrl, input?.jsonLd]);
+  }, [input?.title, input?.description, input?.pathname, input?.imageUrl, input?.jsonLd, shortName]);
 }

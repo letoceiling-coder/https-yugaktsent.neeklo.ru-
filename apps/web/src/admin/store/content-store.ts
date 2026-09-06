@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { normalizeAboutPlatformSettings } from '@/shared/lib/about-platform-cms';
 import { normalizeHelpSelectionSettings } from '@/shared/lib/help-selection-cms';
 import { normalizePlatformToolsSettings } from '@/shared/lib/platform-tools-cms';
+import { defaultPublicBrandName, replaceLegacyBrandDeep } from '@/shared/lib/site-brand-text';
 
 // ============================================================
 // Content Store — единый контентный слой для управления данными
@@ -36,8 +37,8 @@ export interface PageContent {
 const defaultHomeContent: PageContent = {
   slug: '/',
   title: 'Главная',
-  meta_title: 'Live Grid — Более 100 000 объектов недвижимости по России',
-  meta_description: 'Поиск и продажа недвижимости в России. Новостройки, вторичка, аренда, ипотека.',
+  meta_title: 'ЮгАкцент — новостройки и недвижимость в Анапе',
+  meta_description: 'Каталог новостроек и квартир в Анапе. Подбор, карта, консультация специалистов ЮгАкцент.',
   og_image: '',
   status: 'published',
   sections: [
@@ -59,24 +60,7 @@ const defaultHomeContent: PageContent = {
     { id: 'home-quiz', type: 'quiz', label: 'Квиз', position: 4, is_active: true, settings: { title: 'Подберем объект под Ваш запрос', bannerTitle: 'Подберем\nза 5 минут' } },
     { id: 'home-hot', type: 'property_grid', label: 'Горячие предложения', position: 5, is_active: true, settings: { title: 'Горячие предложения', gridType: 'hot' } },
     { id: 'home-start', type: 'property_grid', label: 'Старт продаж', position: 6, is_active: true, settings: { title: 'Старт продаж', gridType: 'start' } },
-    { id: 'home-about', type: 'about_platform', label: 'О платформе', position: 7, is_active: true, settings: {
-      eyebrow: 'Платформа недвижимости нового поколения',
-      title: 'Live Grid — единая платформа для поиска и управления недвижимостью',
-      description: 'Агрегируем новостройки, вторичку и коммерцию в одном каталоге. Удобный поиск, карта и сопровождение сделки — без лишнего шума.',
-      primaryButtonText: 'Зарегистрироваться',
-      primaryButtonUrl: '/login',
-      secondaryButtonText: 'Помощь с подбором',
-      secondaryButtonUrl: '/catalog',
-      imageUrl: '',
-      imageAlt: 'Платформа Live Grid',
-      imageUrlMobile: '',
-      backgroundVariant: 'muted',
-      stats: [
-        { id: 's1', value: '65 122', label: 'объектов в каталоге', icon: 'layers', enabled: true, order: 0 },
-        { id: 's2', value: '480+', label: 'жилых комплексов', icon: 'building2', enabled: true, order: 1 },
-        { id: 's3', value: '120+', label: 'застройщиков', icon: 'users', enabled: true, order: 2 },
-      ],
-    } },
+    { id: 'home-about', type: 'about_platform', label: 'О компании', position: 7, is_active: true, settings: {} },
     { id: 'home-help', type: 'help_selection', label: 'Помощь с выбором', position: 8, is_active: true, settings: {
       title: 'Поможем подобрать недвижимость',
       description: 'Подберём квартиры, дома и ЖК под ваш бюджет и задачи.',
@@ -93,20 +77,20 @@ const defaultHomeContent: PageContent = {
       ],
     } },
     { id: 'home-news', type: 'latest_news', label: 'Последние новости', position: 10, is_active: true, settings: { title: 'Последние новости' } },
-    { id: 'home-contacts', type: 'contacts', label: 'Контакты', position: 11, is_active: true, settings: { title: 'Свяжитесь с LiveGrid', phone1: '+7 (4) 333 44 11', phone2: '+7 (4) 333 66 12', email: 'info@livegrid.ru', address: 'Москва, ул. Примерная, д. 1', socials: ['VK', 'TG', 'YT', 'OK'] } },
+    { id: 'home-contacts', type: 'contacts', label: 'Контакты', position: 11, is_active: true, settings: { title: 'Свяжитесь с нами', phone1: '+7 (4) 333 44 11', phone2: '+7 (4) 333 66 12', email: 'info@yugaktsent.ru', address: 'Анапа', socials: ['VK', 'TG', 'YT', 'OK'] } },
     { id: 'home-footer', type: 'footer', label: 'Подвал', position: 12, is_active: true, settings: { columns: [
       { title: 'Покупка', items: ['Новостройки', 'Вторичка', 'Коттеджи', 'Участки', 'Коммерция'] },
       { title: 'Аренда', items: ['Квартиры', 'Дома', 'Офисы', 'Склады', 'Помещения'] },
       { title: 'Ипотека', items: ['Калькулятор', 'Банки-партнеры', 'Программы', 'Рефинансирование'] },
       { title: 'Компания', items: ['О нас', 'Контакты', 'Карьера', 'Блог', 'Партнерам'] },
-    ], copyright: '© 2025 Live Grid. Все права защищены.' } },
+    ], copyright: '© 2026 ЮгАкцент. Все права защищены.' } },
   ],
 };
 
 const defaultCatalogContent: PageContent = {
   slug: '/catalog',
   title: 'Каталог',
-  meta_title: 'Каталог недвижимости — Live Grid',
+  meta_title: 'Каталог недвижимости — ЮгАкцент',
   meta_description: 'Все объекты недвижимости в одном каталоге.',
   og_image: '',
   status: 'published',
@@ -125,7 +109,7 @@ const defaultCatalogContent: PageContent = {
 const defaultCatalogZhkContent: PageContent = {
   slug: '/catalog-zhk',
   title: 'Каталог ЖК',
-  meta_title: 'Каталог ЖК — Live Grid',
+  meta_title: 'Каталог ЖК — ЮгАкцент',
   meta_description: 'Каталог жилых комплексов в Москве.',
   og_image: '',
   status: 'published',
@@ -143,7 +127,7 @@ const defaultCatalogZhkContent: PageContent = {
 const defaultNewsContent: PageContent = {
   slug: '/news',
   title: 'Новости',
-  meta_title: 'Новости — Live Grid',
+  meta_title: 'Новости — ЮгАкцент',
   meta_description: 'Последние новости рынка недвижимости.',
   og_image: '',
   status: 'published',
@@ -165,8 +149,9 @@ const defaultPages: PageContent[] = [
 
 // --- Load / Save ---
 
-const migratePages = (pages: PageContent[]): PageContent[] =>
-  pages.map((page) => ({
+const migratePages = (pages: PageContent[]): PageContent[] => {
+  const brand = defaultPublicBrandName();
+  const normalized = pages.map((page) => ({
     ...page,
     sections: page.sections.map((s) => {
       if (s.type === 'about_platform') {
@@ -181,6 +166,8 @@ const migratePages = (pages: PageContent[]): PageContent[] =>
       return s;
     }),
   }));
+  return replaceLegacyBrandDeep(normalized, brand);
+};
 
 const loadContent = (): PageContent[] => {
   try {

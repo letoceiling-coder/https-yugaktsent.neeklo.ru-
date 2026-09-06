@@ -46,6 +46,16 @@ function readStoredId(): number | null {
 
 function pickDefaultId(rows: RegionRow[]): number | undefined {
   if (!rows.length) return undefined;
+  if (rows.length === 1) return rows[0]?.id;
+
+  const envCode = (import.meta.env.VITE_DEFAULT_REGION_CODE as string | undefined)
+    ?.trim()
+    .toLowerCase();
+  if (envCode) {
+    const fromEnv = rows.find((r) => (r.code ?? '').toLowerCase() === envCode);
+    if (fromEnv) return fromEnv.id;
+  }
+
   const msk =
     rows.find((r) => (r.code ?? '').toLowerCase() === 'msk') ??
     rows.find((r) => r.name?.trim() === 'Москва');

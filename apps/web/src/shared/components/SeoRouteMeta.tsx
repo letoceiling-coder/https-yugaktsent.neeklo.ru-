@@ -3,9 +3,9 @@ import { useLocation } from 'react-router-dom';
 import { catalogFiltersFromSearchParams } from '@/redesign/lib/catalog-url-sync';
 import { buildCatalogSeoMeta } from '@/redesign/lib/catalog-seo-meta';
 import { useSiteSettings, setting, settingOptional } from '@/redesign/hooks/useSiteSettings';
+import { siteBrandFromMap } from '@/redesign/hooks/useSiteBrand';
 import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
 
-const SITE_NAME = 'LiveGrid';
 const SITE_URL = (import.meta.env.VITE_PUBLIC_SITE_URL as string | undefined)?.replace(/\/+$/, '') || 'https://livegrid.ru';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
 
@@ -46,8 +46,9 @@ function ensureCanonical(): HTMLLinkElement {
   return link;
 }
 
-function stripSiteSuffix(title: string): string {
-  return title.replace(/\s*\|\s*LiveGrid\s*$/i, '').trim();
+function stripSiteSuffix(title: string, siteName: string): string {
+  const escaped = siteName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return title.replace(new RegExp(`\\s*\\|\\s*${escaped}\\s*$`, 'i'), '').trim();
 }
 
 function resolveRegionName(
@@ -67,6 +68,7 @@ function buildMeta(
   search: string,
   cms: Map<string, string> | undefined,
   regionName: string | null,
+  siteName: string,
 ): SeoMeta {
   if (pathname === '/') {
     const cmsTitle = settingOptional(cms, 'site_title');
@@ -74,12 +76,12 @@ function buildMeta(
     const ogImage = settingOptional(cms, 'og_image');
     const defaultTitle = regionName
       ? `Недвижимость в ${regionName}`
-      : 'Недвижимость в России';
+      : `Недвижимость — ${siteName}`;
     const defaultDesc = regionName
       ? `Каталог жилых комплексов и квартир в ${regionName}: фильтры, карта, избранное и подборки.`
-      : 'Каталог жилых комплексов и квартир: фильтры, карты, избранное и подборки.';
+      : `Каталог жилых комплексов и квартир: фильтры, карты, избранное и подборки.`;
     return {
-      title: cmsTitle ? stripSiteSuffix(cmsTitle) : defaultTitle,
+      title: cmsTitle ? stripSiteSuffix(cmsTitle, siteName) : defaultTitle,
       description: cmsDesc || defaultDesc,
       ogImage: ogImage ? (ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`) : undefined,
     };
@@ -88,7 +90,7 @@ function buildMeta(
     return {
       title: 'Недвижимость в Белгороде',
       description:
-        'Квартиры, дома и участки в Белгороде от партнёра ЦН «Авангард». Каталог, фильтры и карта на LiveGrid.',
+        `Квартиры, дома и участки в Белгороде. Каталог, фильтры и карта на ${siteName}.`,
     };
   }
   if (pathname.startsWith('/catalog')) {
@@ -96,12 +98,12 @@ function buildMeta(
     const filters = catalogFiltersFromSearchParams(sp);
     const page = Math.max(1, Number(sp.get('page') || 1) || 1);
     const sort = sp.get('sort');
-    return buildCatalogSeoMeta(filters.search, filters, { page, sort, regionName });
+    return buildCatalogSeoMeta(filters.search, filters, { page, sort, regionName, siteName });
   }
   if (pathname.startsWith('/listing/')) {
     return {
       title: 'Объект недвижимости',
-      description: 'Карточка объекта: параметры, фото, цена и контакты на LiveGrid.',
+      description: `Карточка объекта: параметры, фото, цена и контакты на ${siteName}.`,
     };
   }
   if (pathname.startsWith('/complex/')) {
@@ -126,7 +128,7 @@ function buildMeta(
   if (pathname.startsWith('/agency/')) {
     return {
       title: 'Агентство недвижимости',
-      description: 'Профиль агентства: команда, объекты и контакты на LiveGrid.',
+      description: `Профиль агентства: команда, объекты и контакты на ${siteName}.`,
     };
   }
   if (pathname.startsWith('/agent/')) {
@@ -150,19 +152,19 @@ function buildMeta(
   if (pathname === '/contacts') {
     return {
       title: 'Контакты',
-      description: setting(cms, 'contacts_meta_description', 'Контакты команды LiveGrid и форма обратной связи.'),
+      description: setting(cms, 'contacts_meta_description', `Контакты ${siteName} и форма обратной связи.`),
     };
   }
   if (pathname === '/privacy') {
     return {
       title: 'Политика конфиденциальности',
-      description: 'Условия обработки персональных данных на платформе LiveGrid.',
+      description: `Условия обработки персональных данных на сайте ${siteName}.`,
     };
   }
   if (pathname === '/about') {
     return {
       title: 'О компании',
-      description: 'Платформа LiveGrid: эксперты, сервисы и поддержка клиентов.',
+      description: `${siteName}: эксперты, сервисы и поддержка клиентов.`,
     };
   }
   if (pathname === '/selection') {
@@ -182,13 +184,13 @@ function buildMeta(
   ) {
     return {
       title: 'Служебный раздел',
-      description: 'Служебный раздел платформы LiveGrid.',
+      description: `Служебный раздел ${siteName}.`,
       noindex: true,
     };
   }
   return {
     title: 'Платформа недвижимости',
-    description: 'LiveGrid: платформа управления и поиска недвижимости.',
+    description: `${siteName}: поиск и управление недвижимостью.`,
   };
 }
 
@@ -202,15 +204,17 @@ export default function SeoRouteMeta() {
     [search, defaultRegionId, regionRows],
   );
 
+  const siteName = useMemo(() => siteBrandFromMap(siteSettings).shortName, [siteSettings]);
+
   const meta = useMemo(
-    () => buildMeta(pathname, search, siteSettings, regionName),
-    [pathname, search, siteSettings, regionName],
+    () => buildMeta(pathname, search, siteSettings, regionName, siteName),
+    [pathname, search, siteSettings, regionName, siteName],
   );
 
   const ogImage = meta.ogImage ?? DEFAULT_OG_IMAGE;
 
   useEffect(() => {
-    const fullTitle = `${meta.title} | ${SITE_NAME}`;
+    const fullTitle = `${meta.title} | ${siteName}`;
     const sp = new URLSearchParams(search);
     if (pathname.startsWith('/catalog')) {
       sp.delete('page');
@@ -233,7 +237,7 @@ export default function SeoRouteMeta() {
     ensureMetaByProperty('og:description').setAttribute('content', meta.description);
     ensureMetaByProperty('og:url').setAttribute('content', canonicalUrl);
     ensureMetaByProperty('og:type').setAttribute('content', 'website');
-    ensureMetaByProperty('og:site_name').setAttribute('content', SITE_NAME);
+    ensureMetaByProperty('og:site_name').setAttribute('content', siteName);
     ensureMetaByProperty('og:image').setAttribute('content', ogImage);
     ensureMetaByProperty('og:locale').setAttribute('content', 'ru_RU');
 

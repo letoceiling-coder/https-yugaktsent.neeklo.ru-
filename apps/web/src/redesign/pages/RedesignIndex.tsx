@@ -46,11 +46,10 @@ const RedesignIndex = () => {
 
   const featured = useMemo(() => {
     const rows = blocksFeatured.data?.data ?? [];
-    const pool = rows.filter(
-      (b) => (b._count?.listings ?? 0) > 0 && (b.images?.length ?? 0) > 0,
-    );
-    const promoted = pool.filter((b) => b.isPromoted);
-    const pick = (promoted.length >= 6 ? promoted : pool.length ? pool : rows)
+    const pool = rows.filter((b) => (b._count?.listings ?? 0) > 0);
+    const withImages = pool.filter((b) => (b.images?.length ?? 0) > 0);
+    const promoted = (withImages.length ? withImages : pool).filter((b) => b.isPromoted);
+    const pick = (promoted.length >= 6 ? promoted : withImages.length ? withImages : pool.length ? pool : rows)
       .slice()
       .sort((a, z) => (z._count?.listings ?? 0) - (a._count?.listings ?? 0))
       .slice(0, 8)

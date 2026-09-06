@@ -39,6 +39,7 @@ import { RetentionModule } from './modules/retention/retention.module';
 import { CrmAutomationModule } from './modules/crm-automation/crm-automation.module';
 import { TrustModule } from './modules/trust/trust.module';
 import { BillingModule } from './modules/billing/billing.module';
+import { FeedLinksModule } from './modules/feed-links/feed-links.module';
 import { EcosystemModule } from './modules/ecosystem/ecosystem.module';
 
 @Module({
@@ -65,6 +66,7 @@ import { EcosystemModule } from './modules/ecosystem/ecosystem.module';
     AuditModule,
     BullSharedModule,
     FeedImportModule,
+    FeedLinksModule,
     StatsModule,
     NewsModule,
     AiSettingsModule,

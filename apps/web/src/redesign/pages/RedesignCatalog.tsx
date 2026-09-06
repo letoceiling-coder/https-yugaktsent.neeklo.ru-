@@ -15,6 +15,7 @@ import RegionSelector from '@/redesign/components/RegionSelector';
 import MapSearch from '@/redesign/components/MapSearch';
 import ListingsMapSearch, { type ListingMapItem } from '@/redesign/components/ListingsMapSearch';
 import { useDefaultRegionId, type RegionRow } from '@/redesign/hooks/useDefaultRegionId';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import { mapApiBlockListRowToResidentialComplex, type ApiBlockListRow } from '@/redesign/lib/blocks-from-api';
 import {
   catalogFilterUrlSignature,
@@ -124,6 +125,7 @@ const RedesignCatalog = () => {
   const [mapActive, setMapActive] = useState<string | null>(null);
   const [mapActiveListing, setMapActiveListing] = useState<number | null>(null);
   const { data: defaultRegionId, rows: regionRows, setStoredRegionId } = useDefaultRegionId();
+  const { shortName } = useSiteBrand();
   const urlRegionIdRaw = searchParams.get('region_id');
   const urlRegionId = urlRegionIdRaw ? parseInt(urlRegionIdRaw, 10) : NaN;
   const cityParam = searchParams.get('city');
@@ -222,8 +224,8 @@ const RedesignCatalog = () => {
     [filters, catalogSort],
   );
   const catalogSeo = useMemo(
-    () => buildCatalogSeoMeta(debouncedSearch, filters, { sort: catalogSort, regionName }),
-    [debouncedSearch, filters, catalogSort, regionName],
+    () => buildCatalogSeoMeta(debouncedSearch, filters, { sort: catalogSort, regionName, siteName: shortName }),
+    [debouncedSearch, filters, catalogSort, regionName, shortName],
   );
   const pageTitle =
     catalogLanding.kind === 'district' || catalogLanding.kind === 'subway'

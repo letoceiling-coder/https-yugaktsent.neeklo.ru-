@@ -44,6 +44,17 @@ const RegionSelector = ({ regions, selectedRegionId, onSelect, className }: Prop
 
   if (!ordered.length) return null;
 
+  if (ordered.length === 1) {
+    return (
+      <div className={cn('flex flex-wrap items-center justify-center gap-2 min-w-0 max-w-full', className)}>
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-sm font-medium shadow-sm shrink-0">
+          <MapPin className="h-3.5 w-3.5 text-primary shrink-0" aria-hidden />
+          {regionLabel(ordered[0])}
+        </span>
+      </div>
+    );
+  }
+
   const handleSelect = (id: number) => {
     onSelect(id);
     setOpen(false);

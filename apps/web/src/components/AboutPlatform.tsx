@@ -16,6 +16,8 @@ import {
 import { useAboutPlatformSection } from '@/shared/hooks/useAboutPlatformSection';
 import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
 import { useSiteSettings, settingOptional } from '@/redesign/hooks/useSiteSettings';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
+import { withoutLegacyBrand } from '@/shared/lib/site-brand-text';
 
 type Props = {
   pageSlug?: string;
@@ -69,6 +71,7 @@ function CtaLink({
 
 const AboutPlatform = ({ pageSlug = '/', settings: settingsProp, preview = false }: Props) => {
   const cms = useAboutPlatformSection(preview ? '' : pageSlug);
+  const { shortName } = useSiteBrand();
   const { data: defaultRegionId } = useDefaultRegionId();
   const { data: siteMap } = useSiteSettings();
 
@@ -126,6 +129,11 @@ const AboutPlatform = ({ pageSlug = '/', settings: settingsProp, preview = false
   if (!preview && !settingsProp && cms === null) return null;
 
   const settings = settingsProp ?? cms?.settings ?? normalizeAboutPlatformSettings(null);
+  const brandText = (value: string) => withoutLegacyBrand(value, shortName);
+  const eyebrow = brandText(settings.eyebrow);
+  const title = brandText(settings.title);
+  const description = brandText(settings.description);
+  const imageAlt = brandText(settings.imageAlt);
   const stats = sortedEnabledStats(settings).map((s) => ({
     ...s,
     value: preview ? s.value : applyLiveStatValue(s, liveStats),
@@ -149,7 +157,7 @@ const AboutPlatform = ({ pageSlug = '/', settings: settingsProp, preview = false
                 ) : null}
                 <img
                   src={desktopSrc}
-                  alt={settings.imageAlt}
+                  alt={imageAlt}
                   className="h-full w-full object-cover"
                   loading="lazy"
                   decoding="async"
@@ -161,15 +169,15 @@ const AboutPlatform = ({ pageSlug = '/', settings: settingsProp, preview = false
           </div>
 
           <div className="flex flex-col gap-3 sm:gap-4 min-w-0 justify-center">
-            {settings.eyebrow ? (
-              <p className="text-xs font-medium tracking-wide text-primary/80">{settings.eyebrow}</p>
+            {eyebrow ? (
+              <p className="text-xs font-medium tracking-wide text-primary/80">{eyebrow}</p>
             ) : null}
             <h2 id="about-platform-title" className="text-xl sm:text-2xl font-bold leading-tight text-foreground">
-              {settings.title}
+              {title}
             </h2>
-            {settings.description ? (
-              <p className="text-sm text-muted-foreground leading-relaxed max-w-xl line-clamp-3">
-                {settings.description}
+            {description ? (
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-xl line-clamp-6">
+                {description}
               </p>
             ) : null}
             <div className="flex flex-wrap items-center gap-2.5 pt-1">

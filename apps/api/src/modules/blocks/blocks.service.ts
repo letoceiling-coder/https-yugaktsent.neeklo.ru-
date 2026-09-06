@@ -19,6 +19,25 @@ import {
   CHESSBOARD_LISTING_KIND,
   CHESSBOARD_LISTING_STATUSES,
 } from './blocks-chessboard.util';
+import type { ChessboardBlockResponse } from '@lg/shared';
+
+type BlockPublicDetailPayload = Prisma.BlockGetPayload<{
+  include: {
+    region: true;
+    district: true;
+    builder: true;
+    addresses: true;
+    images: true;
+    subways: { include: { subway: true } };
+    buildings: { include: { buildingType: true; addresses: true } };
+  };
+}>;
+
+type PublicBlockDetail = BlockPublicDetailPayload & {
+  _count: { listings: number };
+  listingPriceMin: number | null;
+  listingPriceMax: number | null;
+};
 
 function intersectBlockIdFilter(current: Prisma.BlockWhereInput['id'], ids: number[]): number[] {
   if (!current || typeof current !== 'object' || !('in' in current)) {
@@ -921,7 +940,11 @@ export class BlocksService {
   }
 
   async invalidateCatalogCache() {
-    await this.cache.delByPrefix('api:catalog:');
+    await Promise.all([
+      this.cache.delByPrefix('api:catalog:'),
+      this.cache.delByPrefix('api:block:detail:'),
+      this.cache.delByPrefix('api:block:chessboard:'),
+    ]);
   }
 
   private makeCacheKey(prefix: string, query: QueryBlocksDto): string {
@@ -931,7 +954,7 @@ export class BlocksService {
     return `${prefix}${JSON.stringify(entries)}`;
   }
 
-  private readonly blockDetailInclude = {
+  private readonly blockPublicDetailInclude = {
     region: true,
     district: true,
     builder: true,
@@ -945,44 +968,98 @@ export class BlocksService {
       include: { buildingType: true, addresses: true },
       orderBy: { name: 'asc' as const },
     },
-    _count: {
-      select: {
-        listings: {
-          // «В продаже» = ACTIVE + RESERVED. SOLD исключаем, isPublished обязателен.
-          where: {
-            status: { in: [ListingStatus.ACTIVE, ListingStatus.RESERVED] },
-            kind: { in: PUBLIC_CATALOG_LISTING_KINDS },
-            isPublished: true,
-          },
-        },
-      },
-    },
   } satisfies Prisma.BlockInclude;
 
-  async findOne(id: number) {
-    const block = await this.prisma.block.findUnique({
-      where: { id },
-      include: this.blockDetailInclude,
+  private async listingActiveCountByBlockIds(
+    blockIds: number[],
+  ): Promise<Map<number, number>> {
+    const map = new Map<number, number>();
+    if (!blockIds.length) return map;
+    if (await this.isCatalogMvAvailable()) {
+      try {
+        const rows = await this.prisma.$queryRaw<Array<{ block_id: number; cnt: bigint }>>`
+          SELECT mv.block_id, COUNT(*)::bigint AS cnt
+          FROM catalog_apartment_active_mv mv
+          WHERE mv.block_id IN (${Prisma.join(blockIds)})
+          GROUP BY mv.block_id
+        `;
+        for (const row of rows) {
+          map.set(Number(row.block_id), Number(row.cnt));
+        }
+        if (map.size > 0) return map;
+      } catch (e: unknown) {
+        this.logger.warn(
+          `MV listing count fallback: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      }
+    }
+    const rows = await this.prisma.listing.groupBy({
+      by: ['blockId'],
+      where: {
+        blockId: { in: blockIds },
+        status: { in: [ListingStatus.ACTIVE, ListingStatus.RESERVED] },
+        kind: { in: PUBLIC_CATALOG_LISTING_KINDS },
+        isPublished: true,
+      },
+      _count: { _all: true },
     });
-    if (!block) throw new NotFoundException('Block not found');
-    const prices = await this.listingPriceBoundsByBlockIds([id]);
-    const p = prices.get(id);
-    return { ...block, listingPriceMin: p?.min ?? null, listingPriceMax: p?.max ?? null };
+    for (const row of rows) {
+      if (row.blockId == null) continue;
+      map.set(row.blockId, row._count._all);
+    }
+    return map;
   }
 
-  async findBySlug(slug: string) {
+  private async enrichPublicBlockDetail(block: BlockPublicDetailPayload): Promise<PublicBlockDetail> {
+    const [prices, counts] = await Promise.all([
+      this.listingPriceBoundsByBlockIds([block.id]),
+      this.listingActiveCountByBlockIds([block.id]),
+    ]);
+    const p = prices.get(block.id);
+    return {
+      ...block,
+      _count: { listings: counts.get(block.id) ?? 0 },
+      listingPriceMin: p?.min ?? null,
+      listingPriceMax: p?.max ?? null,
+    };
+  }
+
+  async findOne(id: number): Promise<PublicBlockDetail> {
+    const cacheKey = `api:block:detail:id:${id}`;
+    const cached = await this.cache.getJson<PublicBlockDetail>(cacheKey);
+    if (cached) return cached;
+
     const block = await this.prisma.block.findUnique({
-      where: { slug },
-      include: this.blockDetailInclude,
+      where: { id },
+      include: this.blockPublicDetailInclude,
     });
     if (!block) throw new NotFoundException('Block not found');
-    const prices = await this.listingPriceBoundsByBlockIds([block.id]);
-    const p = prices.get(block.id);
-    return { ...block, listingPriceMin: p?.min ?? null, listingPriceMax: p?.max ?? null };
+    const result = await this.enrichPublicBlockDetail(block);
+    await this.cache.setJson(cacheKey, result, 90);
+    return result;
+  }
+
+  async findBySlug(slug: string): Promise<PublicBlockDetail> {
+    const cacheKey = `api:block:detail:slug:${slug}`;
+    const cached = await this.cache.getJson<PublicBlockDetail>(cacheKey);
+    if (cached) return cached;
+
+    const block = await this.prisma.block.findUnique({
+      where: { slug },
+      include: this.blockPublicDetailInclude,
+    });
+    if (!block) throw new NotFoundException('Block not found');
+    const result = await this.enrichPublicBlockDetail(block);
+    await this.cache.setJson(cacheKey, result, 90);
+    return result;
   }
 
   /** Precomputed chessboard matrix per building (grid[][] source of truth for frontend). */
-  async getChessboard(idOrSlug: string) {
+  async getChessboard(idOrSlug: string): Promise<ChessboardBlockResponse> {
+    const cacheKey = `api:block:chessboard:${idOrSlug}`;
+    const cached = await this.cache.getJson<ChessboardBlockResponse>(cacheKey);
+    if (cached) return cached;
+
     const block = /^\d+$/.test(idOrSlug)
       ? await this.prisma.block.findUnique({
           where: { id: Number.parseInt(idOrSlug, 10) },
@@ -1002,15 +1079,29 @@ export class BlocksService {
         isPublished: true,
         status: { in: CHESSBOARD_LISTING_STATUSES },
       },
-      include: {
+      select: {
+        id: true,
+        buildingId: true,
+        price: true,
+        status: true,
         apartment: {
-          include: { roomType: true, finishing: true },
+          select: {
+            floor: true,
+            number: true,
+            areaTotal: true,
+            areaKitchen: true,
+            planUrl: true,
+            roomType: { select: { name: true, nameOne: true } },
+            finishing: { select: { name: true } },
+          },
         },
       },
       orderBy: [{ apartment: { floor: 'desc' } }, { id: 'asc' }],
     });
 
-    return buildBlockChessboardResponse(block, listings);
+    const result = buildBlockChessboardResponse(block, listings);
+    await this.cache.setJson(cacheKey, result, 120);
+    return result;
   }
 
   private parseBlockStatus(raw?: string): BlockStatus {

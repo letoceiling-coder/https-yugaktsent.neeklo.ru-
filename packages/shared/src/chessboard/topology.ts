@@ -74,7 +74,8 @@ function makeUnionFind(ids: string[]): UnionFind {
 function groupByFloor(apartments: ChessboardApartmentInput[]): Map<number, ChessboardApartmentInput[]> {
   const byFloor = new Map<number, ChessboardApartmentInput[]>();
   for (const apt of apartments) {
-    const floor = apt.floor || 1;
+    const floor = apt.floor;
+    if (floor == null || floor <= 0 || floor > 200) continue;
     const list = byFloor.get(floor) ?? [];
     list.push(apt);
     byFloor.set(floor, list);
@@ -97,12 +98,42 @@ function referenceFloor(byFloor: Map<number, ChessboardApartmentInput[]>): numbe
   return bestFloor;
 }
 
+function greedyLinkAdjacentFloors(
+  lower: ChessboardApartmentInput[],
+  upper: ChessboardApartmentInput[],
+  uf: UnionFind,
+): void {
+  const usedUpper = new Set<number>();
+  for (const la of lower) {
+    let bestIdx = -1;
+    let bestScore = VERTICAL_LINK_MAX_SCORE + 1;
+    for (let j = 0; j < upper.length; j += 1) {
+      if (usedUpper.has(j)) continue;
+      const s = verticalMatchScore(la, upper[j]!);
+      if (s <= bestScore) {
+        bestScore = s;
+        bestIdx = j;
+      }
+    }
+    if (bestIdx >= 0 && bestScore <= VERTICAL_LINK_MAX_SCORE) {
+      usedUpper.add(bestIdx);
+      uf.union(la.id, upper[bestIdx]!.id);
+    }
+  }
+}
+
 function linkAdjacentFloors(
   lower: ChessboardApartmentInput[],
   upper: ChessboardApartmentInput[],
   uf: UnionFind,
 ): void {
   if (!lower.length || !upper.length) return;
+
+  const n = Math.max(lower.length, upper.length);
+  if (n > 60 || lower.length * upper.length > 3600) {
+    greedyLinkAdjacentFloors(lower, upper, uf);
+    return;
+  }
 
   const cost = lower.map((la) =>
     upper.map((ub) => {

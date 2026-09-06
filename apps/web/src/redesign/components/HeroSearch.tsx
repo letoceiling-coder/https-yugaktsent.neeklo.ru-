@@ -16,6 +16,7 @@ import {
 import type { CatalogFilters, ObjectType } from '@/redesign/data/types';
 import { defaultFilters } from '@/redesign/data/types';
 import RegionSelector from '@/redesign/components/RegionSelector';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import {
   getCatalogFilterVisibility,
   heroDeadlineFromFilters,
@@ -49,6 +50,7 @@ function useDebouncedCatalogFilters(filters: CatalogFilters, ms: number): Catalo
 }
 
 const HeroSearch = () => {
+  const { shortName } = useSiteBrand();
   const [filters, setFilters] = useState<CatalogFilters>(() => ({ ...defaultFilters }));
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -198,7 +200,7 @@ const HeroSearch = () => {
             className="w-full"
           />
           <h1 className="text-2xl sm:text-3xl md:text-[2.5rem] font-bold leading-tight text-center tracking-tight">
-            <span className="text-primary">Live Grid.</span>{' '}
+            <span className="text-primary">{shortName}.</span>{' '}
             <span className="text-foreground">{heroSubtitle}</span>
           </h1>
         </div>

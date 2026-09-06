@@ -10,6 +10,8 @@ import { useAuth } from '@/shared/hooks/useAuth';
 import { useFavorites } from '@/shared/hooks/useFavorites';
 import UserNotificationBell from '@/account/components/UserNotificationBell';
 import { useSiteSettings, settingOptional } from '@/redesign/hooks/useSiteSettings';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
+import { isBelgorodRegion } from '@/redesign/lib/region-picker-utils';
 import { telHref } from '@/lib/contact-links';
 import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
 import CatalogSearchHintsDropdown from '@/redesign/components/CatalogSearchHintsDropdown';
@@ -31,7 +33,9 @@ const navLinkClass =
 
 const RedesignHeader = () => {
   const { data: siteSettings } = useSiteSettings();
-  const { data: regionId } = useDefaultRegionId();
+  const { shortName, logoUrl } = useSiteBrand();
+  const { data: regionId, rows: regionRows } = useDefaultRegionId();
+  const belgorodRegion = regionRows?.find(isBelgorodRegion);
   const phoneMain = settingOptional(siteSettings, 'phone_main');
   const phoneHref = phoneMain ? telHref(phoneMain) : undefined;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -88,11 +92,12 @@ const RedesignHeader = () => {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#e5e7eb] shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 h-16 flex items-center gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 shrink-0 lg:min-w-[140px]">
-            <div className="w-9 h-9 flex items-center justify-center">
-              <img src="/logo.svg" alt="Live Grid" className="w-full h-full object-contain" />
-            </div>
-            <span className="hidden sm:block font-semibold text-sm tracking-tight">Live Grid</span>
+          <Link to="/" className="flex items-center gap-2 shrink-0 lg:min-w-[140px]">
+            <img
+              src={logoUrl}
+              alt={shortName}
+              className="h-10 sm:h-11 w-auto max-w-[min(220px,46vw)] object-contain object-left"
+            />
           </Link>
 
           {/* Desktop nav — centered */}
@@ -148,9 +153,11 @@ const RedesignHeader = () => {
             <Link to="/catalog?type=apartments&market=new" className={navLinkClass}>
               Новостройки
             </Link>
-            <Link to="/catalog?city=belgorod" className={navLinkClass}>
-              Белгород
-            </Link>
+            {belgorodRegion ? (
+              <Link to={`/catalog?region_id=${belgorodRegion.id}`} className={navLinkClass}>
+                {belgorodRegion.name ?? 'Белгород'}
+              </Link>
+            ) : null}
             <Link to="/agents" className={navLinkClass}>
               Агенты
             </Link>
@@ -369,7 +376,15 @@ const RedesignHeader = () => {
             ))}
             <div className="h-px bg-border my-2" />
             <Link to="/catalog?type=apartments&market=new" onClick={() => setMenuOpen(false)} className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-[#f3f4f6] min-h-[52px] flex items-center">Новостройки</Link>
-            <Link to="/catalog?city=belgorod" onClick={() => setMenuOpen(false)} className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-[#f3f4f6] min-h-[52px] flex items-center">Белгород</Link>
+            {belgorodRegion ? (
+              <Link
+                to={`/catalog?region_id=${belgorodRegion.id}`}
+                onClick={() => setMenuOpen(false)}
+                className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-[#f3f4f6] min-h-[52px] flex items-center"
+              >
+                {belgorodRegion.name ?? 'Белгород'}
+              </Link>
+            ) : null}
             <Link to="/agents" onClick={() => setMenuOpen(false)} className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-[#f3f4f6] min-h-[52px] flex items-center">Агенты</Link>
             <Link to="/contacts" onClick={() => setMenuOpen(false)} className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-[#f3f4f6] min-h-[52px] flex items-center">Контакты</Link>
           </nav>

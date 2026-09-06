@@ -3,10 +3,12 @@ import FooterSection from '@/components/FooterSection';
 import LeadForm from '@/shared/components/LeadForm';
 import { Phone, Mail, MapPin, Navigation } from 'lucide-react';
 import { useSiteSettings, settingOptional } from '@/redesign/hooks/useSiteSettings';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import { telHref, yandexMapsHref } from '@/lib/contact-links';
 
 const Contacts = () => {
   const { data: s } = useSiteSettings();
+  const { shortName } = useSiteBrand();
   const phone = settingOptional(s, 'phone_main');
   const phoneTel = phone ? telHref(phone) : undefined;
   const email = settingOptional(s, 'email');
@@ -30,7 +32,7 @@ const Contacts = () => {
                 <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">
                   <MapPin className="h-7 w-7" />
                 </div>
-                <p className="max-w-md text-lg font-semibold">{address ?? 'Офис LiveGrid'}</p>
+                <p className="max-w-md text-lg font-semibold">{address ?? `Офис ${shortName}`}</p>
                 <p className="mt-2 max-w-md text-sm text-muted-foreground">
                   Откройте маршрут в Яндекс Картах или свяжитесь с нами через форму справа.
                 </p>

@@ -33,8 +33,9 @@ function countActiveFilters(f: CatalogFilters): number {
 export function buildCatalogSeoMeta(
   search: string,
   filters: CatalogFilters,
-  opts?: { page?: number; sort?: string | null; regionName?: string | null },
+  opts?: { page?: number; sort?: string | null; regionName?: string | null; siteName?: string | null },
 ): CatalogSeoMeta {
+  const siteName = opts?.siteName?.trim() || 'Агентство недвижимости';
   const landing = detectCatalogLanding(filters, opts);
   const regionPrefix = opts?.regionName?.trim() ? `${opts.regionName.trim()} — ` : '';
   const parts: string[] = [];
@@ -99,13 +100,13 @@ export function buildCatalogSeoMeta(
   const regionHint = opts?.regionName?.trim() ? ` в ${opts.regionName.trim()}` : '';
   let description: string;
   if (landing.kind === 'district' && landing.district) {
-    description = `Квартиры и новостройки в районе ${landing.district}${regionHint}. Фильтры, карта, актуальные объекты из фида застройщиков на LiveGrid.`;
+    description = `Квартиры и новостройки в районе ${landing.district}${regionHint}. Фильтры, карта, актуальные объекты на ${siteName}.`;
   } else if (landing.kind === 'subway' && landing.subway) {
-    description = `Недвижимость у метро ${landing.subway}${regionHint}: ЖК и квартиры с фильтрами и картой на LiveGrid.`;
+    description = `Недвижимость у метро ${landing.subway}${regionHint}: ЖК и квартиры с фильтрами и картой на ${siteName}.`;
   } else {
     description =
       activeCount > 0
-        ? `Подбор недвижимости${regionHint} на LiveGrid: ${parts.join(', ')}. Фильтры, карта, актуальные объекты из фида застройщиков.`
+        ? `Подбор недвижимости${regionHint} на ${siteName}: ${parts.join(', ')}. Фильтры, карта, актуальные объекты.`
         : `Подбор ЖК и квартир${regionHint} по цене, району, метро и другим параметрам. Карта, избранное, подборки.`;
   }
 

@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => {
     env.PUBLIC_SITE_URL ||
     "https://livegrid.ru"
   ).replace(/\/+$/, "");
+  const defaultRegionCode = env.VITE_DEFAULT_REGION_CODE || "";
 
   return {
     envDir: repoRoot,
@@ -20,6 +21,7 @@ export default defineConfig(({ mode }) => {
       /** Время сборки фронта — в подвале админки, чтобы отличить старый dist на сервере */
       __LG_BUILD_TIME__: JSON.stringify(new Date().toISOString()),
       "import.meta.env.VITE_PUBLIC_SITE_URL": JSON.stringify(publicSiteUrl),
+      "import.meta.env.VITE_DEFAULT_REGION_CODE": JSON.stringify(defaultRegionCode),
     },
     server: {
       host: "::",

@@ -43,6 +43,7 @@ import { useFavorites } from '@/shared/hooks/useFavorites';
 import { shareCurrentPage } from '@/lib/share-page';
 import { useCompare } from '@/shared/hooks/useCompare';
 import { useEntitySeoMeta } from '@/shared/hooks/useEntitySeoMeta';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import { toast } from '@/components/ui/sonner';
 
 type ApiListingDetailUniversal = {
@@ -305,6 +306,7 @@ const RedesignListingDetail = () => {
   const { isAuthenticated } = useAuth();
   const { isListingFavorite, toggleListing } = useFavorites();
   const { isCompared, toggle: toggleCompare, count: compareCount } = useCompare();
+  const { shortName } = useSiteBrand();
 
   const listingId = useMemo(() => {
     const n = Number.parseInt(idParam ?? '', 10);
@@ -358,7 +360,7 @@ const RedesignListingDetail = () => {
       data.kind === 'HOUSE' ? 'SingleFamilyResidence' : data.kind === 'LAND' ? 'Landform' : 'Product';
     return {
       title,
-      description: description || `${kindLabel} на LiveGrid`,
+      description: description || `${kindLabel} на ${shortName}`,
       pathname: path,
       imageUrl,
       jsonLd: {
@@ -372,7 +374,7 @@ const RedesignListingDetail = () => {
         ...(address ? { address: { '@type': 'PostalAddress', streetAddress: address } } : {}),
       },
     };
-  }, [data, listingId, photos]);
+  }, [data, listingId, photos, shortName]);
 
   useEntitySeoMeta(entitySeo);
 

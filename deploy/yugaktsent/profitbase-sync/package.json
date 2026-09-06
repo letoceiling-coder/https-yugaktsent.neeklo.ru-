@@ -1,0 +1,21 @@
+{
+  "name": "yugaktsent-profitbase-sync",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Profitbase XML → LiveGrid admin API (blocks + manual apartments)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js --watch-cron",
+    "sync": "node src/index.js --once"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "fast-xml-parser": "^4.5.0",
+    "node-cron": "^3.0.3",
+    "pg": "^8.13.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

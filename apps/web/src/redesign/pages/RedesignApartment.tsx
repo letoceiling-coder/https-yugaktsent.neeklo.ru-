@@ -38,6 +38,7 @@ import { toast } from '@/components/ui/sonner';
 import { useYandexMapsReady } from '@/shared/hooks/useYandexMapsReady';
 import { buildCatalogFilterUrl } from '@/redesign/lib/catalog-filter-links';
 import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import RelatedListingsCarousel from '@/discovery/components/RelatedListingsCarousel';
 import SessionDiscoverySection from '@/redesign/components/SessionDiscoverySection';
 import CompareSessionChip from '@/shared/components/CompareSessionChip';
@@ -77,6 +78,7 @@ const RedesignApartment = () => {
   const { isCompared, toggle: toggleCompare, count: compareCount } = useCompare();
   const { ready: ymapsReady } = useYandexMapsReady();
   const { data: defaultRegionId } = useDefaultRegionId();
+  const { shortName } = useSiteBrand();
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const mapInitializedRef = useRef(false);
@@ -151,7 +153,7 @@ const RedesignApartment = () => {
     const path = listingId != null ? `/apartment/${listingId}` : location.pathname;
     return {
       title: title || 'Квартира',
-      description: description || 'Карточка квартиры на LiveGrid',
+      description: description || `Карточка квартиры на ${shortName}`,
       pathname: path,
       imageUrl: mediaImages[0] ?? null,
       jsonLd: {
@@ -163,7 +165,7 @@ const RedesignApartment = () => {
         ...(apt.area ? { floorSize: { '@type': 'QuantitativeValue', value: apt.area, unitCode: 'MTK' } } : {}),
       },
     };
-  }, [apt, complex, listingId, location.pathname, mediaImages]);
+  }, [apt, complex, listingId, location.pathname, mediaImages, shortName]);
   useEntitySeoMeta(entitySeo);
 
   const similarApts = useMemo(() => {
