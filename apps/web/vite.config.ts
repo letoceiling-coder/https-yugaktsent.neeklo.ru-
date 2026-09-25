@@ -14,6 +14,8 @@ export default defineConfig(({ mode }) => {
     "https://livegrid.ru"
   ).replace(/\/+$/, "");
   const defaultRegionCode = env.VITE_DEFAULT_REGION_CODE || "";
+  /** Куда проксировать /api и /uploads в dev (по умолчанию локальный API) */
+  const apiProxyTarget = env.VITE_API_PROXY_TARGET || "http://127.0.0.1:3000";
 
   return {
     envDir: repoRoot,
@@ -31,11 +33,11 @@ export default defineConfig(({ mode }) => {
       },
       proxy: {
         "/api": {
-          target: "http://127.0.0.1:3000",
+          target: apiProxyTarget,
           changeOrigin: true,
         },
         "/uploads": {
-          target: "http://127.0.0.1:3000",
+          target: apiProxyTarget,
           changeOrigin: true,
         },
       },
