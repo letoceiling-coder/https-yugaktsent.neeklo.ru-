@@ -173,7 +173,7 @@ const PropertyGridSection = ({ title, type }: Props) => {
 
         {!loading && !empty && isHot && (
           <HorizontalSnapSlider
-            mobileItemClass="w-[calc(100vw-32px)]"
+            mobileItemClass="w-[calc(100vw-72px)]"
             desktopGridClass="sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 items-stretch"
             showArrows
             showDots

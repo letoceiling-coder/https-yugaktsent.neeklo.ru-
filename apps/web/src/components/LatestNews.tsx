@@ -116,7 +116,7 @@ const LatestNews = () => {
 
         {!isLoading && items.length > 0 && (
           <HorizontalSnapSlider
-            mobileItemClass="w-[calc(100vw-32px)]"
+            mobileItemClass="w-[calc(100vw-72px)]"
             desktopGridClass="sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-stretch"
             showDots
             showArrows={false}

@@ -72,7 +72,7 @@ export default function CatalogFilterPresets({
                 )
               }
               className={cn(
-                'shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors min-h-[32px] touch-manipulation',
+                'shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors min-h-[44px] sm:min-h-[32px] touch-manipulation',
                 active
                   ? 'border-primary bg-primary/10 text-primary'
                   : 'border-border bg-background hover:bg-muted/60',
@@ -86,7 +86,7 @@ export default function CatalogFilterPresets({
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
-            className="shrink-0 rounded-full border border-dashed border-border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors min-h-[32px]"
+            className="shrink-0 rounded-full border border-dashed border-border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors min-h-[44px] sm:min-h-[32px]"
           >
             {expanded ? 'Свернуть' : `Ещё${hiddenCount > 0 ? ` (${hiddenCount})` : ''}`}
           </button>

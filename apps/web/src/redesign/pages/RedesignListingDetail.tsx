@@ -399,7 +399,7 @@ const RedesignListingDetail = () => {
 
   if (isPending) {
     return (
-      <div className="min-h-screen bg-background pb-16 lg:pb-0">
+      <div className="min-h-screen bg-background pb-32 lg:pb-0">
         <RedesignHeader />
         <div className="max-w-[1400px] mx-auto px-4 py-6 animate-pulse space-y-4">
           <div className="h-4 w-48 bg-muted rounded" />
@@ -489,7 +489,7 @@ const RedesignListingDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-16 lg:pb-0">
+    <div className="min-h-screen bg-background pb-32 lg:pb-0">
       <RedesignHeader />
 
       <div className="max-w-[1400px] mx-auto px-4 py-6">
@@ -875,7 +875,7 @@ const RedesignListingDetail = () => {
 
       <CompareSessionChip />
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-sm p-3 lg:hidden safe-area-pb">
+      <div className="fixed inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom,0px))] z-40 border-t border-border bg-background/95 backdrop-blur-sm p-3 lg:hidden">
         <ConversionCTABar
           context={baseConsultContext}
           onConsultation={openConsultation}

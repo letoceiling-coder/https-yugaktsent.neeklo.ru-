@@ -14,7 +14,7 @@ type Props = {
 
 const HorizontalSnapSlider = ({
   children,
-  mobileItemClass = 'w-[calc(100vw-32px)]',
+  mobileItemClass = 'w-[calc(100vw-72px)]',
   desktopGridClass,
   showDots = true,
   showArrows = true,

@@ -590,11 +590,11 @@ const RedesignCatalog = () => {
                 geo_preset: geoPreset ?? undefined,
               }}
             />
-            <Button variant="outline" size="sm" className="lg:hidden h-9" onClick={() => setShowMobileFilters(true)}>
+            <Button variant="outline" size="sm" className="lg:hidden h-11 sm:h-9" onClick={() => setShowMobileFilters(true)}>
               <SlidersHorizontal className="w-4 h-4 mr-1.5" /> Фильтры
             </Button>
             <Select value={catalogSort} onValueChange={handleSortChange}>
-              <SelectTrigger className="h-9 w-[min(200px,42vw)] sm:w-[220px] text-xs bg-background">
+              <SelectTrigger className="h-11 sm:h-9 w-[min(200px,42vw)] sm:w-[220px] text-xs bg-background">
                 <SelectValue placeholder="Сортировка" />
               </SelectTrigger>
               <SelectContent>
@@ -661,7 +661,7 @@ const RedesignCatalog = () => {
                 aria-selected={filters.marketType === tab.value}
                 onClick={() => handleFiltersChange({ ...filters, marketType: tab.value })}
                 className={cn(
-                  'h-9 rounded-full px-4 text-sm font-medium transition-colors',
+                  'h-11 sm:h-9 rounded-full px-4 text-sm font-medium transition-colors',
                   filters.marketType === tab.value
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-secondary text-foreground hover:bg-secondary/70',

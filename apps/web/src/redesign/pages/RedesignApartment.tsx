@@ -385,7 +385,7 @@ const RedesignApartment = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24 lg:pb-8">
+    <div className="min-h-screen bg-background pb-32 lg:pb-8">
       <RedesignHeader />
 
       <div className="max-w-[1400px] mx-auto px-4 py-4 sm:py-6">
@@ -715,7 +715,7 @@ const RedesignApartment = () => {
         </div>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-sm p-3 lg:hidden safe-area-pb min-h-14">
+      <div className="fixed inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom,0px))] z-40 border-t border-border bg-background/95 backdrop-blur-sm p-3 lg:hidden min-h-14">
         <ConversionCTABar
           layout="stack"
           context={baseConsultContext}

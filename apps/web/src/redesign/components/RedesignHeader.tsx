@@ -15,6 +15,7 @@ import { isBelgorodRegion } from '@/redesign/lib/region-picker-utils';
 import { telHref } from '@/lib/contact-links';
 import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
 import CatalogSearchHintsDropdown from '@/redesign/components/CatalogSearchHintsDropdown';
+import MobileTabBar from '@/redesign/components/MobileTabBar';
 import type { CatalogHints } from '@/redesign/lib/catalog-hints-types';
 import { btnClass } from '@/redesign/lib/button-styles';
 
@@ -421,36 +422,11 @@ const RedesignHeader = () => {
         </>
       )}
 
-      {/* Mobile bottom nav */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border pb-[env(safe-area-inset-bottom,0px)]">
-        <div className="grid grid-cols-4 h-14 min-h-[56px]">
-          <Link to="/" className={cn('flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium', location.pathname === '/' ? 'text-primary' : 'text-[#6b7280]')}>
-            <Home className="w-6 h-6" />
-            <span>Главная</span>
-          </Link>
-          <Link to="/catalog" className={cn('flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium', location.pathname.startsWith('/catalog') ? 'text-primary' : 'text-[#6b7280]')}>
-            <LayoutGrid className="w-6 h-6" />
-            <span>Каталог</span>
-          </Link>
-          <Link to="/map" className={cn('flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium', location.pathname === '/map' ? 'text-primary' : 'text-[#6b7280]')}>
-            <MapPin className="w-6 h-6" />
-            <span>Карта</span>
-          </Link>
-          <button
-            type="button"
-            onClick={handleHeartClick}
-            className={cn('relative flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium text-[#6b7280]')}
-          >
-            <Heart className="w-6 h-6" />
-            {favoritesCount > 0 ? (
-              <span className="absolute top-1 right-2 min-w-[14px] h-3.5 px-0.5 rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground flex items-center justify-center leading-none">
-                {favoritesCount > 9 ? '9+' : favoritesCount}
-              </span>
-            ) : null}
-            <span>Избранное</span>
-          </button>
-        </div>
-      </div>
+      <MobileTabBar
+        onSearch={() => setSearchOpen(true)}
+        onMore={() => setMenuOpen(true)}
+        onFavorites={handleHeartClick}
+      />
 
       {/* Login Modal */}
       {loginModalOpen && (

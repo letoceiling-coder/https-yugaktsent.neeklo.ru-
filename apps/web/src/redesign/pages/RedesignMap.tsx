@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import RedesignHeader from '@/redesign/components/RedesignHeader';
@@ -121,6 +121,9 @@ const RedesignMap = () => {
   const [activeBlock, setActiveBlock] = useState<string | null>(null);
   const [activeListing, setActiveListing] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  /** Мобильная шторка со списком: свёрнута — видно край, развёрнута — почти весь экран */
+  const [sheetExpanded, setSheetExpanded] = useState(false);
+  const sheetTouchY = useRef<number | null>(null);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
 
   const geoPreset = searchParams.get('geo_preset') ?? undefined;
@@ -515,7 +518,7 @@ const RedesignMap = () => {
           />
         </aside>
 
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
+        <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
           {/* Map */}
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-3 sm:p-4 lg:min-w-0">
             <div className="mb-2 flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between lg:mb-3">
@@ -593,10 +596,36 @@ const RedesignMap = () => {
           {/* Right sidebar list */}
           <aside
             className={cn(
-              'flex min-h-0 shrink-0 flex-col overflow-hidden border-t border-border bg-muted/20',
-              'max-h-[40vh] lg:max-h-none lg:w-[360px] lg:border-l lg:border-t-0',
+              'flex min-h-0 shrink-0 flex-col overflow-hidden border-t border-border bg-background',
+              // мобильный вид: шторка поверх полноэкранной карты
+              'absolute inset-x-0 bottom-0 z-20 rounded-t-2xl shadow-[0_-8px_24px_rgba(15,23,42,0.12)]',
+              'transition-[height] duration-200',
+              sheetExpanded ? 'h-[82%]' : 'h-[38%]',
+              // десктоп: обычная колонка справа
+              'lg:static lg:z-auto lg:h-auto lg:max-h-none lg:w-[360px] lg:rounded-none lg:border-l lg:border-t-0 lg:bg-muted/20 lg:shadow-none',
             )}
           >
+            <button
+              type="button"
+              aria-label={sheetExpanded ? 'Свернуть список' : 'Развернуть список'}
+              aria-expanded={sheetExpanded}
+              onClick={() => setSheetExpanded((v) => !v)}
+              onTouchStart={(e) => {
+                sheetTouchY.current = e.touches[0]?.clientY ?? null;
+              }}
+              onTouchEnd={(e) => {
+                const start = sheetTouchY.current;
+                const end = e.changedTouches[0]?.clientY ?? null;
+                sheetTouchY.current = null;
+                if (start == null || end == null) return;
+                const dy = start - end;
+                if (Math.abs(dy) < 30) return;
+                setSheetExpanded(dy > 0);
+              }}
+              className="flex h-7 w-full shrink-0 items-center justify-center lg:hidden"
+            >
+              <span className="h-1.5 w-10 rounded-full bg-border" />
+            </button>
             <div className="px-3 py-2 border-b border-border bg-background/80 backdrop-blur-sm shrink-0">
               <p className="text-xs font-semibold text-foreground">
                 {useBlocksMap ? 'Список ЖК' : 'Список объектов'}

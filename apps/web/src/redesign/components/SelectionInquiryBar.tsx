@@ -36,7 +36,7 @@ export default function SelectionInquiryBar({ source, contextFooter, sticky, cla
     <>
       {sticky ? (
         <div
-          className={`fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-sm p-3 lg:hidden safe-area-pb ${className}`}
+          className={`fixed inset-x-0 bottom-[calc(56px+env(safe-area-inset-bottom,0px))] z-40 border-t border-border bg-background/95 backdrop-blur-sm p-3 lg:hidden ${className}`}
         >
           {bar}
         </div>
