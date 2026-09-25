@@ -30,11 +30,12 @@ export const cardVisual = {
   metaMuted: 'text-[10px] text-muted-foreground/75 leading-snug truncate',
 
   /** Map sidebar compact */
-  sidebarRow: 'flex gap-2 p-1.5 rounded-lg border transition-colors min-w-0',
-  sidebarThumb: 'w-12 shrink-0 rounded-md',
-  sidebarPrice: 'text-xs font-bold tabular-nums leading-none',
-  sidebarTitle: 'text-[11px] font-semibold leading-snug line-clamp-2 text-foreground',
-  sidebarMeta: 'text-[10px] text-muted-foreground/85 truncate leading-snug',
+  sidebarRow: 'flex gap-2.5 p-2 rounded-xl border transition-colors min-w-0',
+  sidebarThumb: 'w-[120px] shrink-0 overflow-hidden rounded-lg',
+  /** Цена в одну строку нормальным кеглем — на карте она главная */
+  sidebarPrice: 'text-[17px] font-bold tabular-nums leading-tight whitespace-nowrap',
+  sidebarTitle: 'text-xs font-semibold leading-snug line-clamp-1 text-foreground',
+  sidebarMeta: 'text-[11px] text-muted-foreground/85 truncate leading-snug',
 
   /** Card shell */
   cardShell: 'rounded-xl border border-border bg-card overflow-hidden transition-shadow hover:shadow-sm',

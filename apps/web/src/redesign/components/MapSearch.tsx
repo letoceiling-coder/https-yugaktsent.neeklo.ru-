@@ -10,6 +10,7 @@ import { panMapToCoords, useMapClusterLayer } from '@/redesign/hooks/useMapClust
 import { MapPin, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import StableMediaFrame from '@/redesign/components/StableMediaFrame';
+import MapUnavailableNotice from '@/redesign/components/MapUnavailableNotice';
 import MapDevOverlay from '@/redesign/components/MapDevOverlay';
 import MapPopupActions from '@/redesign/components/MapPopupActions';
 import ConsultationFlow from '@/redesign/components/ConsultationFlow';
@@ -53,7 +54,7 @@ function getAptCount(c: ResidentialComplex) {
 const MapSearch = ({ complexes, activeSlug, onSelect, height = '70vh', compact, regionCenter, regionId, filterSearchParams }: Props) => {
   const fillParent = Boolean(compact) || height === '100%';
   const mapRef = useRef<HTMLDivElement>(null);
-  const { ready } = useYandexMapsReady();
+  const { ready, failure } = useYandexMapsReady();
   const [consultOpen, setConsultOpen] = useState(false);
   const [consultContext, setConsultContext] = useState<ConsultationContext | null>(null);
 
@@ -69,6 +70,12 @@ const MapSearch = ({ complexes, activeSlug, onSelect, height = '70vh', compact, 
 
   const buildDescriptors = useCallback(
     (mode: MarkerZoomMode) => buildComplexMarkerDescriptors(effectiveComplexes, mode),
+    [effectiveComplexes],
+  );
+
+  /** Сколько ЖК реально можно поставить на карту */
+  const plottableCount = useMemo(
+    () => effectiveComplexes.filter((c) => c.hasCoords !== false).length,
     [effectiveComplexes],
   );
 
@@ -172,7 +179,16 @@ const MapSearch = ({ complexes, activeSlug, onSelect, height = '70vh', compact, 
           fillParent ? 'min-h-0 overflow-hidden' : 'min-h-[300px] overflow-hidden',
         )}
       />
-      {!ready ? (
+      {!ready && failure ? <MapUnavailableNotice failure={failure} /> : null}
+      {ready && complexes.length > 0 && plottableCount === 0 ? (
+        <div
+          className="pointer-events-none absolute inset-x-4 top-4 z-[6] rounded-xl border border-amber-200 bg-amber-50/95 px-3 py-2 text-xs text-amber-900 shadow-sm"
+          role="status"
+        >
+          У найденных ЖК не заполнены координаты — на карте их пока нет. Список справа работает.
+        </div>
+      ) : null}
+      {!ready && !failure ? (
         <div
           className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-muted/80 backdrop-blur-[1px] z-[5]"
           role="status"

@@ -1,5 +1,5 @@
 /** Fixed row geometry for map sidebar virtual list — tuned to sidebarRow + w-12 thumb layout */
-export const MAP_SIDEBAR_ROW_HEIGHT = 72;
+export const MAP_SIDEBAR_ROW_HEIGHT = 104;
 export const MAP_SIDEBAR_ROW_GAP = 4;
 /** Extra rows rendered above/below viewport */
 export const MAP_SIDEBAR_OVERSCAN = 8;

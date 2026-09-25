@@ -52,6 +52,27 @@ function rowFocusProps(index: number, count: number) {
   };
 }
 
+const KIND_LABEL: Record<string, string> = {
+  APARTMENT: 'Квартира',
+  HOUSE: 'Дом',
+  LAND: 'Участок',
+  COMMERCIAL: 'Коммерция',
+};
+
+/** «1-к.кв · 42 м²» — то, по чему объект узнают в списке. */
+function listingHeadline(l: ListingMapItem): string {
+  const rooms =
+    l.rooms == null
+      ? (KIND_LABEL[l.kind] ?? 'Объект')
+      : l.rooms === 0
+        ? 'Студия'
+        : `${l.rooms}-к.кв`;
+  const area = l.area && l.area > 0 ? `${l.area} м²` : null;
+  const parts = [rooms, area].filter(Boolean);
+  if (parts.length > 0) return parts.join(' · ');
+  return l.title ?? l.address ?? `Объект #${l.id}`;
+}
+
 const MapSidebarBlockRow = memo(function MapSidebarBlockRow({
   complex: c,
   isActive,
@@ -60,6 +81,10 @@ const MapSidebarBlockRow = memo(function MapSidebarBlockRow({
   rowCount,
 }: BlockRowProps) {
   const price = formatPriceFrom(c.priceFrom);
+  const blockMeta = metaDotLine([
+    c.district && c.district !== '—' ? c.district : null,
+    c.deadline && c.deadline !== '—' ? c.deadline : null,
+  ]);
   const focusProps = rowFocusProps(rowIndex, rowCount);
 
   return (
@@ -78,12 +103,14 @@ const MapSidebarBlockRow = memo(function MapSidebarBlockRow({
       >
         <StableMediaFrame
           src={c.images[0]}
+          altContext={c.name}
           aspect="4/3"
           className={cardVisual.sidebarThumb}
-          fallback="placeholder"
+          fallback="branded"
           loading="lazy"
         />
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 overflow-hidden">
+        <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 overflow-hidden">
+          <p className={cardVisual.sidebarTitle} data-sidebar-title>{c.name}</p>
           <p
             className={cn(
               cardVisual.sidebarPrice,
@@ -93,10 +120,7 @@ const MapSidebarBlockRow = memo(function MapSidebarBlockRow({
           >
             {price}
           </p>
-          <p className={cardVisual.sidebarTitle} data-sidebar-title>{c.name}</p>
-          {c.district && c.district !== '—' ? (
-            <p className={cardVisual.sidebarMeta}>{c.district}</p>
-          ) : null}
+          {blockMeta ? <p className={cardVisual.sidebarMeta}>{blockMeta}</p> : null}
         </div>
       </button>
       <Link
@@ -119,7 +143,12 @@ const MapSidebarListingRow = memo(function MapSidebarListingRow({
   rowCount,
 }: ListingRowProps) {
   const listingPrice = formatDisplayPrice(l.price);
-  const listingMeta = metaDotLine([l.address && l.title ? l.address : null]);
+  const headline = listingHeadline(l);
+  const listingMeta = metaDotLine([
+    l.complexName ?? null,
+    l.deadline && l.deadline !== '—' ? l.deadline : null,
+    !l.complexName && l.address ? l.address : null,
+  ]);
   const focusProps = rowFocusProps(rowIndex, rowCount);
 
   return (
@@ -138,12 +167,16 @@ const MapSidebarListingRow = memo(function MapSidebarListingRow({
       >
         <StableMediaFrame
           src={l.photoUrl}
+          altContext={headline}
           aspect="4/3"
           className={cardVisual.sidebarThumb}
-          fallback="logo"
+          fallback="branded"
           loading="lazy"
         />
-        <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 overflow-hidden">
+        <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 overflow-hidden">
+          <p className={cardVisual.sidebarTitle} data-sidebar-title>
+            {headline}
+          </p>
           <p
             className={cn(
               cardVisual.sidebarPrice,
@@ -152,9 +185,6 @@ const MapSidebarListingRow = memo(function MapSidebarListingRow({
             aria-label={priceAriaLabel(listingPrice)}
           >
             {listingPrice}
-          </p>
-          <p className={cardVisual.sidebarTitle} data-sidebar-title>
-            {l.title ?? l.address ?? `Объект #${l.id}`}
           </p>
           {listingMeta ? <p className={cardVisual.sidebarMeta}>{listingMeta}</p> : null}
         </div>

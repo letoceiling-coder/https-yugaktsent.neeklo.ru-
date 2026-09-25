@@ -89,6 +89,21 @@ function regionCenterFromRow(region?: RegionRow): [number, number] | null {
   return Number.isFinite(lat) && Number.isFinite(lng) ? [lat, lng] : null;
 }
 
+function num(v: unknown): number {
+  const n = typeof v === 'string' ? Number(v) : typeof v === 'number' ? v : NaN;
+  return Number.isFinite(n) ? n : 0;
+}
+
+/** Комнатность из типа комнат донора; студия (0) сохраняется как 0, неизвестное — null. */
+function roomsFromListing(l: any): number | null {
+  const name = (l.apartment?.roomType?.name ?? '').toLowerCase();
+  if (name.includes('студ')) return 0;
+  const m = name.match(/(\d)/);
+  if (m) return Math.min(4, parseInt(m[1], 10));
+  const raw = l.apartment?.roomsCount;
+  return typeof raw === 'number' && Number.isFinite(raw) ? raw : null;
+}
+
 function fallbackCoords(center: [number, number] | null, index: number): [number, number] | null {
   if (!center) return null;
   const ring = Math.floor(index / 12) + 1;
@@ -299,6 +314,10 @@ const RedesignMap = () => {
           kind: l.kind,
           address: l.address ?? null,
           photoUrl: getListingPhoto(l),
+          rooms: roomsFromListing(l),
+          area: num(l.apartment?.areaTotal ?? l.house?.areaTotal ?? l.commercial?.area) || null,
+          complexName: l.block?.name ?? null,
+          deadline: l.apartment?.buildingDeadline ?? null,
         };
       })
       .filter((l): l is ListingMapItem => l != null);

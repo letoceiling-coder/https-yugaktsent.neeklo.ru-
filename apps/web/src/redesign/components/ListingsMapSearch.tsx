@@ -9,6 +9,7 @@ import type { MarkerZoomMode } from '@/redesign/lib/map-marker-layout';
 import { panMapToCoords, useMapClusterLayer } from '@/redesign/hooks/useMapClusterLayer';
 import { Button } from '@/components/ui/button';
 import StableMediaFrame from '@/redesign/components/StableMediaFrame';
+import MapUnavailableNotice from '@/redesign/components/MapUnavailableNotice';
 import MapDevOverlay from '@/redesign/components/MapDevOverlay';
 import MapPopupActions from '@/redesign/components/MapPopupActions';
 import ConsultationFlow from '@/redesign/components/ConsultationFlow';
@@ -50,6 +51,11 @@ export interface ListingMapItem {
   address: string | null;
   photoUrl?: string | null;
   slug?: string;
+  /** Для карточки в списке: комнатность, площадь, ЖК и срок сдачи */
+  rooms?: number | null;
+  area?: number | null;
+  complexName?: string | null;
+  deadline?: string | null;
 }
 
 interface Props {
@@ -75,7 +81,7 @@ const ListingsMapSearch = ({
 }: Props) => {
   const fillParent = Boolean(compact) || height === '100%';
   const mapRef = useRef<HTMLDivElement>(null);
-  const { ready } = useYandexMapsReady();
+  const { ready, failure } = useYandexMapsReady();
 
   const viewportProduction = isMapViewportProductionEnabled();
   const viewportListingsSource = isViewportListingsSourceEnabled() || viewportProduction;
@@ -255,6 +261,8 @@ const ListingsMapSearch = ({
           fillParent ? 'min-h-0 overflow-hidden' : 'min-h-[300px] overflow-hidden',
         )}
       />
+
+      {!ready && failure ? <MapUnavailableNotice failure={failure} /> : null}
 
       {active && (
         <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-[300px] z-10 animate-in slide-in-from-bottom-2 duration-200">

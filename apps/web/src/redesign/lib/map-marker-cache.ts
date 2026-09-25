@@ -68,11 +68,15 @@ export function buildComplexMarkerDescriptors(
   complexes: ResidentialComplex[],
   mode: MarkerZoomMode,
 ): MapMarkerDescriptor[] {
-  return complexes.map((c) => ({
-    id: c.slug,
-    coords: c.coords,
-    label: complexMarkerLabel(c, mode),
-  }));
+  // ЖК без настоящих координат отбрасываем: coords у них — запасной центр,
+  // метка встала бы в чужом городе
+  return complexes
+    .filter((c) => c.hasCoords !== false)
+    .map((c) => ({
+      id: c.slug,
+      coords: c.coords,
+      label: complexMarkerLabel(c, mode),
+    }));
 }
 
 export function buildListingMarkerDescriptors(
