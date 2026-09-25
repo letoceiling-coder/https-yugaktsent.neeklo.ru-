@@ -55,6 +55,7 @@ import {
 import { buildCatalogFilterUrl } from '@/redesign/lib/catalog-filter-links';
 import { roomCategoryFromRooms } from '@/redesign/lib/complex-room-groups';
 import { recordBrowseHistory } from '@/shared/lib/record-browse-history';
+import { blockHref } from '@/shared/lib/browse-history-local';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 
 declare global {
