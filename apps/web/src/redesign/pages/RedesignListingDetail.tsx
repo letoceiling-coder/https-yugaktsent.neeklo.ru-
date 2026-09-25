@@ -401,7 +401,7 @@ const RedesignListingDetail = () => {
     return (
       <div className="min-h-screen bg-background pb-16 lg:pb-0">
         <RedesignHeader />
-        <div className="max-w-[1200px] mx-auto px-4 py-6 animate-pulse space-y-4">
+        <div className="max-w-[1400px] mx-auto px-4 py-6 animate-pulse space-y-4">
           <div className="h-4 w-48 bg-muted rounded" />
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3 aspect-[4/3] bg-muted rounded-2xl" />
@@ -420,7 +420,7 @@ const RedesignListingDetail = () => {
     return (
       <div className="min-h-screen bg-background">
         <RedesignHeader />
-        <div className="max-w-[1200px] mx-auto px-4 py-16 text-center">
+        <div className="max-w-[1400px] mx-auto px-4 py-16 text-center">
           <p className="text-muted-foreground">Объект не найден</p>
           <Link to="/catalog" className="text-primary text-sm mt-2 inline-block">← Каталог</Link>
         </div>
@@ -492,7 +492,7 @@ const RedesignListingDetail = () => {
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <RedesignHeader />
 
-      <div className="max-w-[1200px] mx-auto px-4 py-6">
+      <div className="max-w-[1400px] mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
           <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">

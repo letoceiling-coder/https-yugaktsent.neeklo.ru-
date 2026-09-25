@@ -19,6 +19,8 @@ export interface ResidentialComplex {
   priceTo: number;
   images: string[];
   coords: [number, number];
+  /** false — координат в данных нет, coords содержит запасной центр и карту рисовать нельзя */
+  hasCoords?: boolean;
   advantages: string[];
   infrastructure: string[];
   buildings: Building[];

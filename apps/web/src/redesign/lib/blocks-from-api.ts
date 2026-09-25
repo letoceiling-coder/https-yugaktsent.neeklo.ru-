@@ -91,7 +91,13 @@ function coordsFromBlock(b: ApiBlockListRow): [number, number] {
   const lat = num(b.latitude);
   const lng = num(b.longitude);
   if (lat && lng) return [lat, lng];
+  // Запасной центр, чтобы карта не падала; рисовать метку по нему нельзя — см. hasBlockCoords
   return [55.75, 37.62];
+}
+
+/** Есть ли у ЖК настоящие координаты (а не запасной центр). */
+function hasBlockCoords(b: ApiBlockListRow): boolean {
+  return Boolean(num(b.latitude) && num(b.longitude));
 }
 
 function statusFromApi(s: string): ResidentialComplex['status'] {
@@ -173,6 +179,7 @@ export function mapApiBlockListRowToResidentialComplex(b: ApiBlockListRow): Resi
     priceTo: priceMax || priceMin,
     images: imgs,
     coords: coordsFromBlock(b),
+    hasCoords: hasBlockCoords(b),
     advantages: [],
     infrastructure: extractInfrastructureLabels(b.infrastructure),
     buildings: (b.buildings ?? []).map((bg) => ({

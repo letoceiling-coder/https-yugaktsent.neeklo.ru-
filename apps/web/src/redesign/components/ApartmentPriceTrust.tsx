@@ -64,7 +64,7 @@ const ApartmentPriceTrust = ({
             </Link>
             {buildingName ? ` · ${buildingName}` : ''}
           </p>
-          <h1 className="text-xl sm:text-2xl font-bold">{roomLabel}, {apartment.area} м²</h1>
+          <p className="text-xl sm:text-2xl font-bold">{roomLabel}, {apartment.area} м²</p>
           {address ? (
             <p className="mt-1.5 flex items-center gap-1 text-sm text-muted-foreground">
               <MapPin className="h-3.5 w-3.5 shrink-0" />

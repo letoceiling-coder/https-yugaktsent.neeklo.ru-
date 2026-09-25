@@ -143,9 +143,12 @@ const RedesignApartment = () => {
 
   const entitySeo = useMemo(() => {
     if (!apt) return null;
-    const roomsLabel = apt.rooms != null ? `${apt.rooms}-комн.` : 'Квартира';
+    const roomsLabel =
+      apt.rooms == null ? 'Квартира' : apt.rooms === 0 ? 'Студия' : `${apt.rooms}-комн.`;
     const priceLabel = formatDisplayPrice(apt.price);
-    const title = [roomsLabel, complex?.name].filter(Boolean).join(' · ');
+    const title = [apt.area ? `${roomsLabel}, ${apt.area} м²` : roomsLabel, complex?.name]
+      .filter(Boolean)
+      .join(' · ');
     const description = [priceLabel, complex?.name, apt.area ? `${apt.area} м²` : '']
       .filter(Boolean)
       .join(' · ')
@@ -322,6 +325,8 @@ const RedesignApartment = () => {
   }
 
   const roomLabel = apt.rooms === 0 ? 'Студия' : `${apt.rooms}-комнатная`;
+  /** Без настоящих координат ЖК карту рисовать нечем — прячем и кнопку, и саму карту */
+  const hasCoords = complex.hasCoords === true;
   const isSold = apt.status === 'sold';
   const isReserved = apt.status === 'reserved';
 
@@ -577,11 +582,19 @@ const RedesignApartment = () => {
           <section id="map" className="scroll-mt-28">
             {sectionHeading('Расположение')}
             <div className="rounded-xl border border-border overflow-hidden bg-card">
-              <div className="p-4 border-b border-border flex flex-wrap items-center gap-2 text-sm">
-                <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
-                <span className="font-medium">{complex.address}</span>
-              </div>
-              <div ref={mapRef} className="h-[min(360px,45vh)] min-h-[220px] bg-muted" />
+              {complex.address && complex.address !== '—' ? (
+                <div className="p-4 border-b border-border flex flex-wrap items-center gap-2 text-sm">
+                  <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span className="font-medium">{complex.address}</span>
+                </div>
+              ) : null}
+              {hasCoords ? (
+                <div ref={mapRef} className="h-[min(360px,45vh)] min-h-[220px] bg-muted" />
+              ) : (
+                <p className="px-4 py-6 text-sm text-muted-foreground">
+                  Координаты ЖК пока не указаны — карта появится, когда их заполнят в админке.
+                </p>
+              )}
             </div>
           </section>
 
@@ -672,6 +685,17 @@ const RedesignApartment = () => {
               onConsultation={openConsultation}
               consultationLabel={isSold ? CONVERSION_CTA.consultation : CONVERSION_CTA.viewing}
             />
+            {hasCoords ? (
+              <Button
+                variant="outline"
+                className="w-full"
+                type="button"
+                onClick={() => scrollToSection('map')}
+              >
+                <MapPin className="w-4 h-4 mr-2" />
+                Показать на карте
+              </Button>
+            ) : null}
             {listingId != null ? (
               <Button variant="outline" className="w-full" asChild>
                 <Link to={`/presentation/listing/${listingId}`}>
