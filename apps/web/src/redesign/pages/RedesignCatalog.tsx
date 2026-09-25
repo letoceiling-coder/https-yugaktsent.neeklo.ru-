@@ -667,9 +667,14 @@ const RedesignCatalog = () => {
             {view === 'grid' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-stretch">
                 {showBlocks
-                  ? filtered.map((c) => (
+                  ? filtered.map((c, index) => (
                       <div key={c.id} className="flex h-full min-h-0">
-                        <ComplexCard complex={c} variant="compact" coverAspect="16/9" />
+                        <ComplexCard
+                          complex={c}
+                          variant="compact"
+                          coverAspect="16/9"
+                          priority={index < 4}
+                        />
                       </div>
                     ))
                   : listingRows.map((l) => <ListingCard key={l.id} listing={l} />)}

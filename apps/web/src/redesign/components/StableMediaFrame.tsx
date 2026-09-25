@@ -22,6 +22,8 @@ type Props = {
   fixedHeightClass?: string;
   fallback?: MediaFallback;
   loading?: 'lazy' | 'eager';
+  /** Приоритет загрузки обложки: 'high' для первого экрана */
+  fetchPriority?: 'high' | 'low' | 'auto';
   /** cover — фото ЖК; contain — планировки квартир целиком */
   fit?: 'cover' | 'contain';
   className?: string;
@@ -70,6 +72,7 @@ const StableMediaFrame = ({
   fixedHeightClass,
   fallback = 'branded',
   loading = 'lazy',
+  fetchPriority,
   fit = 'cover',
   className,
   imgClassName,
@@ -87,6 +90,8 @@ const StableMediaFrame = ({
   const containerClass = fixedHeightClass ?? aspectClass(aspect);
 
   const isContain = fit === 'contain';
+  // React 18 не типизирует fetchpriority, но пробрасывает атрибут в DOM как есть.
+  const priorityAttrs: Record<string, string> = fetchPriority ? { fetchpriority: fetchPriority } : {};
 
   return (
     <div
@@ -128,6 +133,7 @@ const StableMediaFrame = ({
               alt={imageAltText(altContext, decorative)}
               loading={loading}
               decoding="async"
+              {...priorityAttrs}
               onLoad={(e) => {
                 setLoaded(true);
                 onImageLoad?.(e);

@@ -93,8 +93,14 @@ const RedesignIndex = () => {
           showDots
           showArrows={false}
         >
-          {featured.map((c) => (
-            <ComplexCard key={c.id} complex={c} variant="compact" coverAspect="16/9" />
+          {featured.map((c, index) => (
+            <ComplexCard
+              key={c.id}
+              complex={c}
+              variant="compact"
+              coverAspect="16/9"
+              priority={index < 4}
+            />
           ))}
         </HorizontalSnapSlider>
 
