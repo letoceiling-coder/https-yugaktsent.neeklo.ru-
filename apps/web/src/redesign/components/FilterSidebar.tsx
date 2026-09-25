@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronDown, Search, X, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import RangeSlider from '@/redesign/components/hero/RangeSlider';
 import type { CatalogFilters, ObjectType, MarketType } from '@/redesign/data/types';
 import {
   COMMERCIAL_TYPE_FILTER_OPTIONS,
@@ -373,6 +374,17 @@ const FilterSidebar = ({
             onChange={e => update('priceMax', e.target.value ? Number(e.target.value) : undefined)}
           />
         </div>
+        <RangeSlider
+          className="mt-1"
+          min={0}
+          max={50_000_000}
+          step={100_000}
+          ariaLabel="Цена, ₽"
+          value={[filters.priceMin ?? null, filters.priceMax ?? null]}
+          onChange={([from, to]) =>
+            onChange({ ...filters, priceMin: from ?? undefined, priceMax: to ?? undefined })
+          }
+        />
       </FilterSection>
 
       {/* 4. Комнатность — only for apartments */}

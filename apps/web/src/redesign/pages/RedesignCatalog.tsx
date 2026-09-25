@@ -74,6 +74,8 @@ const CATALOG_SORT_VALUES = [
   'price_asc',
   'price_desc',
   'sales_start_asc',
+  'area_asc',
+  'area_desc',
 ] as const;
 type CatalogSort = (typeof CATALOG_SORT_VALUES)[number];
 
@@ -367,11 +369,44 @@ const RedesignCatalog = () => {
   });
 
   const kindCounts = kindCountsQuery.data ?? {};
-  const objectKindLinks = useMemo(
-    () => OBJECT_TYPE_TABS.map((x) => ({ ...x, count: kindCounts[x.countKey] ?? 0 })),
-    [kindCounts],
+  const objectKindLinks = useMemo(() => {
+    const withCounts = OBJECT_TYPE_TABS.map((x) => ({ ...x, count: kindCounts[x.countKey] ?? 0 }));
+    // Счётчики ещё не пришли или API молчит — показываем все типы, чтобы не запереть пользователя
+    if (withCounts.every((x) => x.count === 0)) return withCounts;
+    return withCounts.filter((x) => x.count > 0 || x.type === filters.objectType);
+  }, [kindCounts, filters.objectType]);
+  const showKindSwitcher = objectKindLinks.length > 1;
+  /** Таб «Вторичка» показываем только там, где она есть в данных. */
+  const secondaryCountQuery = useQuery({
+    queryKey: ['listings', 'secondary-availability', regionId],
+    queryFn: async () => {
+      const sp = buildListingsSearchParams({
+        filters: { ...defaultFilters, objectType: 'apartments', marketType: 'secondary' },
+        regionId,
+        kind: 'APARTMENT',
+        page: 1,
+        perPage: 1,
+      });
+      const res = await apiGet<{ meta?: { total?: number } }>(`/listings?${sp}`);
+      return res.meta?.total ?? 0;
+    },
+    enabled: regionId != null && isApartmentMode,
+    staleTime: 5 * 60 * 1000,
+  });
+  const hasSecondary = (secondaryCountQuery.data ?? 0) > 0;
+
+  const marketTabs = useMemo(
+    () =>
+      [
+        { value: 'all' as const, label: 'Все' },
+        { value: 'new' as const, label: 'Новостройки' },
+        ...(hasSecondary || filters.marketType === 'secondary'
+          ? [{ value: 'secondary' as const, label: 'Вторичка' }]
+          : []),
+      ],
+    [hasSecondary, filters.marketType],
   );
-  const showKindSwitcher = true;
+
   const moscowMetro = useMemo(
     () => isMoscowRegion(regionRows, regionId),
     [regionId, regionRows],
@@ -495,7 +530,7 @@ const RedesignCatalog = () => {
       <RedesignHeader />
 
       <div className="border-b border-border bg-muted/30">
-        <div className="max-w-[1400px] mx-auto px-4 py-3">
+        <div className="max-w-[1400px] 2xl:max-w-[1760px] mx-auto px-4 py-3">
           <div className="flex items-center gap-3 max-w-[800px]">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
@@ -527,7 +562,7 @@ const RedesignCatalog = () => {
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-4 py-3">
+      <div className="max-w-[1400px] 2xl:max-w-[1760px] mx-auto px-4 py-3">
         <SessionResumeBanner className="mb-2" />
         <SavedSearchReminder className="mb-2" />
 
@@ -568,7 +603,14 @@ const RedesignCatalog = () => {
                 <SelectItem value="created_desc">Сначала новые по дате</SelectItem>
                 <SelectItem value="price_asc">Цена: сначала дешевле</SelectItem>
                 <SelectItem value="price_desc">Цена: сначала дороже</SelectItem>
-                <SelectItem value="sales_start_asc">Старт продаж (раньше)</SelectItem>
+                {showBlocks ? (
+                  <SelectItem value="sales_start_asc">Старт продаж (раньше)</SelectItem>
+                ) : (
+                  <>
+                    <SelectItem value="area_asc">Площадь: сначала меньше</SelectItem>
+                    <SelectItem value="area_desc">Площадь: сначала больше</SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
             <div className="hidden sm:flex items-center gap-0.5 border border-border rounded-xl p-1 bg-muted/50">
@@ -609,6 +651,28 @@ const RedesignCatalog = () => {
           <p className="text-sm text-muted-foreground mb-4">Нет регионов в базе — добавьте регион и ЖК в админке.</p>
         )}
 
+        {isApartmentMode && marketTabs.length > 1 && (
+          <div className="mb-3 flex flex-wrap items-center gap-2" role="tablist" aria-label="Тип рынка">
+            {marketTabs.map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                role="tab"
+                aria-selected={filters.marketType === tab.value}
+                onClick={() => handleFiltersChange({ ...filters, marketType: tab.value })}
+                className={cn(
+                  'h-9 rounded-full px-4 text-sm font-medium transition-colors',
+                  filters.marketType === tab.value
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-foreground hover:bg-secondary/70',
+                )}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         {showKindSwitcher && (
           <div className="mb-2 flex flex-wrap items-center gap-1.5">
             <span className="text-xs text-muted-foreground mr-1">Тип объекта:</span>
@@ -646,6 +710,7 @@ const RedesignCatalog = () => {
                 builderOptions={buildersQuery.data}
                 deadlineOptions={deadlinesQuery.data}
                 objectTypeOptions={OBJECT_TYPE_TABS.map(x => x.type)}
+                showObjectTypeSwitcher={false}
                 showMetro={moscowMetro}
                 hasBlocks={showBlocks}
               />

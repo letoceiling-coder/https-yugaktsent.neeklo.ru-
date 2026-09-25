@@ -101,7 +101,7 @@ const RedesignHeader = () => {
           </Link>
 
           {/* Desktop nav — centered */}
-          <nav className="hidden lg:flex flex-1 items-center justify-center gap-8 text-[#111827]">
+          <nav className="hidden lg:flex flex-1 min-w-0 items-center justify-center gap-4 xl:gap-8 text-[#111827]">
             <div
               ref={catalogRef}
               className="relative"
@@ -167,7 +167,7 @@ const RedesignHeader = () => {
           </nav>
 
           {/* Desktop right */}
-          <div className="hidden lg:flex items-center gap-2 shrink-0 lg:min-w-[280px] justify-end">
+          <div className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0 justify-end">
             <div
               ref={searchRef}
               className={cn(
@@ -234,10 +234,11 @@ const RedesignHeader = () => {
             {phoneMain && phoneHref ? (
               <a
                 href={phoneHref}
+                title={phoneMain}
                 className="flex items-center gap-2 px-2 py-2 rounded-lg text-sm hover:text-primary hover:bg-muted/50 transition-colors"
               >
                 <Phone className="w-4 h-4 text-primary shrink-0" />
-                <span>{phoneMain}</span>
+                <span className="hidden xl:inline whitespace-nowrap">{phoneMain}</span>
               </a>
             ) : null}
 
