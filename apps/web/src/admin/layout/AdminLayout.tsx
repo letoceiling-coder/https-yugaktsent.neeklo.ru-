@@ -3,7 +3,7 @@ import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, FileText, Image, Users, Settings, ChevronLeft,
   ChevronRight, Palette, BookOpen, ClipboardList, ClipboardCheck, Crown, Building2, Building, Download, Newspaper, Home, History, HardHat,
-  Globe, LayoutTemplate, BellRing, ExternalLink, LogOut, Contact, Radar, Menu, X, MessageSquare, ListTodo, Shield, Activity, CreditCard, Sparkles, UserCircle, Link2,
+  Globe, LayoutTemplate, GalleryHorizontal, BellRing, ExternalLink, LogOut, Contact, Radar, Menu, X, MessageSquare, ListTodo, Shield, Activity, CreditCard, Sparkles, UserCircle, Link2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/shared/hooks/useAuth';
@@ -47,6 +47,7 @@ const navItems = [
   { to: '/admin/reference', icon: BookOpen, label: 'Справочники', roles: ['admin', 'editor'] },
   { to: '/admin/regions', icon: Globe, label: 'Регионы', roles: ['admin', 'editor'] },
   { to: '/admin/homepage', icon: LayoutTemplate, label: 'Главная: блоки API', roles: ['admin', 'editor'] },
+  { to: '/admin/banners', icon: GalleryHorizontal, label: 'Главная: баннеры', roles: ['admin', 'editor'] },
   { to: '/admin/news', icon: Newspaper, label: 'Новости / парсер', roles: ['admin', 'editor'] },
   { to: '/admin/media', icon: Image, label: 'Медиа', roles: ['admin', 'editor'] },
   { to: '/admin/users', icon: Users, label: 'Пользователи', roles: ['admin'] },

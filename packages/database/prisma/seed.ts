@@ -104,6 +104,7 @@ async function main() {
     { key: 'home_start_per_page', value: '8', groupName: 'homepage', label: 'Сколько карточек в «Старте продаж»', fieldType: 'TEXT' as const, sortOrder: 11 },
     { key: 'home_start_window_days', value: '365', groupName: 'homepage', label: 'Окно дней: дата старта продаж от сегодня до +N дней', fieldType: 'TEXT' as const, sortOrder: 12 },
     { key: 'home_start_badge', value: 'Старт продаж', groupName: 'homepage', label: 'Текст бейджа «Старт продаж»', fieldType: 'TEXT' as const, sortOrder: 13 },
+    { key: 'home_banners', value: '[]', groupName: 'homepage', label: 'Слайды баннера на главной (JSON). Редактируется в админке → «Главная: баннеры»', fieldType: 'TEXTAREA' as const, sortOrder: 5 },
     { key: 'home_news_per_page', value: '4', groupName: 'homepage', label: 'Сколько новостей в блоке на главной', fieldType: 'TEXT' as const, sortOrder: 20 },
     {
       key: 'home_news_rss_url',

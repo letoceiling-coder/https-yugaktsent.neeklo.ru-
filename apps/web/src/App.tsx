@@ -108,6 +108,7 @@ const AdminFeedLinks = lazyWithReload('AdminFeedLinks', () => import("./admin/pa
 const AdminNews = lazyWithReload('AdminNews', () => import("./admin/pages/AdminNews"));
 const AdminRegions = lazyWithReload('AdminRegions', () => import("./admin/pages/AdminRegions"));
 const AdminHomepage = lazyWithReload('AdminHomepage', () => import("./admin/pages/AdminHomepage"));
+const AdminBanners = lazyWithReload('AdminBanners', () => import("./admin/pages/AdminBanners"));
 const AdminReference = lazyWithReload('AdminReference', () => import("./admin/pages/AdminReference"));
 const EditorPage = lazyWithReload('EditorPage', () => import("./admin/components/editor/EditorPage"));
 
@@ -234,6 +235,7 @@ const AppRoutes = () => (
       <Route path="regions" element={<RequireAuth roles={['admin', 'editor']}><AdminRegions /></RequireAuth>} />
       <Route path="reference" element={<RequireAuth roles={['admin', 'editor']}><AdminReference /></RequireAuth>} />
       <Route path="homepage" element={<RequireAuth roles={['admin', 'editor']}><AdminHomepage /></RequireAuth>} />
+      <Route path="banners" element={<RequireAuth roles={['admin', 'editor']}><AdminBanners /></RequireAuth>} />
       <Route path="media" element={<RequireAuth roles={['admin', 'editor']}><AdminMedia /></RequireAuth>} />
       <Route path="users" element={<RequireAuth roles={['admin']}><AdminUsers /></RequireAuth>} />
       <Route path="agents" element={<RequireAuth roles={['admin', 'editor', 'manager']}><AdminAgentsListPage /></RequireAuth>} />

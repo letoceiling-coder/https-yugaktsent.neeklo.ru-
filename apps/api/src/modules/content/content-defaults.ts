@@ -83,6 +83,15 @@ export const DEFAULT_HOMEPAGE_SITE_SETTINGS: Array<{
     sortOrder: 13,
   },
   {
+    key: 'home_banners',
+    value: '[]',
+    groupName: 'homepage',
+    label:
+      'Слайды баннера на главной (JSON). Редактируется в админке → «Главная: баннеры», вручную менять не нужно',
+    fieldType: SiteSettingFieldType.TEXTAREA,
+    sortOrder: 5,
+  },
+  {
     key: 'home_news_per_page',
     value: '4',
     groupName: 'homepage',
