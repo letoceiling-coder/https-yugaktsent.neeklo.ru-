@@ -490,7 +490,7 @@ const RedesignComplex = () => {
     <div className="min-h-screen bg-background pb-24 lg:pb-8">
       <RedesignHeader />
 
-      <div className="max-w-[1280px] mx-auto px-4 py-4 sm:py-6">
+      <div className="max-w-[1400px] 2xl:max-w-[1680px] mx-auto px-4 py-4 sm:py-6">
         <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3 min-w-0 flex-wrap">
             <Link to="/" className="hover:text-foreground shrink-0">Главная</Link>
             <span>/</span>

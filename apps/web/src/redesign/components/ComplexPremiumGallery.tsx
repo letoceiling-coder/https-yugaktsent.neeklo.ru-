@@ -117,11 +117,90 @@ export default function ComplexPremiumGallery({ images, title }: Props) {
     <>
       <section
         id="gallery"
-        className="scroll-mt-28 overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm"
+        className="scroll-mt-28 overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm lg:border-0 lg:bg-transparent lg:shadow-none"
       >
+        {/* Десктоп: коллаж — большое фото слева, превью справа */}
+        {hasImages ? (
+          <div
+            className={cn(
+              'hidden lg:grid lg:gap-2',
+              // одно фото — коллаж не собрать, показываем его на всю ширину
+              images.length > 1 ? 'lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]' : 'lg:grid-cols-1',
+            )}
+          >
+            <button
+              type="button"
+              onClick={() => setLightbox(true)}
+              className="relative block h-[420px] w-full overflow-hidden rounded-2xl bg-muted"
+              aria-label="Открыть фото на весь экран"
+            >
+              <StableMediaFrame
+                src={images[0]}
+                altContext={title}
+                decorative={false}
+                aspect="none"
+                fallback="branded"
+                loading="eager"
+                fetchPriority="high"
+                className="absolute inset-0 h-full w-full"
+                imgClassName="h-full w-full object-cover transition-transform duration-200 hover:scale-[1.01]"
+              />
+            </button>
+
+            {images.length > 1 ? (
+            <div className="grid h-[420px] grid-rows-2 gap-2">
+              {[1, 2].map((row) => {
+                const src = images[row];
+                const isLastTile = row === 2;
+                const hiddenCount = images.length - 3;
+                if (!src) return null;
+                return (
+                  <button
+                    key={`${src}-${row}`}
+                    type="button"
+                    onClick={() => {
+                      setIdx(row);
+                      setLightbox(true);
+                    }}
+                    className="relative block h-full w-full overflow-hidden rounded-2xl bg-muted"
+                    aria-label={`Фото ${row + 1}`}
+                  >
+                    <StableMediaFrame
+                      src={src}
+                      altContext={title}
+                      aspect="none"
+                      fallback="branded"
+                      className="absolute inset-0 h-full w-full"
+                      imgClassName="h-full w-full object-cover"
+                    />
+                    {isLastTile && hiddenCount > 0 ? (
+                      <span className="absolute inset-0 flex items-center justify-center bg-black/55 text-sm font-semibold text-white">
+                        Ещё {hiddenCount} фото
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+            ) : null}
+
+            <div className={cn('mt-2 flex justify-end', images.length > 1 && 'col-span-2')}>
+              <button
+                type="button"
+                onClick={() => setLightbox(true)}
+                className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-border bg-background px-4 text-sm font-medium transition-colors hover:bg-muted/50"
+              >
+                <Maximize2 className="h-4 w-4" />
+                Смотреть все фото{images.length > 1 ? ` (${images.length})` : ''}
+              </button>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Мобильный вид: свайп и лента превью */}
         <div
           ref={containerRef}
-          className={COMPLEX_GALLERY_VIEWPORT_CLASS}
+          className={cn(COMPLEX_GALLERY_VIEWPORT_CLASS, hasImages && 'lg:hidden')}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
         >
@@ -169,7 +248,7 @@ export default function ComplexPremiumGallery({ images, title }: Props) {
           ) : null}
         </div>
         {images.length > 1 ? (
-          <div className="flex gap-2 overflow-x-auto border-t border-border/50 bg-muted/15 px-2.5 py-2.5 scrollbar-hide sm:gap-2.5 sm:px-3">
+          <div className="flex gap-2 overflow-x-auto border-t border-border/50 bg-muted/15 px-2.5 py-2.5 scrollbar-hide sm:gap-2.5 sm:px-3 lg:hidden">
             {images.map((src, i) => (
               <GalleryThumbnail
                 key={`${src}-${i}`}
