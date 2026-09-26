@@ -13,6 +13,7 @@ import ListingCard, { type ApiListingCardRow } from '@/redesign/components/Listi
 import FilterSidebar from '@/redesign/components/FilterSidebar';
 import RegionSelector from '@/redesign/components/RegionSelector';
 import MapSearch from '@/redesign/components/MapSearch';
+import CardGridSkeleton from '@/redesign/components/CardGridSkeleton';
 import ListingsMapSearch, { type ListingMapItem } from '@/redesign/components/ListingsMapSearch';
 import { useDefaultRegionId, type RegionRow } from '@/redesign/hooks/useDefaultRegionId';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
@@ -729,7 +730,10 @@ const RedesignCatalog = () => {
                 </span>
               </div>
             )}
-            {view === 'grid' && (
+            {loading && totalShown === 0 && view !== 'map' && (
+              <CardGridSkeleton count={8} variant={view === 'list' ? 'list' : 'grid'} />
+            )}
+            {view === 'grid' && !(loading && totalShown === 0) && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 items-stretch">
                 {showBlocks
                   ? filtered.map((c, index) => (
@@ -745,7 +749,7 @@ const RedesignCatalog = () => {
                   : listingRows.map((l) => <ListingCard key={l.id} listing={l} />)}
               </div>
             )}
-            {view === 'list' && (
+            {view === 'list' && !(loading && totalShown === 0) && (
               <div className="space-y-3">
                 {showBlocks
                   ? filtered.map((c) => <ComplexCard key={c.id} complex={c} variant="list" />)

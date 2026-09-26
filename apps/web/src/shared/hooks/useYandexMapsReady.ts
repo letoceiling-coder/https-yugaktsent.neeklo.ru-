@@ -10,17 +10,20 @@ export type YandexMapsFailure = 'no-key' | 'script' | null;
  * Скрипт запрашивается только когда карта реально нужна — хук вызывают
  * компоненты карты, а не общий layout.
  */
-export function useYandexMapsReady() {
+export function useYandexMapsReady(options?: { enabled?: boolean }) {
+  // Скрипт карт весит сотни килобайт — грузим только там, где карта реально нужна
+  const enabled = options?.enabled ?? true;
   const [ready, setReady] = useState(false);
   const [failure, setFailure] = useState<YandexMapsFailure>(null);
   const cfg = useQuery({
     queryKey: ['content', 'maps-config'],
     queryFn: () => apiGet<{ apiKey: string | null }>('/content/maps-config'),
     staleTime: 300_000,
+    enabled,
   });
 
   useEffect(() => {
-    if (cfg.isPending) return;
+    if (!enabled || cfg.isPending) return;
     const key = cfg.isError ? null : (cfg.data?.apiKey ?? null);
     let cancelled = false;
     // Скрипт может загрузиться, но не вызвать ready (например, ключ отклонён) —
@@ -49,11 +52,11 @@ export function useYandexMapsReady() {
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, [cfg.isPending, cfg.isError, cfg.data?.apiKey]);
+  }, [enabled, cfg.isPending, cfg.isError, cfg.data?.apiKey]);
 
   return {
     ready,
-    isLoading: cfg.isPending || (!ready && failure == null),
+    isLoading: enabled && (cfg.isPending || (!ready && failure == null)),
     configError: cfg.isError,
     /** Карта не поднимется: 'no-key' — ключ не задан в админке, 'script' — скрипт не загрузился */
     failure,

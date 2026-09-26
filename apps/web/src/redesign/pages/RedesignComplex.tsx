@@ -43,6 +43,7 @@ import { shareCurrentPage } from '@/lib/share-page';
 import { useEntitySeoMeta } from '@/shared/hooks/useEntitySeoMeta';
 import { toast } from '@/components/ui/sonner';
 import { useYandexMapsReady } from '@/shared/hooks/useYandexMapsReady';
+import { useInViewOnce } from '@/shared/hooks/useInViewOnce';
 import { prefersReducedMotion } from '@/redesign/lib/map-sidebar-scroll-utils';
 import {
   buildLayoutGroupsFromApartments,
@@ -84,7 +85,6 @@ const RedesignComplex = () => {
   const { isAuthenticated } = useAuth();
   const { isBlockFavorite, toggleBlock } = useFavorites();
   const { isCompared, toggle: toggleCompare, count: compareCount } = useCompare();
-  const { ready: ymapsReady } = useYandexMapsReady();
   const { shortName } = useSiteBrand();
   const mockComplex = useMemo(() => getComplexBySlug(slug || ''), [slug]);
   const resolvedSlug = useMemo(() => {
@@ -215,6 +215,8 @@ const RedesignComplex = () => {
   const [consultOpen, setConsultOpen] = useState(false);
   const [consultContext, setConsultContext] = useState<ConsultationContext | null>(null);
   const mapRef = useRef<HTMLDivElement>(null);
+  const mapInView = useInViewOnce(mapRef);
+  const { ready: ymapsReady } = useYandexMapsReady({ enabled: mapInView });
   const mapInstanceRef = useRef<any>(null);
   const mapInitializedRef = useRef(false);
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useYandexMapsReady } from '@/shared/hooks/useYandexMapsReady';
+import { useInViewOnce } from '@/shared/hooks/useInViewOnce';
 import { MapPin } from 'lucide-react';
 
 declare global {
@@ -21,7 +22,8 @@ interface Props {
 const ListingLocationMap = ({ address, regionName, height = '300px' }: Props) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
-  const { ready } = useYandexMapsReady();
+  const inView = useInViewOnce(mapRef);
+  const { ready } = useYandexMapsReady({ enabled: inView });
   const [geocodeStatus, setGeocodeStatus] = useState<'idle' | 'loading' | 'ok' | 'failed'>('idle');
 
   useEffect(() => {
