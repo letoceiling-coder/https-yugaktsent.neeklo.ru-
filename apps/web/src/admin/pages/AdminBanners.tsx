@@ -186,6 +186,12 @@ export default function AdminBanners() {
               <div className="space-y-2">
                 <input
                   className={inputClass}
+                  placeholder="Надзаголовок капсом, например НОВОСТРОЙКИ АНАПЫ"
+                  value={banner.tag}
+                  onChange={(e) => patch(banner.id, { tag: e.target.value })}
+                />
+                <input
+                  className={inputClass}
                   placeholder="Заголовок"
                   value={banner.title}
                   onChange={(e) => patch(banner.id, { title: e.target.value })}
@@ -211,6 +217,12 @@ export default function AdminBanners() {
                     onChange={(e) => patch(banner.id, { buttonLink: e.target.value })}
                   />
                 </div>
+                <input
+                  className={inputClass}
+                  placeholder="Вторая кнопка — открывает форму заявки. Пусто — кнопки нет"
+                  value={banner.consultButtonText}
+                  onChange={(e) => patch(banner.id, { consultButtonText: e.target.value })}
+                />
                 <p className="text-xs text-muted-foreground">
                   Ссылка внутри сайта начинается со слэша (<code>/catalog?type=houses</code>), внешняя — с
                   <code> https://</code>. Пустой текст кнопки — кнопки не будет.

@@ -100,7 +100,7 @@ const FilterBar = () => {
     'h-11 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none transition-colors focus:border-primary/60';
 
   return (
-    <section className="max-w-[1400px] mx-auto px-4 pt-4 sm:pt-6">
+    <section className="container-page relative z-20 pt-6 lg:-mt-16 lg:pt-0">
       <div className="rounded-[20px] border border-border/60 bg-card p-4 shadow-[0_8px_32px_rgba(15,23,42,0.06)] sm:p-5">
         {/* Строка поиска над табами */}
         <div ref={searchRef} className="relative mb-3">
