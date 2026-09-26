@@ -60,7 +60,14 @@ async function optimize(file) {
   if (ext === '.webp') {
     await run('convert', [file, '-resize', `${MAX_SIDE}x${MAX_SIDE}>`, '-quality', '82', tmp]);
   } else if (ext === '.png') {
-    await run('convert', [file, '-resize', `${MAX_SIDE}x${MAX_SIDE}>`, '-strip', '-define', 'png:compression-level=9', tmp]);
+    // Тяжёлые PNG — это фотографии и рендеры, сохранённые без палитры.
+    // pngquant даёт около 70 % выигрыша, визуально разницы нет.
+    await run('convert', [file, '-resize', `${MAX_SIDE}x${MAX_SIDE}>`, '-strip', tmp]);
+    try {
+      await run('pngquant', ['--quality=65-90', '--speed', '3', '--force', '--output', tmp, tmp]);
+    } catch {
+      // pngquant не установлен или не смог уложиться в качество — остаётся вариант ImageMagick
+    }
   } else {
     await run('convert', [
       file, '-auto-orient', '-resize', `${MAX_SIDE}x${MAX_SIDE}>`,
