@@ -4,11 +4,11 @@ import { Copy, Check, BookOpen, RefreshCw } from 'lucide-react';
 const generateDocs = () => {
   const now = new Date().toLocaleString('ru-RU');
   
-  return `# Документация проекта Live Grid
+  return `# Документация проекта ЮгАкцент
 Обновлено: ${now}
 
 ## Обзор
-Live Grid — премиальная платформа по недвижимости. Веб-приложение на React + Vite + TypeScript + Tailwind CSS с shadcn/ui компонентами и framer-motion анимациями. Состояние управляется через Zustand.
+ЮгАкцент — сайт агентства недвижимости Юга России. Веб-приложение на React + Vite + TypeScript + Tailwind CSS с shadcn/ui компонентами и framer-motion анимациями. Состояние управляется через Zustand.
 
 ## Технологический стек
 - **Frontend**: React 18, TypeScript, Vite

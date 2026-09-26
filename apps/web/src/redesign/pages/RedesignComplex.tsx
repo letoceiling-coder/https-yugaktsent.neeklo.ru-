@@ -33,7 +33,6 @@ import {
   priceAriaLabel,
   isPriceHidden,
 } from '@/redesign/lib/display-price';
-import { complexes, getComplexBySlug, getLayoutGroups } from '@/redesign/data/mock-data';
 import type { Apartment, ResidentialComplex, SortField, SortDir } from '@/redesign/data/types';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/shared/hooks/useAuth';
@@ -86,7 +85,6 @@ const RedesignComplex = () => {
   const { isBlockFavorite, toggleBlock } = useFavorites();
   const { isCompared, toggle: toggleCompare, count: compareCount } = useCompare();
   const { shortName } = useSiteBrand();
-  const mockComplex = useMemo(() => getComplexBySlug(slug || ''), [slug]);
   const resolvedSlug = useMemo(() => {
     const raw = (slug || '').trim();
     if (!raw) return raw;
@@ -128,7 +126,7 @@ const RedesignComplex = () => {
     return mapApiBlockDetailToResidentialComplex(apiBlockQuery.data, rows);
   }, [apiBlockQuery.data, listingsQuery.data]);
 
-  const complex = apiComplex ?? mockComplex ?? null;
+  const complex = apiComplex ?? null;
   const fromApi = Boolean(apiComplex);
   const regionId = apiBlockQuery.data?.region?.id ?? null;
 
@@ -222,8 +220,8 @@ const RedesignComplex = () => {
 
   const similarComplexes = useMemo((): ResidentialComplex[] => {
     if (!complex) return [];
-    if (similarQuery.data?.length) return similarQuery.data;
-    return complexes.filter((c) => c.id !== complex.id).slice(0, 4);
+    // Похожих нет — показываем пустой блок, а не чужие комплексы
+    return similarQuery.data ?? [];
   }, [complex, similarQuery.data]);
 
   const buildings = complex?.buildings ?? [];
@@ -292,7 +290,7 @@ const RedesignComplex = () => {
     if (fromApi) {
       return buildLayoutGroupsFromApartments(complex.id, apts);
     }
-    return getLayoutGroups(complex.id);
+    return [];
   }, [complex, fromApi, activeBuilding]);
 
   const hasApartments = scopedApartments.length > 0;
@@ -467,7 +465,7 @@ const RedesignComplex = () => {
   }, [complex]);
 
   if (!complex) {
-    if (slug && !mockComplex && apiBlockQuery.isPending) {
+    if (slug && apiBlockQuery.isPending) {
       return (
         <div className="min-h-screen bg-background">
           <RedesignHeader />

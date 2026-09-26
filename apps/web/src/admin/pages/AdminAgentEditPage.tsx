@@ -189,11 +189,7 @@ export default function AdminAgentEditPage() {
 
       {form.status !== 'PUBLISHED' ? (
         <div className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-900 dark:text-amber-200">
-          Карточка не отображается на{' '}
-          <a href="/agents" target="_blank" rel="noreferrer" className="underline font-medium">
-            livegrid.ru/agents
-          </a>
-          , пока статус не «На сайте». Выберите «На сайте» и нажмите «Сохранить».
+          Карточка неактивна, пока статус не «На сайте». Выберите «На сайте» и нажмите «Сохранить».
         </div>
       ) : null}
 
@@ -307,10 +303,9 @@ export default function AdminAgentEditPage() {
         </section>
 
         <section className="rounded-xl border bg-card p-5 space-y-3">
-          <h2 className="font-semibold text-sm">Публикация на livegrid.ru/agents</h2>
+          <h2 className="font-semibold text-sm">Статус агента</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Статус «На сайте» добавляет агента в каталог специалистов. Для отображения объявлений на странице агента
-            нужны ручные публичные объявления, назначенные этому пользователю.
+            Статус «На сайте» помечает агента как активного. Публичного каталога специалистов на сайте нет.
           </p>
           <div className="flex flex-wrap gap-2">
             {(

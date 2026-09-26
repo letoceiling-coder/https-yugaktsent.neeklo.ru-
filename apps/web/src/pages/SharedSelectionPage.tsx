@@ -4,7 +4,7 @@ import RedesignHeader from '@/redesign/components/RedesignHeader';
 import FooterSection from '@/components/FooterSection';
 import MissingPhotoPlaceholder from '@/redesign/components/MissingPhotoPlaceholder';
 import { apiGet } from '@/lib/api';
-import { formatListingPriceFromApi } from '@/redesign/data/mock-data';
+import { formatDisplayPrice as formatListingPriceFromApi } from '@/redesign/lib/display-price';
 
 type PublicSelectionItem = {
   id: string;

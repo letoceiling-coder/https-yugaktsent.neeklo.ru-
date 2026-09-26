@@ -22,7 +22,7 @@ function SectionTitle({ children }: { children: string }) {
 
 /**
  * Одна категория подсказок: заголовок всегда снаружи скролла; список — отдельный скролл-контейнер
- * (как на livegrid/trendagent: свой скролл у ЖК, у метро, у улиц и т.д., без общего скролла панели).
+ * У каждой группы — ЖК, метро, улицы — свой скролл, общего скролла панели нет.
  */
 function HintCategorySection({ title, children }: { title: string; children: ReactNode }) {
   return (

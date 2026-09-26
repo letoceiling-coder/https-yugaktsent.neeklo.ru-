@@ -56,10 +56,7 @@ export default function AdminAgentsListPage() {
             Агенты
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Пользователи с ролью «агент». Карточки публикуются на{' '}
-            <a href="/agents" target="_blank" rel="noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">
-              livegrid.ru/agents <ExternalLink className="w-3 h-3" />
-            </a>
+            Пользователи с ролью «агент». Используются внутри админки, публичного каталога специалистов нет.
           </p>
         </div>
         <Link

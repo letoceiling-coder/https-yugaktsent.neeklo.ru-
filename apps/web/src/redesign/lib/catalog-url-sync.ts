@@ -131,9 +131,9 @@ export function catalogFiltersFromSearchParams(sp: URLSearchParams): CatalogFilt
   f.directions = parseStringList(sp.get('directions')).filter((s) =>
     ['south', 'north', 'east', 'west'].includes(s),
   );
-  f.houseLocation = parseStringList(sp.get('house_location')).filter((s) =>
-    ['belgorod_district', 'belgorod_region'].includes(s),
-  );
+  // Фильтр расположения убран из интерфейса: в API он завязан на флаги
+  // чужой географии в схеме (см. docs/BACKEND_TODO.md), для Юга он пуст.
+  f.houseLocation = [];
   f.houseMaterials = parseStringList(sp.get('house_materials'));
   f.landPurpose = parseStringList(sp.get('land_categories'));
   f.commercialTypes = parseStringList(sp.get('commercial_types'));

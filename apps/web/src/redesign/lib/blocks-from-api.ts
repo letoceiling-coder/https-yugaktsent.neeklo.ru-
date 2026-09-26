@@ -1,5 +1,5 @@
 import type { Apartment, Building, LayoutGroup, ResidentialComplex } from '@/redesign/data/types';
-import { MIN_REASONABLE_PRICE_RUB } from '@/redesign/data/mock-data';
+import { MIN_REASONABLE_PRICE_RUB } from '@/redesign/lib/display-price';
 import { normalizePriceValue } from '@/redesign/lib/display-price';
 import { IMAGE_PLACEHOLDER } from '@/redesign/lib/image-media';
 

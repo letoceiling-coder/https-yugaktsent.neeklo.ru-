@@ -26,7 +26,6 @@ import StableMediaFrame from '@/redesign/components/StableMediaFrame';
 import { apiGet } from '@/lib/api';
 import { mapListingRowToApartment, type ApiListingRow } from '@/redesign/lib/blocks-from-api';
 import { mapListingDetailToApartmentPage, type ApiListingDetail } from '@/redesign/lib/listing-page-from-api';
-import { getApartmentById } from '@/redesign/data/mock-data';
 import { formatDisplayPrice } from '@/redesign/lib/display-price';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/shared/hooks/useAuth';
@@ -89,10 +88,8 @@ const RedesignApartment = () => {
   const [consultContext, setConsultContext] = useState<ConsultationContext | null>(null);
   const listingId = parseNumericListingId(idParam);
 
-  const mockResult = useMemo(() => {
-    if (listingId != null) return null;
-    return getApartmentById(idParam || '');
-  }, [idParam, listingId]);
+  /** Объекты живут только в API: выдуманных подстановок больше нет. */
+  const mockResult = null;
 
   const listingQuery = useQuery({
     queryKey: ['listing', 'detail', listingId],

@@ -86,13 +86,6 @@ function buildMeta(
       ogImage: ogImage ? (ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage.startsWith('/') ? '' : '/'}${ogImage}`) : undefined,
     };
   }
-  if (pathname === '/belgorod') {
-    return {
-      title: 'Недвижимость в Белгороде',
-      description:
-        `Квартиры, дома и участки в Белгороде. Каталог, фильтры и карта на ${siteName}.`,
-    };
-  }
   if (pathname.startsWith('/catalog')) {
     const sp = new URLSearchParams(search);
     const filters = catalogFiltersFromSearchParams(sp);

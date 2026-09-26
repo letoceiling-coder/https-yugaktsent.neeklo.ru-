@@ -17,8 +17,7 @@ import {
 import type { RegionRow } from '@/redesign/hooks/useDefaultRegionId';
 import RegionPickerPanel from '@/redesign/components/RegionPickerPanel';
 import {
-  isBelgorodRegion,
-  orderRegionsWithBelgorodFirst,
+  sortRegionsByName,
   regionLabel,
 } from '@/redesign/lib/region-picker-utils';
 
@@ -33,14 +32,8 @@ const RegionSelector = ({ regions, selectedRegionId, onSelect, className }: Prop
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
 
-  const ordered = useMemo(
-    () => orderRegionsWithBelgorodFirst(regions ?? []),
-    [regions],
-  );
+  const ordered = useMemo(() => sortRegionsByName(regions ?? []), [regions]);
   const selected = ordered.find((r) => r.id === selectedRegionId);
-  const belgorod = ordered.find(isBelgorodRegion);
-  const showBelgorodQuick =
-    belgorod != null && belgorod.id !== selectedRegionId && ordered.length > 1;
 
   if (!ordered.length) return null;
 
@@ -71,17 +64,6 @@ const RegionSelector = ({ regions, selectedRegionId, onSelect, className }: Prop
 
   return (
     <div className={cn('flex flex-wrap items-center justify-center gap-2 min-w-0 max-w-full', className)}>
-      {showBelgorodQuick ? (
-        <button
-          type="button"
-          onClick={() => handleSelect(belgorod.id)}
-          className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/15 shrink-0"
-        >
-          <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          {regionLabel(belgorod)}
-        </button>
-      ) : null}
-
       <button
         type="button"
         onClick={() => setOpen(true)}

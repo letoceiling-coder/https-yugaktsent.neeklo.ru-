@@ -5,7 +5,7 @@ import {
   isPriceFallbackText,
   normalizePriceValue,
 } from '@/redesign/lib/display-price';
-import { MIN_REASONABLE_PRICE_RUB } from '@/redesign/data/mock-data';
+import { MIN_REASONABLE_PRICE_RUB } from '@/redesign/lib/display-price';
 
 /**
  * Shared typography + badge tokens for catalog cards and map sidebar rows.

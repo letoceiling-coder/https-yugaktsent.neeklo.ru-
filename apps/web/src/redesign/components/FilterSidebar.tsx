@@ -50,11 +50,6 @@ const marketTypes: { value: MarketType; label: string }[] = [
 
 const roomOptions = [0, 1, 2, 3, 4];
 const houseRoomOptions = [1, 2, 3, 4];
-const houseLocationOptions = [
-  { value: 'belgorod_district', label: 'Белгородский район' },
-  { value: 'belgorod_region', label: 'Белгородская область' },
-] as const;
-
 function prettyDistrict(name: string): string {
   const n = name.trim();
   return n
@@ -249,10 +244,6 @@ const FilterSidebar = ({
     filters.directions.forEach(d => {
       const opt = DIRECTION_FILTER_OPTIONS.find(o => o.value === d);
       tags.push({ label: opt?.label || d, clear: () => toggleArray('directions', d) });
-    });
-    filters.houseLocation.forEach(l => {
-      const opt = houseLocationOptions.find(o => o.value === l);
-      tags.push({ label: opt?.label || l, clear: () => toggleArray('houseLocation', l) });
     });
     filters.status.forEach(s => {
       const opt = statusOptions.find(o => o.value === s);
@@ -503,18 +494,6 @@ const FilterSidebar = ({
           </FilterSection>
           )}
 
-          {visibility.houseLocation && (
-          <FilterSection title="Расположение" defaultOpen={false} count={filters.houseLocation.length}>
-            <div className="space-y-1.5">
-              {houseLocationOptions.map(option => (
-                <label key={option.value} className="flex items-center gap-2 cursor-pointer text-xs hover:text-foreground transition-colors">
-                  <Checkbox checked={filters.houseLocation.includes(option.value)} onCheckedChange={() => toggleArray('houseLocation', option.value)} className="w-3.5 h-3.5" />
-                  {option.label}
-                </label>
-              ))}
-            </div>
-          </FilterSection>
-          )}
         </>
       )}
 

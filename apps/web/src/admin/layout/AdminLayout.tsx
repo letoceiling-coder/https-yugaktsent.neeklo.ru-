@@ -116,7 +116,7 @@ export default function AdminLayout() {
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0">
             <span className="text-primary-foreground font-bold text-xs">LG</span>
           </div>
-          {!collapsed && <span className="font-bold text-sm truncate">Live Grid CMS</span>}
+          {!collapsed && <span className="font-bold text-sm truncate">ЮгАкцент CMS</span>}
         </div>
         <nav className="flex-1 py-2 space-y-0.5 px-2 overflow-y-auto">
           {availableNavItems.map(item => (

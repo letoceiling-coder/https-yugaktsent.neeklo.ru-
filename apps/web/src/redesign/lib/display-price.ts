@@ -1,5 +1,5 @@
 /**
- * Single source of truth for price display across LiveGrid frontend.
+ * Единая точка форматирования цены для всей витрины.
  * Iteration 3 — price fallback normalization.
  */
 

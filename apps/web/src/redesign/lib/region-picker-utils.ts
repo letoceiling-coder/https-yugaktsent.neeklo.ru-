@@ -4,19 +4,20 @@ export function regionLabel(region: RegionRow): string {
   return region.name?.trim() || region.code || `Регион ${region.id}`;
 }
 
-export function isBelgorodRegion(region: RegionRow): boolean {
-  const code = (region.code ?? '').toLowerCase();
-  const name = (region.name ?? '').toLowerCase();
-  return code === 'belgorod' || name.includes('белгород');
-}
-
+/**
+ * Города, которые поднимаются наверх в выборе региона.
+ * Юг России и Крым — там, где работает агентство. Список только про порядок:
+ * сами регионы приходят из API, и чего нет в данных — не показывается.
+ */
 const POPULAR_MATCHERS: { codes: string[]; names: string[] }[] = [
-  { codes: ['msk'], names: ['москва'] },
-  { codes: ['spb', 'saint-petersburg', 'petersburg'], names: ['санкт-петербург', 'петербург'] },
-  { codes: ['kzn'], names: ['казань'] },
+  { codes: ['anapa'], names: ['анапа'] },
   { codes: ['krd', 'krasnodar'], names: ['краснодар'] },
-  { codes: ['ekb', 'yekaterinburg'], names: ['екатеринбург'] },
-  { codes: ['nsk', 'novosibirsk'], names: ['новосибирск'] },
+  { codes: ['novorossiysk'], names: ['новороссийск'] },
+  { codes: ['gelendzhik'], names: ['геленджик'] },
+  { codes: ['sochi'], names: ['сочи'] },
+  { codes: ['simferopol'], names: ['симферополь'] },
+  { codes: ['sevastopol'], names: ['севастополь'] },
+  { codes: ['yalta'], names: ['ялта'] },
 ];
 
 function matchesPopular(region: RegionRow, matcher: (typeof POPULAR_MATCHERS)[number]): boolean {
@@ -67,10 +68,7 @@ export function groupRegionsByLetter(regions: RegionRow[]): RegionLetterGroup[] 
     .map(([letter, rows]) => ({ letter, regions: rows }));
 }
 
-export function orderRegionsWithBelgorodFirst(regions: RegionRow[]): RegionRow[] {
-  const belgorod = regions.find(isBelgorodRegion);
-  const rest = regions
-    .filter((r) => r.id !== belgorod?.id)
-    .sort((a, b) => regionLabel(a).localeCompare(regionLabel(b), 'ru'));
-  return belgorod ? [belgorod, ...rest] : rest;
+/** Регионы по алфавиту: ни один город не выделен заранее. */
+export function sortRegionsByName(regions: RegionRow[]): RegionRow[] {
+  return [...regions].sort((a, b) => regionLabel(a).localeCompare(regionLabel(b), 'ru'));
 }

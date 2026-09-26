@@ -170,7 +170,7 @@ export default function AdminRegions() {
               className="w-full border rounded-lg px-2 py-2 bg-background font-mono text-sm"
               value={newCode}
               onChange={(e) => setNewCode(e.target.value)}
-              placeholder="belgorod"
+              placeholder="anapa"
               disabled={!canManage}
             />
           </div>
@@ -180,7 +180,7 @@ export default function AdminRegions() {
               className="w-full border rounded-lg px-2 py-2 bg-background text-sm"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              placeholder="Белгород"
+              placeholder="Анапа"
               disabled={!canManage}
             />
           </div>
@@ -204,7 +204,7 @@ export default function AdminRegions() {
               className="w-full border rounded-lg px-2 py-2 bg-background text-xs"
               value={newPublicSiteUrl}
               onChange={(e) => setNewPublicSiteUrl(e.target.value)}
-              placeholder="https://belgorod.… или пусто"
+              placeholder="https://anapa.… или пусто"
               disabled={!canManage}
             />
           </div>

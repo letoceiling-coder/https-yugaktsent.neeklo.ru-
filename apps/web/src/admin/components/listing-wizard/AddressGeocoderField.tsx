@@ -156,7 +156,7 @@ export default function AddressGeocoderField({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), runGeocode())}
-              placeholder="Белгород, ул. Щорса, 45"
+              placeholder="Анапа, ул. Крымская, 99"
               className="pl-9 min-h-11"
             />
           </div>

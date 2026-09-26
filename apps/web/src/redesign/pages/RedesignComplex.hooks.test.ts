@@ -6,7 +6,7 @@ describe('RedesignComplex hooks order', () => {
   const src = readFileSync(resolve(__dirname, 'RedesignComplex.tsx'), 'utf8');
 
   it('declares post-handler hooks before early return when complex is null', () => {
-    const earlyReturn = src.indexOf('\n  if (!complex) {\n    if (slug && !mockComplex');
+    const earlyReturn = src.indexOf('\n  if (!complex) {\n    if (slug && apiBlockQuery.isPending');
     expect(earlyReturn).toBeGreaterThan(-1);
 
     for (const hook of [

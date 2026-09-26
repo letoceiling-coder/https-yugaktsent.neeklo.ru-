@@ -62,27 +62,15 @@ type ListingDetail = {
 
 const materialOptions = ['Панель', 'Кирпич', 'Блок', 'Монолит', 'Железобетон', 'Дерево', 'Металл'];
 const districtOptions = [
-  'Алексеевский',
-  'Белгородский',
-  'Борисовский',
-  'Валуйский',
-  'Вейделевский',
-  'Волоконовский',
-  'Грайворонский',
-  'Губкинский',
-  'Ивнянский',
-  'Корочанский',
-  'Красненский',
-  'Красногвардейский',
-  'Краснояружский',
-  'Новооскольский',
-  'Прохоровский',
-  'Ракитянский',
-  'Ровеньский',
-  'Старооскольский',
-  'Чернянский',
-  'Шебекинский',
-  'Яковлевский',
+  'Анапский',
+  'Темрюкский',
+  'Крымский',
+  'Новороссийск',
+  'Геленджик',
+  'Абинский',
+  'Северский',
+  'Туапсинский',
+  'Сочи',
 ];
 
 const houseTypeOptions = [
@@ -150,7 +138,7 @@ export default function AdminManualHouse() {
   const [floorsCount, setFloorsCount] = useState('');
   const [bedrooms, setBedrooms] = useState('');
   const [bathrooms, setBathrooms] = useState('');
-  const [districtName, setDistrictName] = useState('Белгородский');
+  const [districtName, setDistrictName] = useState('Анапский');
   const [settlement, setSettlement] = useState('');
   const [street, setStreet] = useState('');
   const [houseNumber, setHouseNumber] = useState('');
@@ -161,8 +149,6 @@ export default function AdminManualHouse() {
   const [directionNorth, setDirectionNorth] = useState(false);
   const [directionEast, setDirectionEast] = useState(false);
   const [directionWest, setDirectionWest] = useState(false);
-  const [inBelgorodDistrict, setInBelgorodDistrict] = useState(true);
-  const [inBelgorodRegion, setInBelgorodRegion] = useState(true);
   const [hasGarage, setHasGarage] = useState(false);
   const [yearBuilt, setYearBuilt] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
@@ -207,7 +193,7 @@ export default function AdminManualHouse() {
     setFloorsCount(current.house?.floorsCount != null ? String(current.house.floorsCount) : '');
     setBedrooms(current.house?.bedrooms != null ? String(current.house.bedrooms) : '');
     setBathrooms(current.house?.bathrooms != null ? String(current.house.bathrooms) : '');
-    setDistrictName(current.house?.districtName ?? 'Белгородский');
+    setDistrictName(current.house?.districtName ?? 'Анапский');
     setSettlement(current.house?.settlement ?? '');
     setStreet(current.house?.street ?? '');
     setHouseNumber(current.house?.houseNumber ?? '');
@@ -217,8 +203,6 @@ export default function AdminManualHouse() {
     setDirectionNorth(Boolean(current.house?.directionNorth));
     setDirectionEast(Boolean(current.house?.directionEast));
     setDirectionWest(Boolean(current.house?.directionWest));
-    setInBelgorodDistrict(current.house?.inBelgorodDistrict ?? true);
-    setInBelgorodRegion(current.house?.inBelgorodRegion ?? true);
     setHasGarage(Boolean(current.house?.hasGarage));
     setYearBuilt(current.house?.yearBuilt != null ? String(current.house.yearBuilt) : '');
     setPhotoUrl(typeof current.house?.photoUrl === 'string' ? current.house.photoUrl : '');
@@ -266,8 +250,8 @@ export default function AdminManualHouse() {
           directionNorth,
           directionEast,
           directionWest,
-          inBelgorodDistrict,
-          inBelgorodRegion,
+          inBelgorodDistrict: null,
+          inBelgorodRegion: null,
           hasGarage,
           yearBuilt: yearBuilt ? Number(yearBuilt) : undefined,
           photoUrl: photoUrl.trim() || undefined,
@@ -501,14 +485,6 @@ export default function AdminManualHouse() {
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={hasGarage} onChange={(e) => setHasGarage(e.target.checked)} />
           Гараж
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={inBelgorodDistrict} onChange={(e) => setInBelgorodDistrict(e.target.checked)} />
-          Белгородский район
-        </label>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={inBelgorodRegion} onChange={(e) => setInBelgorodRegion(e.target.checked)} />
-          Белгородская область
         </label>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={isHot} onChange={(e) => setIsHot(e.target.checked)} />

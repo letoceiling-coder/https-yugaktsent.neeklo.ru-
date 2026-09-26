@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import RedesignHeader from '@/redesign/components/RedesignHeader';
 import FooterSection from '@/components/FooterSection';
 import { Heart, Printer, FolderPlus, GitCompare, Clock, MapPin } from 'lucide-react';
-import { formatPrice } from '@/redesign/data/mock-data';
+import { formatDisplayPrice as formatPrice } from '@/redesign/lib/display-price';
 import { Button } from '@/components/ui/button';
 import { useFavorites, type FavoriteRow } from '@/shared/hooks/useFavorites';
 import { useAuth } from '@/shared/hooks/useAuth';

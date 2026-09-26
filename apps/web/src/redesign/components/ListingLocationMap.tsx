@@ -3,6 +3,9 @@ import { useYandexMapsReady } from '@/shared/hooks/useYandexMapsReady';
 import { useInViewOnce } from '@/shared/hooks/useInViewOnce';
 import { MapPin } from 'lucide-react';
 
+/** Стартовый центр карты — Анапа, рабочая география агентства. */
+const DEFAULT_MAP_CENTER = [44.8948, 37.3164];
+
 declare global {
   interface Window { ymaps: any; }
 }
@@ -35,10 +38,9 @@ const ListingLocationMap = ({ address, regionName, height = '300px' }: Props) =>
       .trim();
     const fullQuery = [regionName, cleanAddress].filter(Boolean).join(', ');
 
-    // Default: center on Belgorod if region matches, else Russia center
-    const defaultCenter = regionName?.toLowerCase().includes('белгород')
-      ? [50.595414, 36.587277]
-      : [55.751244, 37.618423];
+    // Стартовый вид до того, как геокодер вернёт точку по адресу:
+    // Анапа — город, в котором работает агентство.
+    const defaultCenter = DEFAULT_MAP_CENTER;
 
     const map = new window.ymaps.Map(mapRef.current, {
       center: defaultCenter,

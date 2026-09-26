@@ -20,11 +20,8 @@ const RedesignComplex = lazyWithReload(() => import("./redesign/pages/RedesignCo
 const RedesignApartment = lazyWithReload(() => import("./redesign/pages/RedesignApartment"));
 const RedesignListingDetail = lazyWithReload(() => import("./redesign/pages/RedesignListingDetail"));
 const RedesignMap = lazyWithReload(() => import("./redesign/pages/RedesignMap"));
-const RedesignLayouts = lazyWithReload(() => import("./redesign/pages/RedesignLayouts"));
 
 // Catalog sub-pages
-const CatalogApartments = lazy(() => import("./pages/CatalogApartments"));
-const Belgorod = lazy(() => import("./pages/Belgorod"));
 
 // Detail / utility pages
 const Presentation = lazyWithReload(() => import("./pages/Presentation"));
@@ -39,9 +36,6 @@ const AccountHistory = lazyWithReload(() => import("./account/pages/AccountHisto
 const AccountNotifications = lazyWithReload(() => import("./account/pages/AccountNotifications"));
 const AccountBillingPage = lazyWithReload(() => import("./account/pages/AccountBillingPage"));
 const PublicAgencyPage = lazyWithReload(() => import("./ecosystem/pages/PublicAgencyPage"));
-const PublicAgentPage = lazyWithReload(() => import("./ecosystem/pages/PublicAgentPage"));
-const PublicAgentsListPage = lazyWithReload(() => import("./ecosystem/pages/PublicAgentsListPage"));
-const PublicAgentListingsPage = lazyWithReload(() => import("./ecosystem/pages/PublicAgentListingsPage"));
 const Contacts = lazy(() => import("./pages/Contacts"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const AboutCompany = lazy(() => import("./pages/AboutCompany"));
@@ -141,17 +135,15 @@ const AppRoutes = () => (
     {/* Main */}
     <Route path="/" element={<RedesignIndex />} />
     <Route path="/catalog" element={<RedesignCatalog />} />
-    <Route path="/catalog/apartments" element={<CatalogApartments />} />
+    <Route path="/catalog/apartments" element={<Navigate to="/catalog?type=apartments" replace />} />
     <Route path="/catalog/houses" element={<Navigate to="/catalog?type=houses" replace />} />
     <Route path="/catalog/land" element={<Navigate to="/catalog?type=land" replace />} />
     <Route path="/catalog/commercial" element={<Navigate to="/catalog?type=commercial" replace />} />
-    <Route path="/belgorod" element={<Belgorod />} />
     <Route path="/complex/:slug" element={<RedesignComplex />} />
     <Route path="/apartment/:id" element={<RedesignApartment />} />
     <Route path="/listing/:id" element={<RedesignListingDetail />} />
     <Route path="/presentation/listing/:listingId" element={<ListingPresentation />} />
     <Route path="/presentation/:slug" element={<Presentation />} />
-    <Route path="/layouts/:complex" element={<RedesignLayouts />} />
     <Route path="/map" element={<RedesignMap />} />
     <Route path="/mortgage" element={<Navigate to="/catalog" replace />} />
     <Route path="/compare" element={<Compare />} />
@@ -176,9 +168,6 @@ const AppRoutes = () => (
 
     {/* Ecosystem — public agency/agent profiles */}
     <Route path="/agency/:slug" element={<PublicAgencyPage />} />
-    <Route path="/agents" element={<PublicAgentsListPage />} />
-    <Route path="/agent/:slug/listings" element={<PublicAgentListingsPage />} />
-    <Route path="/agent/:slug" element={<PublicAgentPage />} />
 
     {/* Auth */}
     <Route path="/login" element={<Login />} />

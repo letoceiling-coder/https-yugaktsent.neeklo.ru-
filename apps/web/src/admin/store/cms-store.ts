@@ -21,7 +21,7 @@ const saveToStorage = (key: string, data: any) => {
 // Default user
 const defaultUser: CMSUser = {
   id: 'admin-1',
-  email: 'admin@livegrid.com',
+  email: 'admin@yugaktsent.ru',
   name: 'Admin',
   role: 'admin',
   createdAt: new Date().toISOString(),
@@ -42,7 +42,7 @@ const createDemoPage = (): Page => ({
           id: generateId(),
           type: 'hero',
           props: {
-            title: 'Добро пожаловать в Live Grid',
+            title: 'Добро пожаловать в ЮгАкцент',
             subtitle: 'Платформа для управления контентом нового поколения',
             buttonText: 'Начать',
             buttonUrl: '#',
@@ -56,7 +56,7 @@ const createDemoPage = (): Page => ({
       styles: {},
     },
   ],
-  seo: { title: 'Главная — Live Grid', description: 'Live Grid CMS', slug: '/' },
+  seo: { title: 'Главная — ЮгАкцент', description: 'ЮгАкцент CMS', slug: '/' },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
   createdBy: 'admin-1',

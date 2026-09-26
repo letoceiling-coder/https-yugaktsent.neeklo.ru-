@@ -42,7 +42,7 @@ const defaultHomeContent: PageContent = {
   og_image: '',
   status: 'published',
   sections: [
-    { id: 'home-hero', type: 'hero', label: 'Hero секция', position: 0, is_active: true, settings: { title: 'Live Grid.', subtitle: 'Более 100 000 объектов по России', searchPlaceholder: 'Поиск по сайту', buttonText: 'Показать 121 563 объекта', location: 'Москва и МО', tabs: ['Квартиры', 'Паркинги', 'Дома с участками', 'Участки', 'Коммерция'] } },
+    { id: 'home-hero', type: 'hero', label: 'Hero секция', position: 0, is_active: true, settings: { title: 'ЮгАкцент', subtitle: 'Новостройки и вторичка Юга России', searchPlaceholder: 'Поиск по сайту', buttonText: 'Показать объекты', location: 'Анапа', tabs: ['Квартиры', 'Паркинги', 'Дома с участками', 'Участки', 'Коммерция'] } },
     { id: 'home-categories', type: 'category_tiles', label: 'Плитки категорий', position: 1, is_active: true, settings: { items: [
       { name: 'Новостройки', link: '/catalog' },
       { name: 'Вторичная\nнедвижимость', link: '/catalog' },
