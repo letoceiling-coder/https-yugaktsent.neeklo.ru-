@@ -116,6 +116,11 @@ for await (const file of walk(ROOT)) {
       console.log(
         `обработано ${stats.processed}: ${(stats.before / 1048576).toFixed(0)} МБ → ${(stats.after / 1048576).toFixed(0)} МБ`,
       );
+      // Журнал пишем по ходу дела: длинный прогон не должен терять историю при обрыве
+      if (logLines.length) {
+        await fs.appendFile(LOG_PATH, logLines.join('\n') + '\n');
+        logLines.length = 0;
+      }
     }
   } catch (e) {
     stats.failed++;
