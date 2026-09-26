@@ -3,7 +3,7 @@ import { useSiteSettings, setting, settingOptional } from '@/redesign/hooks/useS
 import { defaultPublicBrandName } from '@/shared/lib/site-brand-text';
 
 const DEFAULT_BRAND = defaultPublicBrandName();
-const DEFAULT_LOGO = '/logo.svg';
+const DEFAULT_LOGO = '/logo-yug-aktsent.png';
 
 /** Публичное имя бренда и лого из site_settings (white-label). */
 export function useSiteBrand() {
