@@ -1,7 +1,11 @@
+import { useEffect, useRef } from 'react';
+import { Clock, Mail, MapPin, Navigation, Phone } from 'lucide-react';
 import RedesignHeader from '@/redesign/components/RedesignHeader';
 import FooterSection from '@/components/FooterSection';
-import LeadForm from '@/shared/components/LeadForm';
-import { Phone, Mail, MapPin, Navigation } from 'lucide-react';
+import LeadHighlightSection from '@/redesign/components/LeadHighlightSection';
+import MapUnavailableNotice from '@/redesign/components/MapUnavailableNotice';
+import { useYandexMapsReady } from '@/shared/hooks/useYandexMapsReady';
+import { useInViewOnce } from '@/shared/hooks/useInViewOnce';
 import { useSiteSettings, settingOptional } from '@/redesign/hooks/useSiteSettings';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import { telHref, yandexMapsHref } from '@/lib/contact-links';
@@ -9,98 +13,137 @@ import { telHref, yandexMapsHref } from '@/lib/contact-links';
 const Contacts = () => {
   const { data: s } = useSiteSettings();
   const { shortName } = useSiteBrand();
+
   const phone = settingOptional(s, 'phone_main');
-  const phoneTel = phone ? telHref(phone) : undefined;
-  const email = settingOptional(s, 'email');
-  const address = settingOptional(s, 'address');
+  const email = settingOptional(s, 'email') ?? settingOptional(s, 'contacts_email');
+  const address = settingOptional(s, 'address') ?? settingOptional(s, 'contacts_address');
+  const workHours = settingOptional(s, 'contacts_work_hours') ?? settingOptional(s, 'work_hours');
+  const officeTitle = settingOptional(s, 'office_title') ?? `Офис ${shortName}`;
   const lat = settingOptional(s, 'office_lat');
   const lng = settingOptional(s, 'office_lng');
+
   const mapsUrl =
     address || (lat && lng) ? yandexMapsHref({ address, officeLat: lat, officeLng: lng }) : undefined;
+
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInView = useInViewOnce(mapRef);
+  const { ready: ymapsReady, failure } = useYandexMapsReady({ enabled: mapInView });
+  const mapBuiltRef = useRef(false);
+
+  const latNum = Number(lat);
+  const lngNum = Number(lng);
+  const hasCoords = Number.isFinite(latNum) && Number.isFinite(lngNum) && latNum !== 0 && lngNum !== 0;
+
+  useEffect(() => {
+    if (!ymapsReady || !hasCoords || !mapRef.current || mapBuiltRef.current) return;
+    const ymaps = (window as unknown as { ymaps?: any }).ymaps;
+    if (!ymaps) return;
+    mapBuiltRef.current = true;
+
+    const map = new ymaps.Map(mapRef.current, {
+      center: [latNum, lngNum],
+      zoom: 16,
+      controls: ['zoomControl', 'fullscreenControl'],
+    });
+    map.geoObjects.add(
+      new ymaps.Placemark([latNum, lngNum], { hintContent: officeTitle }, { preset: 'islands#greenDotIcon' }),
+    );
+    return () => {
+      map.destroy?.();
+      mapBuiltRef.current = false;
+    };
+  }, [ymapsReady, hasCoords, latNum, lngNum, officeTitle]);
+
+  /** Строки контактов: чего нет в настройках — не рисуем, заглушек не придумываем. */
+  const rows = [
+    address ? { icon: MapPin, label: 'Адрес', value: address, href: mapsUrl } : null,
+    workHours ? { icon: Clock, label: 'График работы', value: workHours, href: undefined } : null,
+    phone ? { icon: Phone, label: 'Телефон', value: phone, href: telHref(phone) } : null,
+    email ? { icon: Mail, label: 'Почта', value: email, href: `mailto:${email}` } : null,
+  ].filter(Boolean) as { icon: typeof MapPin; label: string; value: string; href?: string }[];
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <RedesignHeader />
-      <div className="max-w-[1400px] mx-auto px-4 py-8 sm:py-12">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-8">Контакты</h1>
-        <div className="grid lg:grid-cols-[1fr_400px] gap-8">
-          <div className="space-y-6">
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-muted h-[300px] sm:h-[400px]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(37,99,235,0.20),transparent_32%),radial-gradient(circle_at_80%_70%,rgba(249,115,22,0.16),transparent_30%)]" />
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(148,163,184,0.14)_1px,transparent_1px),linear-gradient(rgba(148,163,184,0.14)_1px,transparent_1px)] bg-[size:42px_42px]" />
-              <div className="relative flex h-full flex-col items-center justify-center px-6 text-center">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg">
-                  <MapPin className="h-7 w-7" />
-                </div>
-                <p className="max-w-md text-lg font-semibold">{address ?? `Офис ${shortName}`}</p>
-                <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                  Откройте маршрут в Яндекс Картах или свяжитесь с нами через форму справа.
-                </p>
-                {mapsUrl ? (
-                  <a
-                    href={mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-5 inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-                  >
-                    <Navigation className="h-4 w-4" />
-                    Построить маршрут
-                  </a>
-                ) : null}
-              </div>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {address ? (
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-sm">Адрес</p>
-                    {mapsUrl ? (
-                      <a
-                        href={mapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-muted-foreground hover:text-primary"
-                      >
-                        {address}
-                      </a>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">{address}</p>
-                    )}
-                  </div>
-                </div>
-              ) : null}
-              {phone ? (
-                <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-sm">Телефон</p>
-                    {phoneTel ? (
-                      <a href={phoneTel} className="text-sm text-muted-foreground hover:text-primary">
-                        {phone}
-                      </a>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">{phone}</p>
-                    )}
-                  </div>
-                </div>
-              ) : null}
-              {email ? (
-                <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-sm">Email</p>
-                    <a href={`mailto:${email}`} className="text-sm text-muted-foreground hover:text-primary">
-                      {email}
-                    </a>
-                  </div>
-                </div>
-              ) : null}
-            </div>
+
+      <section className="section-y" aria-labelledby="contacts-title">
+        <div className="container-page grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-start lg:gap-14">
+          <div>
+            <p className="text-overline text-muted-foreground">Наш офис</p>
+            <h1 id="contacts-title" className="text-section-title mt-3">
+              Приезжайте на чашку кофе
+            </h1>
+            <p className="mt-4 max-w-[520px] text-sm leading-relaxed text-muted-foreground sm:text-base">
+              Покажем подборку на большом экране, разберём планировки и документы.
+              Консультация и кофе бесплатные — записываться заранее не нужно.
+            </p>
+
+            {rows.length > 0 ? (
+              <ul className="mt-8 space-y-5">
+                {rows.map(({ icon: Icon, label, value, href }) => (
+                  <li key={label} className="flex items-start gap-4">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-mint">
+                      <Icon className="h-5 w-5 text-primary" aria-hidden />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
+                      {href ? (
+                        <a
+                          href={href}
+                          target={href.startsWith('http') ? '_blank' : undefined}
+                          rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          className="mt-1 block text-base font-medium text-foreground transition-colors hover:text-primary"
+                        >
+                          {value}
+                        </a>
+                      ) : (
+                        <p className="mt-1 text-base font-medium text-foreground">{value}</p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-8 text-sm text-muted-foreground">
+                Контакты пока не заполнены в настройках сайта.
+              </p>
+            )}
           </div>
-          <LeadForm title="Написать нам" source="contacts" />
+
+          <div>
+            <div
+              ref={mapRef}
+              className="relative h-[320px] w-full overflow-hidden rounded-[20px] border border-border bg-muted sm:h-[420px] lg:h-[480px]"
+            >
+              {!hasCoords ? (
+                <div className="absolute inset-0 z-[5] flex flex-col items-center justify-center gap-2 px-6 text-center">
+                  <MapPin className="h-7 w-7 text-muted-foreground" aria-hidden />
+                  <p className="text-sm font-medium">Координаты офиса не заданы</p>
+                  <p className="max-w-[320px] text-xs leading-relaxed text-muted-foreground">
+                    Добавьте их в настройках сайта — поля office_lat и office_lng.
+                  </p>
+                </div>
+              ) : failure ? (
+                <MapUnavailableNotice failure={failure} />
+              ) : null}
+            </div>
+
+            {mapsUrl ? (
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex h-12 items-center gap-2 rounded-xl border border-border px-5 text-[15px] font-medium transition-colors hover:border-primary/40 hover:text-primary"
+              >
+                <Navigation className="h-4 w-4" />
+                Открыть в Яндекс Картах
+              </a>
+            ) : null}
+          </div>
         </div>
-      </div>
+      </section>
+
+      <LeadHighlightSection source="contacts:selection" />
       <FooterSection />
     </div>
   );
