@@ -62,26 +62,52 @@ async function* walk(dir) {
   }
 }
 
+/** Размеры картинки; null — прочитать не удалось. */
+async function dimensions(file) {
+  try {
+    const { stdout } = await run('identify', ['-format', '%w %h', `${file}[0]`]);
+    const [w, h] = stdout.trim().split(/\s+/).map(Number);
+    return Number.isFinite(w) && Number.isFinite(h) ? { w, h } : null;
+  } catch {
+    return null;
+  }
+}
+
 async function optimize(file) {
   const ext = path.extname(file).toLowerCase();
   const tmp = `${file}.opt${ext}`;
+  const dim = await dimensions(file);
+  const needsResize = dim ? Math.max(dim.w, dim.h) > MAX_SIDE : true;
+
   if (ext === '.webp') {
     await run('convert', [file, '-resize', `${MAX_SIDE}x${MAX_SIDE}>`, '-quality', '82', tmp]);
-  } else if (ext === '.png') {
-    // Тяжёлые PNG — это фотографии и рендеры, сохранённые без палитры.
-    // pngquant даёт около 70 % выигрыша, визуально разницы нет.
-    await run('convert', [file, '-resize', `${MAX_SIDE}x${MAX_SIDE}>`, '-strip', tmp]);
-    try {
-      await run('pngquant', ['--quality=65-90', '--speed', '3', '--force', '--output', tmp, tmp]);
-    } catch {
-      // pngquant не установлен или не смог уложиться в качество — остаётся вариант ImageMagick
-    }
-  } else {
-    await run('convert', [
-      file, '-auto-orient', '-resize', `${MAX_SIDE}x${MAX_SIDE}>`,
-      '-strip', '-interlace', 'Plane', '-quality', '82', tmp,
-    ]);
+    return tmp;
   }
+
+  if (ext === '.png') {
+    // Тяжёлые PNG — это фотографии и рендеры без палитры: pngquant даёт около 70 %.
+    // Если уменьшать не нужно, ImageMagick вообще не запускаем — это половина времени прогона.
+    const source = needsResize ? tmp : file;
+    if (needsResize) await run('convert', [file, '-resize', `${MAX_SIDE}x${MAX_SIDE}>`, '-strip', tmp]);
+    try {
+      await run('pngquant', ['--quality=65-90', '--speed', '4', '--force', '--output', tmp, source]);
+    } catch {
+      // pngquant не смог уложиться в качество: если был ресайз — остаётся его результат,
+      // иначе отдаём копию оригинала, и она отсеется проверкой выигрыша
+      if (!needsResize) await fs.copyFile(file, tmp);
+    }
+    return tmp;
+  }
+
+  if (!needsResize) {
+    await fs.copyFile(file, tmp);
+    await run('jpegoptim', ['--max=82', '--strip-all', '--quiet', tmp]);
+    return tmp;
+  }
+  await run('convert', [
+    file, '-auto-orient', '-resize', `${MAX_SIDE}x${MAX_SIDE}>`,
+    '-strip', '-interlace', 'Plane', '-quality', '82', tmp,
+  ]);
   return tmp;
 }
 
