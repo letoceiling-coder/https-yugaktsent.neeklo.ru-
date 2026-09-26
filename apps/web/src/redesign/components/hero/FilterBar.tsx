@@ -10,7 +10,7 @@ import CatalogSearchHintsDropdown from '@/redesign/components/CatalogSearchHints
 import type { CatalogHints } from '@/redesign/lib/catalog-hints-types';
 import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
 import { catalogFiltersIntoSearchParams } from '@/redesign/lib/catalog-url-sync';
-import { OBJECT_TYPE_TABS, ROOM_LABELS, resetFiltersForObjectType } from '@/redesign/lib/catalog-filter-config';
+import { OBJECT_TYPE_TABS, resetFiltersForObjectType } from '@/redesign/lib/catalog-filter-config';
 import type { CatalogFilters, MarketType, ObjectType } from '@/redesign/data/types';
 import { defaultFilters } from '@/redesign/data/types';
 
@@ -24,7 +24,17 @@ const MARKET_TABS: { value: MarketType; label: string }[] = [
   { value: 'secondary', label: 'Вторичка' },
 ];
 
-const ROOM_CHIPS = [0, 1, 2, 3, 4];
+/**
+ * Подписи шире, чем в сайдбаре каталога: здесь колонка позволяет написать «Студия».
+ * `grow` — доля ширины: студии нужно вдвое больше, чем цифре.
+ */
+const ROOM_CHIPS: { room: number; label: string; grow: string }[] = [
+  { room: 0, label: 'Студия', grow: 'lg:flex-[1.7]' },
+  { room: 1, label: '1', grow: 'lg:flex-1' },
+  { room: 2, label: '2', grow: 'lg:flex-1' },
+  { room: 3, label: '3', grow: 'lg:flex-1' },
+  { room: 4, label: '4+', grow: 'lg:flex-1' },
+];
 
 function digitsToNumber(raw: string): number | undefined {
   const digits = raw.replace(/\D/g, '');
@@ -121,7 +131,8 @@ const FilterBar = () => {
         </div>
 
         {/* Ряд 1: рынок + ссылка на карту */}
-        <div className="mb-4 flex items-center justify-between gap-3">
+        {/* На 375 px табы и ссылка в строку не помещаются — ссылка переносится и прижимается вправо */}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
           <div className="flex gap-2" role="tablist" aria-label="Тип рынка">
             {MARKET_TABS.map((tab) => (
               <button
@@ -144,15 +155,17 @@ const FilterBar = () => {
           <button
             type="button"
             onClick={() => navigate(`/map?${buildParams().toString()}`)}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+            className="ml-auto inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
-            <MapPin className="h-4 w-4" />
-            Показать на карте
+            <MapPin className="h-4 w-4 shrink-0" />
+            {/* На узком экране длинная подпись ломалась на две строки и наезжала на табы */}
+            <span className="sm:hidden">На карте</span>
+            <span className="hidden sm:inline">Показать на карте</span>
           </button>
         </div>
 
         {/* Ряд 2: тип, город, цена, комнаты, поиск */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.4fr)_minmax(0,1.2fr)_auto] lg:items-end">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(150px,0.9fr)_minmax(140px,0.9fr)_minmax(200px,1.3fr)_minmax(232px,1.4fr)_auto] lg:items-end">
           <div>
             <label className={labelClass} htmlFor="hero-object-type">
               Тип недвижимости
@@ -239,20 +252,21 @@ const FilterBar = () => {
           <div>
             <span className={labelClass}>Комнат</span>
             <div className="flex gap-1.5">
-              {ROOM_CHIPS.map((room) => (
+              {ROOM_CHIPS.map(({ room, label, grow }) => (
                 <button
                   key={room}
                   type="button"
                   aria-pressed={filters.rooms.includes(room)}
                   onClick={() => toggleRoom(room)}
                   className={cn(
-                    'h-11 min-w-[44px] flex-1 rounded-xl border text-sm font-medium transition-colors',
+                    'h-11 min-w-0 flex-1 whitespace-nowrap rounded-xl border px-1 text-sm font-medium transition-colors',
+                    grow,
                     filters.rooms.includes(room)
                       ? 'border-primary bg-primary text-primary-foreground'
                       : 'border-[#e2e8f0] bg-background hover:border-primary/40',
                   )}
                 >
-                  {ROOM_LABELS[room]}
+                  {label}
                 </button>
               ))}
             </div>

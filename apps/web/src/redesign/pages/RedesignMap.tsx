@@ -7,7 +7,7 @@ import ListingsMapSearch, { type ListingMapItem } from '@/redesign/components/Li
 import FilterSidebar from '@/redesign/components/FilterSidebar';
 import RegionSelector from '@/redesign/components/RegionSelector';
 import { apiGet } from '@/lib/api';
-import { defaultFilters, type CatalogFilters, type ObjectType } from '@/redesign/data/types';
+import { type CatalogFilters, type ObjectType } from '@/redesign/data/types';
 import { isMoscowRegion, OBJECT_TYPE_TABS } from '@/redesign/lib/catalog-filter-config';
 import { Search, SlidersHorizontal, X, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -117,7 +117,10 @@ function fallbackCoords(center: [number, number] | null, index: number): [number
 
 const RedesignMap = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [filters, setFilters] = useState<CatalogFilters>({ ...defaultFilters });
+  // То же, что в каталоге: фильтры из адреса нужны уже на первом рендере.
+  const [filters, setFilters] = useState<CatalogFilters>(() =>
+    catalogFiltersFromSearchParams(new URLSearchParams(window.location.search)),
+  );
   const [activeBlock, setActiveBlock] = useState<string | null>(null);
   const [activeListing, setActiveListing] = useState<number | null>(null);
   const [showFilters, setShowFilters] = useState(false);
