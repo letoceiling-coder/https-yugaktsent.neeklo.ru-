@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Clock } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, Send, Youtube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { setting, settingOptional, useSiteSettings } from '@/redesign/hooks/useSiteSettings';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
@@ -76,7 +76,9 @@ const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
   const phoneMain = settingOptional(s, 'phone_main');
   const phoneHref = phoneMain ? telHref(phoneMain) : null;
   const emailVal = settingOptional(s, 'email') ?? settingOptional(s, 'contacts_email');
-  const addressVal = settingOptional(s, 'address');
+  const addressVal = settingOptional(s, 'address') ?? settingOptional(s, 'contacts_address');
+  const telegramUrl = settingOptional(s, 'telegram_url');
+  const youtubeUrl = settingOptional(s, 'youtube_url');
   const officeLat = settingOptional(s, 'office_lat');
   const officeLng = settingOptional(s, 'office_lng');
 
@@ -159,9 +161,42 @@ const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
             </div>
           </div>
 
-          <FooterNavColumn title="Каталог" links={FOOTER_CATALOG_LINKS} />
+          <FooterNavColumn title="Недвижимость" links={FOOTER_CATALOG_LINKS} />
           <FooterNavColumn title="Компания" links={FOOTER_COMPANY_LINKS} />
         </div>
+
+        {telegramUrl || youtubeUrl ? (
+          <div className="mt-8 flex items-center gap-2 border-t border-primary-foreground/10 pt-6">
+            {telegramUrl ? (
+              <a
+                href={telegramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Telegram"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/10 transition-colors hover:bg-primary-foreground/20"
+              >
+                <Send className="h-[18px] w-[18px]" />
+              </a>
+            ) : null}
+            {youtubeUrl ? (
+              <a
+                href={youtubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/10 transition-colors hover:bg-primary-foreground/20"
+              >
+                <Youtube className="h-[18px] w-[18px]" />
+              </a>
+            ) : null}
+          </div>
+        ) : null}
+
+        {addressVal ? (
+          <p className="mt-8 text-sm opacity-70">
+            Приезжайте на чашечку кофе. Наш офис: {addressVal}
+          </p>
+        ) : null}
 
         {mapWidgetSrc && mapsUrl ? (
           <FooterOfficeMap

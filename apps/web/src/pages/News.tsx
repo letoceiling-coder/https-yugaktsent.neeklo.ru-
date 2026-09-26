@@ -1,17 +1,15 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Loader2 } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, Loader2, Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { cn } from '@/lib/utils';
 import Header from '@/redesign/components/RedesignHeader';
 import FooterSection from '@/components/FooterSection';
-import QuizSection from '@/components/QuizSection';
-import AboutPlatform from '@/components/AboutPlatform';
-import ContactsSection from '@/components/ContactsSection';
+import LeadHighlightSection from '@/redesign/components/LeadHighlightSection';
+import MissingPhotoPlaceholder from '@/redesign/components/MissingPhotoPlaceholder';
 import { apiGet } from '@/lib/api';
 import { stripHtmlToPlainText, truncatePlain } from '@/lib/html';
 import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
-
-import complex1 from '@/assets/complex-1.jpg';
 
 interface NewsRow {
   id: number;
@@ -19,6 +17,8 @@ interface NewsRow {
   title: string;
   body: string | null;
   imageUrl: string | null;
+  /** Рубрика публикации — приходит в поле source */
+  source: string | null;
   publishedAt: string | null;
   createdAt: string;
 }
@@ -28,107 +28,172 @@ interface PaginatedResult {
   meta: { page: number; per_page: number; total: number; total_pages: number };
 }
 
+const ALL_TAB = 'Все';
+/**
+ * Публичный список новостей не умеет ни поиск, ни фильтр по рубрике,
+ * поэтому берём ленту одним запросом и отбираем на клиенте.
+ * Серверная фильтрация описана в docs/BACKEND_TODO.md.
+ */
+const PER_PAGE = 60;
+
+function formatDate(value: string): string {
+  return new Date(value).toLocaleDateString('ru-RU', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
 const News = () => {
-  const [page, setPage] = useState(1);
-  const perPage = 20;
+  const [tab, setTab] = useState(ALL_TAB);
+  const [query, setQuery] = useState('');
   const { data: regionId } = useDefaultRegionId();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['news', 'public', page, regionId ?? null],
+    queryKey: ['news', 'public', regionId ?? null],
     queryFn: () =>
-      apiGet<PaginatedResult>(`/news?page=${page}&per_page=${perPage}${regionId != null ? `&region_id=${regionId}` : ''}`),
+      apiGet<PaginatedResult>(
+        `/news?page=1&per_page=${PER_PAGE}${regionId != null ? `&region_id=${regionId}` : ''}`,
+      ),
     enabled: regionId != null,
     staleTime: 60_000,
   });
 
-  const rows = data?.data ?? [];
-  const meta = data?.meta;
+  const rows = useMemo(() => data?.data ?? [], [data]);
+
+  // Рубрики берём из самих публикаций: выдуманных вкладок быть не должно
+  const tabs = useMemo(() => {
+    const found = new Set<string>();
+    for (const r of rows) {
+      const s = r.source?.trim();
+      if (s) found.add(s);
+    }
+    return [ALL_TAB, ...[...found].sort((a, b) => a.localeCompare(b, 'ru'))];
+  }, [rows]);
+
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return rows.filter((r) => {
+      if (tab !== ALL_TAB && r.source?.trim() !== tab) return false;
+      if (!q) return true;
+      const haystack = `${r.title} ${stripHtmlToPlainText(r.body ?? '')}`.toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [rows, tab, query]);
 
   return (
     <div className="min-h-screen bg-background pb-16 lg:pb-0">
       <Header />
 
-      <div className="max-w-[1400px] mx-auto px-4 pt-4 pb-2">
-        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground">
-          <Link to="/" className="hover:text-foreground transition-colors">Главная</Link>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-foreground font-medium">Новости</span>
-        </nav>
-      </div>
+      <section className="section-y" aria-labelledby="news-title">
+        <div className="container-page">
+          <p className="text-overline text-muted-foreground">Новости и аналитика</p>
+          <h1 id="news-title" className="text-section-title mt-3">
+            Рынок недвижимости Анапы
+          </h1>
 
-      <div className="max-w-[1400px] mx-auto px-4 pb-6">
-        <h1 className="text-3xl font-bold">Все новости</h1>
-        {meta && <p className="text-sm text-muted-foreground mt-1">{meta.total} публикаций</p>}
-      </div>
+          <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            {tabs.length > 1 ? (
+              <div className="flex flex-wrap gap-2" role="tablist" aria-label="Рубрики">
+                {tabs.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === t}
+                    onClick={() => setTab(t)}
+                    className={cn(
+                      'h-10 rounded-full px-4 text-sm font-medium transition-colors',
+                      tab === t
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-secondary text-foreground hover:bg-secondary/70',
+                    )}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <span />
+            )}
 
-      {isLoading && (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-        </div>
-      )}
+            <div className="relative w-full lg:w-[300px]">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="search"
+                className="h-10 w-full rounded-xl border border-border bg-background pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary/60"
+                placeholder="Поиск по новостям"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                aria-label="Поиск по новостям"
+              />
+            </div>
+          </div>
 
-      {!isLoading && rows.length === 0 && (
-        <div className="max-w-[1400px] mx-auto px-4 pb-10 text-center text-sm text-muted-foreground py-16">
-          Новостей пока нет
-        </div>
-      )}
-
-      {rows.length > 0 && (
-        <div className="max-w-[1400px] mx-auto px-4 pb-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {rows.map((n) => (
-              <Link
-                key={n.id}
-                to={`/news/${n.slug}`}
-                className="rounded-2xl overflow-hidden bg-card border border-border hover:shadow-lg transition-shadow group flex flex-col"
-              >
-                <div className="aspect-[4/3] overflow-hidden relative">
-                  <img
-                    src={n.imageUrl || complex1}
-                    alt={n.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-3 flex flex-col flex-1">
-                  <h3 className="font-semibold text-sm mb-1 leading-tight line-clamp-2">{n.title}</h3>
-                  {n.body && (
-                    <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                      {truncatePlain(stripHtmlToPlainText(n.body), 160)}
-                    </p>
-                  )}
-                  <div className="mt-auto flex items-center text-xs text-muted-foreground">
-                    <span>{new Date(n.publishedAt ?? n.createdAt).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-label="Загрузка" />
+            </div>
+          ) : visible.length === 0 ? (
+            <p className="py-20 text-center text-sm text-muted-foreground">
+              {rows.length === 0
+                ? 'Публикаций пока нет.'
+                : 'По этому запросу ничего не нашлось.'}
+            </p>
+          ) : (
+            <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {visible.map((n) => (
+                <Link
+                  key={n.id}
+                  to={`/news/${n.slug}`}
+                  className="group flex flex-col overflow-hidden rounded-[20px] border border-border bg-card transition-shadow hover:shadow-lg"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+                    {n.imageUrl ? (
+                      <img
+                        src={n.imageUrl}
+                        alt=""
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <MissingPhotoPlaceholder label="Без обложки" />
+                    )}
+                    {n.source?.trim() ? (
+                      <span className="absolute left-3 top-3 rounded-lg bg-graphite/75 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
+                        {n.source}
+                      </span>
+                    ) : null}
                   </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {meta && meta.total_pages > 1 && (
-        <div className="max-w-[1400px] mx-auto px-4 pb-10">
-          <div className="flex items-center gap-1">
-            {Array.from({ length: Math.min(meta.total_pages, 10) }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPage(p)}
-                className={`w-9 h-9 rounded-lg text-sm font-medium transition-colors ${
-                  p === page
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-foreground hover:bg-accent'
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+                  <div className="flex flex-1 flex-col p-5">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <CalendarDays className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                      {formatDate(n.publishedAt ?? n.createdAt)}
+                    </div>
 
-      <QuizSection />
-      <AboutPlatform pageSlug="/news" />
-      <ContactsSection />
+                    <h2 className="mt-3 text-base font-bold leading-snug line-clamp-2">{n.title}</h2>
+
+                    {n.body ? (
+                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-3">
+                        {truncatePlain(stripHtmlToPlainText(n.body), 180)}
+                      </p>
+                    ) : null}
+
+                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+                      Читать
+                      <ArrowUpRight className="h-4 w-4" aria-hidden />
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <LeadHighlightSection source="news:selection" />
       <FooterSection />
     </div>
   );

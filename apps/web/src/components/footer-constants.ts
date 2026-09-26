@@ -5,13 +5,13 @@
  */
 
 export const FOOTER_CATALOG_LINKS = [
-  { label: 'Новостройки', to: '/catalog?type=apartments&market=new' },
-  { label: 'Вторичное жильё', to: '/catalog?type=apartments&market=secondary' },
-  { label: 'Дома и участки', to: '/catalog?type=houses' },
+  { label: 'Новостройки Анапы', to: '/catalog?type=apartments&market=new' },
+  { label: 'Каталог недвижимости', to: '/catalog' },
+  { label: 'Поиск на карте', to: '/map' },
 ] as const;
 
 export const FOOTER_COMPANY_LINKS = [
-  { label: 'О нас', to: '/about' },
-  { label: 'Наши агенты', to: '/agents' },
+  { label: 'О компании', to: '/about' },
+  { label: 'Новости', to: '/news' },
   { label: 'Контакты', to: '/contacts' },
 ] as const;

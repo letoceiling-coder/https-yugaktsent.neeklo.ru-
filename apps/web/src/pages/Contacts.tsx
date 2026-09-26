@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Clock, Mail, MapPin, Navigation, Phone } from 'lucide-react';
+import { Clock, Loader2, Mail, MapPin, Navigation, Phone } from 'lucide-react';
 import RedesignHeader from '@/redesign/components/RedesignHeader';
 import FooterSection from '@/components/FooterSection';
 import LeadHighlightSection from '@/redesign/components/LeadHighlightSection';
@@ -125,6 +125,12 @@ const Contacts = () => {
                 </div>
               ) : failure ? (
                 <MapUnavailableNotice failure={failure} />
+              ) : !ymapsReady ? (
+                // Яндекс.Карты поднимаются долго — не оставляем пустой прямоугольник
+                <div className="absolute inset-0 z-[5] flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                  Загружаем карту…
+                </div>
               ) : null}
             </div>
 
