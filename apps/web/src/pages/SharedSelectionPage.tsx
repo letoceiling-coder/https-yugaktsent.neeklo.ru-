@@ -48,7 +48,7 @@ export default function SharedSelectionPage() {
         ) : (
           <>
             <div className="mb-6">
-              <p className="text-sm text-muted-foreground">Публичная подборка LiveGrid</p>
+              <p className="text-sm text-muted-foreground">Публичная подборка объектов</p>
               <h1 className="mt-1 text-2xl font-bold sm:text-3xl">{selection.name}</h1>
               <p className="mt-2 text-sm text-muted-foreground">Показано до 5 объектов. Для консультации откройте объект и оставьте заявку.</p>
             </div>

@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const SITE_NAME = 'LiveGrid';
-const SITE_URL = (import.meta.env.VITE_PUBLIC_SITE_URL as string | undefined)?.replace(/\/+$/, '') || 'https://livegrid.ru';
+const SITE_NAME = (import.meta.env.VITE_SITE_NAME as string | undefined)?.trim() || 'ЮгАкцент';
+const SITE_URL =
+  (import.meta.env.VITE_PUBLIC_SITE_URL as string | undefined)?.replace(/\/+$/, '') ||
+  'https://yugaktsent.neeklo.ru';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
 
 const JSON_LD_ID = 'lg-seo-jsonld';
@@ -94,14 +96,14 @@ function buildJsonLd(pathname: string): Record<string, unknown>[] {
       '@context': 'https://schema.org',
       '@type': 'Apartment',
       url: canonicalUrl,
-      name: 'Квартира на LiveGrid',
+      name: `Квартира · ${SITE_NAME}`,
     });
   } else if (pathname.startsWith('/complex/')) {
     graphs.push({
       '@context': 'https://schema.org',
       '@type': 'Residence',
       url: canonicalUrl,
-      name: 'Жилой комплекс на LiveGrid',
+      name: `Жилой комплекс · ${SITE_NAME}`,
     });
   } else {
     graphs.push({

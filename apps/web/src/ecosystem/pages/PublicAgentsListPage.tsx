@@ -37,7 +37,7 @@ export default function PublicAgentsListPage() {
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-8 sm:py-10">
         <h1 className="text-2xl sm:text-3xl font-bold">Наши специалисты</h1>
         <p className="text-sm text-muted-foreground mt-2 mb-8">
-          Опубликованные карточки специалистов LiveGrid
+          Опубликованные карточки наших специалистов
         </p>
 
         {query.isLoading ? (

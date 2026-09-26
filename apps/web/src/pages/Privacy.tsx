@@ -1,7 +1,13 @@
 import RedesignHeader from '@/redesign/components/RedesignHeader';
 import FooterSection from '@/components/FooterSection';
+import { useSiteContacts } from '@/shared/hooks/useSiteContacts';
 
-const Privacy = () => (
+const Privacy = () => {
+  const { brandName, siteDomain, legalEntity, email, phone } = useSiteContacts();
+  const operator = legalEntity ?? brandName;
+  const contactParts = [email, phone].filter(Boolean).join(', ');
+
+  return (
   <div className="min-h-screen bg-background pb-16 lg:pb-0">
     <RedesignHeader />
     <div className="max-w-[800px] mx-auto px-4 py-8 sm:py-12">
@@ -9,7 +15,11 @@ const Privacy = () => (
       <div className="prose prose-sm max-w-none text-muted-foreground space-y-6">
         <section>
           <h2 className="text-lg font-bold text-foreground">1. Общие положения</h2>
-          <p>Настоящая политика конфиденциальности определяет порядок обработки и защиты персональных данных пользователей сайта livegrid.ru (далее — Сайт), принадлежащего ООО «ЛайвГрид» (далее — Оператор).</p>
+          <p>
+            Настоящая политика конфиденциальности определяет порядок обработки и защиты персональных
+            данных пользователей сайта{siteDomain ? ` ${siteDomain}` : ''} (далее — Сайт), принадлежащего{' '}
+            {operator} (далее — Оператор).
+          </p>
         </section>
         <section>
           <h2 className="text-lg font-bold text-foreground">2. Сбор данных</h2>
@@ -29,7 +39,10 @@ const Privacy = () => (
         </section>
         <section>
           <h2 className="text-lg font-bold text-foreground">6. Контакты</h2>
-          <p>По вопросам, связанным с обработкой персональных данных, обращайтесь: info@livegrid.ru, +7 (904) 539-34-34.</p>
+          <p>
+            По вопросам, связанным с обработкой персональных данных, обращайтесь
+            {contactParts ? `: ${contactParts}.` : ' через раздел «Контакты».'}
+          </p>
         </section>
         <section>
           <h2 className="text-lg font-bold text-foreground">7. Согласие на обработку персональных данных</h2>
@@ -46,7 +59,8 @@ const Privacy = () => (
       </div>
     </div>
     <FooterSection />
-  </div>
-);
+    </div>
+  );
+};
 
 export default Privacy;

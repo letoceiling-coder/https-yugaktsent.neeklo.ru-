@@ -30,7 +30,7 @@ import { CONVERSION_CTA, type ConsultationContext } from '@/redesign/lib/convers
 import { apiGet } from '@/lib/api';
 import TrustBadgeRow from '@/redesign/components/TrustBadgeRow';
 import { formatPriceSafe, formatPricePerMeterSafe, hasValidPrice, isPriceFallbackText, PRICE_ON_REQUEST_CLASS } from '@/redesign/lib/display-price';
-import { LIVEGRID_LOGO_SRC } from '@/redesign/lib/branding';
+import { BRAND_LOGO_SRC } from '@/redesign/lib/branding';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/shared/hooks/useAuth';
 import ListingLocationMap from '@/redesign/components/ListingLocationMap';
@@ -523,7 +523,7 @@ const RedesignListingDetail = () => {
                 {photos.length === 0 || heroFailed ? (
                   <div className="absolute inset-0 flex items-center justify-center bg-muted/50 p-8">
                     <img
-                      src={LIVEGRID_LOGO_SRC}
+                      src={BRAND_LOGO_SRC}
                       alt=""
                       className="max-h-[48%] max-w-[58%] object-contain opacity-45"
                     />

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import { withoutLegacyBrand } from '@/shared/lib/site-brand-text';
 
-const SITE_URL = (import.meta.env.VITE_PUBLIC_SITE_URL as string | undefined)?.replace(/\/+$/, '') || 'https://livegrid.ru';
+const SITE_URL = (import.meta.env.VITE_PUBLIC_SITE_URL as string | undefined)?.replace(/\/+$/, '') || 'https://yugaktsent.neeklo.ru';
 
 export type EntitySeoInput = {
   title: string;

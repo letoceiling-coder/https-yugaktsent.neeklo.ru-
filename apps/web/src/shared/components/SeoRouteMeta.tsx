@@ -6,7 +6,7 @@ import { useSiteSettings, setting, settingOptional } from '@/redesign/hooks/useS
 import { siteBrandFromMap } from '@/redesign/hooks/useSiteBrand';
 import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
 
-const SITE_URL = (import.meta.env.VITE_PUBLIC_SITE_URL as string | undefined)?.replace(/\/+$/, '') || 'https://livegrid.ru';
+const SITE_URL = (import.meta.env.VITE_PUBLIC_SITE_URL as string | undefined)?.replace(/\/+$/, '') || 'https://yugaktsent.neeklo.ru';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.jpg`;
 
 type SeoMeta = {

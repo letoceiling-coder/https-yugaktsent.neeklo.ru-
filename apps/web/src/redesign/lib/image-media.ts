@@ -1,11 +1,11 @@
 import type { SyntheticEvent } from 'react';
-import { LIVEGRID_LOGO_SRC } from '@/redesign/lib/branding';
+import { BRAND_LOGO_SRC } from '@/redesign/lib/branding';
 
 /** Generic SVG placeholder in public/ */
 export const IMAGE_PLACEHOLDER = '/placeholder.svg';
 
 /** Branded logo fallback for listing thumbnails */
-export const IMAGE_LOGO_SRC = LIVEGRID_LOGO_SRC;
+export const IMAGE_LOGO_SRC = BRAND_LOGO_SRC;
 
 export const MEDIA_ASPECT = {
   card: 'aspect-video', // 16:9

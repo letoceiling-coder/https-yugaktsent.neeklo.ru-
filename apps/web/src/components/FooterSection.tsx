@@ -73,31 +73,25 @@ const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
   const { data: s } = useSiteSettings();
   const { shortName, logoUrl, tagline } = useSiteBrand();
 
-  const phoneMain = setting(s, 'phone_main', FOOTER_DEFAULT_PHONE);
-  const phoneHref = telHref(phoneMain);
-  const emailVal =
-    settingOptional(s, 'email') ?? settingOptional(s, 'contacts_email') ?? FOOTER_DEFAULT_EMAIL;
-  const addressVal = setting(s, 'address', FOOTER_DEFAULT_ADDRESS);
+  const phoneMain = settingOptional(s, 'phone_main');
+  const phoneHref = phoneMain ? telHref(phoneMain) : null;
+  const emailVal = settingOptional(s, 'email') ?? settingOptional(s, 'contacts_email');
+  const addressVal = settingOptional(s, 'address');
   const officeLat = settingOptional(s, 'office_lat');
   const officeLng = settingOptional(s, 'office_lng');
 
-  const mapsUrl =
-    yandexMapsHref({ address: addressVal, officeLat, officeLng }) ?? FOOTER_DEFAULT_MAPS_URL;
+  const mapsUrl = yandexMapsHref({ address: addressVal ?? '', officeLat, officeLng });
 
   const whWeekday = settingOptional(s, 'work_hours_weekdays');
   const whWeekend = settingOptional(s, 'work_hours_weekend');
   const whSingle = settingOptional(s, 'work_hours') ?? settingOptional(s, 'contacts_work_hours');
   const hourLines = [whWeekday, whWeekend].filter(Boolean) as string[];
-  if (hourLines.length === 0) {
-    hourLines.push(whSingle?.trim() ? whSingle : FOOTER_DEFAULT_HOURS);
-  }
+  if (hourLines.length === 0 && whSingle?.trim()) hourLines.push(whSingle);
 
   const copyrightYear = settingOptional(s, 'copyright_year') ?? '2026';
 
-  const mapWidgetSrc =
-    yandexMapWidgetSrc({ officeLat, officeLng, address: addressVal }) ??
-    yandexMapWidgetSrc({ address: 'Белгород ул. Есенина 9' }) ??
-    'https://yandex.ru/map-widget/v1/?text=%D0%91%D0%B5%D0%BB%D0%B3%D0%BE%D1%80%D0%BE%D0%B4%20%D1%83%D0%BB.%20%D0%95%D1%81%D0%B5%D0%BD%D0%B8%D0%BD%D0%B0%209&z=16&l=map';
+  // Виджет карты — только по реальному адресу или координатам офиса из настроек
+  const mapWidgetSrc = yandexMapWidgetSrc({ officeLat, officeLng, address: addressVal ?? '' });
 
   const contactLinkClass = cn(
     'inline-flex min-h-11 items-center gap-2 text-sm opacity-80 hover:opacity-100 transition-opacity py-1',
@@ -119,23 +113,37 @@ const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
             <p className="text-sm opacity-70 mb-4">{tagline}</p>
 
             <div className="space-y-0.5">
-              <a
-                href={mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={cn(contactLinkClass, 'items-start whitespace-pre-line')}
-              >
-                <MapPin className="w-4 h-4 shrink-0 mt-0.5" aria-hidden />
-                <span className="underline-offset-2 hover:underline">{addressVal}</span>
-              </a>
-              <a href={phoneHref} className={contactLinkClass}>
-                <Phone className="w-4 h-4 shrink-0" aria-hidden />
-                {phoneMain}
-              </a>
-              <a href={`mailto:${emailVal}`} className={contactLinkClass}>
-                <Mail className="w-4 h-4 shrink-0" aria-hidden />
-                {emailVal}
-              </a>
+              {addressVal ? (
+                mapsUrl ? (
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(contactLinkClass, 'items-start whitespace-pre-line')}
+                  >
+                    <MapPin className="w-4 h-4 shrink-0 mt-0.5" aria-hidden />
+                    <span className="underline-offset-2 hover:underline">{addressVal}</span>
+                  </a>
+                ) : (
+                  <p className={cn(contactLinkClass, 'items-start whitespace-pre-line')}>
+                    <MapPin className="w-4 h-4 shrink-0 mt-0.5" aria-hidden />
+                    <span>{addressVal}</span>
+                  </p>
+                )
+              ) : null}
+              {phoneMain && phoneHref ? (
+                <a href={phoneHref} className={contactLinkClass}>
+                  <Phone className="w-4 h-4 shrink-0" aria-hidden />
+                  {phoneMain}
+                </a>
+              ) : null}
+              {emailVal ? (
+                <a href={`mailto:${emailVal}`} className={contactLinkClass}>
+                  <Mail className="w-4 h-4 shrink-0" aria-hidden />
+                  {emailVal}
+                </a>
+              ) : null}
+              {hourLines.length > 0 ? (
               <div className={cn(contactLinkClass, 'opacity-80')}>
                 <Clock className="w-4 h-4 shrink-0" aria-hidden />
                 <span>
@@ -147,6 +155,7 @@ const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
                   ))}
                 </span>
               </div>
+              ) : null}
             </div>
           </div>
 
@@ -154,11 +163,13 @@ const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
           <FooterNavColumn title="Компания" links={FOOTER_COMPANY_LINKS} />
         </div>
 
-        <FooterOfficeMap
-          widgetSrc={mapWidgetSrc}
-          mapsUrl={mapsUrl}
-          officeTitle={`Офис ${shortName} на Яндекс Картах`}
-        />
+        {mapWidgetSrc && mapsUrl ? (
+          <FooterOfficeMap
+            widgetSrc={mapWidgetSrc}
+            mapsUrl={mapsUrl}
+            officeTitle={`Офис ${shortName} на Яндекс Картах`}
+          />
+        ) : null}
       </div>
 
       <div className="border-t border-primary-foreground/10">
