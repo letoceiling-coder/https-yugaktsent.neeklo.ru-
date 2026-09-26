@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, promises as fs } from 'node:fs';
 import { join } from 'node:path';
-import { BadRequestException, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, OnModuleInit, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Express } from 'express';
 import {
@@ -13,12 +13,14 @@ import {
   resolveMediaRoot,
 } from '../../common/media-storage.util';
 import { PrismaService } from '../../prisma/prisma.service';
+import { optimizeUploadedImage } from './image-optimize';
 
 const PUBLIC_PREFIX = '/uploads/media/';
 const IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
 @Injectable()
 export class MediaService implements OnModuleInit {
+  private readonly logger = new Logger(MediaService.name);
   private readonly mediaRoot: string;
 
   constructor(
@@ -173,7 +175,15 @@ export class MediaService implements OnModuleInit {
     const absDir = join(this.mediaRoot, 'media');
     mkdirSync(absDir, { recursive: true });
     const absPath = join(absDir, storedName);
-    await fs.writeFile(absPath, file.buffer);
+    // Оригиналы с фотоаппарата весят мегабайты и тормозят выдачу — ужимаем до веб-размера
+    const optimized = await optimizeUploadedImage(file.buffer, mime);
+    if (optimized.changed) {
+      this.logger.log(
+        `Изображение ужато: ${(file.size / 1024).toFixed(0)} КБ → ${(optimized.buffer.length / 1024).toFixed(0)} КБ` +
+          (optimized.width ? ` (${optimized.width}×${optimized.height})` : ''),
+      );
+    }
+    await fs.writeFile(absPath, optimized.buffer);
 
     const url = `${PUBLIC_PREFIX}${storedName}`;
     const row = await this.prisma.mediaFile.create({
@@ -181,7 +191,7 @@ export class MediaService implements OnModuleInit {
         kind: 'PHOTO',
         url,
         originalFilename: file.originalname,
-        sizeBytes: BigInt(file.size),
+        sizeBytes: BigInt(optimized.buffer.length),
         uploadedBy: uploadedBy ?? null,
         folderId,
       },
