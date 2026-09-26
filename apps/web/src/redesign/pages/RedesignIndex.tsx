@@ -10,10 +10,8 @@ import ComplexCard from '@/redesign/components/ComplexCard';
 import QuizSection from '@/components/QuizSection';
 import PropertyGridSection from '@/components/PropertyGridSection';
 import AboutPlatform from '@/components/AboutPlatform';
-import HelpSelectionCta from '@/components/HelpSelectionCta';
-import AdditionalFeatures from '@/components/AdditionalFeatures';
 import LatestNews from '@/components/LatestNews';
-import ContactsSection from '@/components/ContactsSection';
+import LeadHighlightSection from '@/redesign/components/LeadHighlightSection';
 import FooterSection from '@/components/FooterSection';
 import ConsultationFlow from '@/redesign/components/ConsultationFlow';
 import type { ConsultationContext } from '@/redesign/lib/conversion-cta';
@@ -141,33 +139,10 @@ const RedesignIndex = () => {
         </Link>
       </section>
 
-      <HelpSelectionCta
-        pageSlug="/"
-        onConsult={() => {
-          setConsultContext({
-            surface: 'home',
-            source: 'home:help-cta',
-            contextFooter: 'Запрос с главной страницы',
-          });
-          setConsultOpen(true);
-        }}
-      />
-
       <ConsultationFlow open={consultOpen} onOpenChange={setConsultOpen} context={consultContext} />
 
-      <AdditionalFeatures
-        pageSlug="/"
-        onConsult={() => {
-          setConsultContext({
-            surface: 'home',
-            source: 'home:tools-consult',
-            contextFooter: 'Запрос с блока инструментов',
-          });
-          setConsultOpen(true);
-        }}
-      />
+      <LeadHighlightSection />
       <LatestNews />
-      <ContactsSection />
       <FooterSection />
     </div>
   );

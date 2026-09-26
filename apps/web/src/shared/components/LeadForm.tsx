@@ -33,6 +33,8 @@ interface Props {
   listingId?: number;
   /** Без карточки и заголовка — для вложения в модалку с собственным `DialogTitle`. */
   embedded?: boolean;
+  /** Подпись кнопки отправки; по умолчанию «Отправить заявку». */
+  submitLabel?: string;
   /** Called after successful API submission (real backend success only). */
   onSuccess?: () => void;
 }
@@ -94,6 +96,7 @@ const LeadForm = ({
   blockId,
   listingId,
   embedded = false,
+  submitLabel,
   onSuccess,
 }: Props) => {
   const queryClient = useQueryClient();
@@ -227,7 +230,7 @@ const LeadForm = ({
         />
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
         <Button type="submit" className="w-full h-11" disabled={loading || !consentAccepted}>
-          {loading ? 'Отправка…' : 'Отправить заявку'}
+          {loading ? 'Отправка…' : submitLabel ?? 'Отправить заявку'}
         </Button>
       </form>
     </>,

@@ -4,7 +4,7 @@ import PrivacyConsent from '@/shared/components/forms/PrivacyConsent';
 import { validatePrivacyConsent } from '@/shared/lib/privacy-consent';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Building2, Home, TreePine, Store, Trees, Phone, Send, CheckCircle2 } from 'lucide-react';
+import { Building2, Home, TreePine, Store, Trees, CheckCircle2 } from 'lucide-react';
 import { apiPost } from '@/lib/api';
 
 /* ── Step 1 types ── */
@@ -257,48 +257,6 @@ const QuizSection = () => {
             </div>
           </div>
 
-          {/* Right info panel */}
-          <div className="hidden lg:flex lg:w-[280px] bg-muted rounded-xl p-5 flex-col gap-5">
-            <h3 className="text-sm font-bold">Что вы получите</h3>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-sm">📋</span>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold">5–10 вариантов</p>
-                  <p className="text-[11px] text-muted-foreground">Подобранных под ваш запрос</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-sm">⚡</span>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold">Подбор за 2 часа</p>
-                  <p className="text-[11px] text-muted-foreground">Менеджер начнёт сразу</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shrink-0 mt-0.5">
-                  <Send className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold">Telegram или звонок</p>
-                  <p className="text-[11px] text-muted-foreground">Отправим как удобно вам</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shrink-0 mt-0.5">
-                  <Phone className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold">Бесплатно</p>
-                  <p className="text-[11px] text-muted-foreground">Без комиссий и скрытых платежей</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>

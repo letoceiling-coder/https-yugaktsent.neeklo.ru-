@@ -132,7 +132,7 @@ const PropertyGridSection = ({ title, type }: Props) => {
   );
 
   return (
-    <section className={cn('section-y', isHot && 'bg-accent/30')}>
+    <section className={cn('section-y', isHot && 'bg-mint')}>
       <div className="max-w-[1400px] mx-auto px-4">
         <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
           <div className="flex items-center gap-2 min-w-0">

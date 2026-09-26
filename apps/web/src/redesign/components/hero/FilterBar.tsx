@@ -88,6 +88,15 @@ const FilterBar = () => {
     return params;
   }, [filters, regionId]);
 
+  /** «Все предложения»: сбрасываем фильтры и открываем каталог целиком. */
+  const resetAndBrowseAll = useCallback(() => {
+    const fresh: CatalogFilters = { ...defaultFilters, marketType: 'new' };
+    setFilters(fresh);
+    const params = new URLSearchParams();
+    if (regionId != null) params.set('region_id', String(regionId));
+    navigate(params.toString() ? `/catalog?${params.toString()}` : '/catalog');
+  }, [navigate, regionId]);
+
   const toggleRoom = (room: number) => {
     setFilters((prev) => ({
       ...prev,
@@ -152,20 +161,10 @@ const FilterBar = () => {
               </button>
             ))}
           </div>
-          <button
-            type="button"
-            onClick={() => navigate(`/map?${buildParams().toString()}`)}
-            className="ml-auto inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-sm font-medium text-primary underline-offset-4 hover:underline"
-          >
-            <MapPin className="h-4 w-4 shrink-0" />
-            {/* На узком экране длинная подпись ломалась на две строки и наезжала на табы */}
-            <span className="sm:hidden">На карте</span>
-            <span className="hidden sm:inline">Показать на карте</span>
-          </button>
         </div>
 
         {/* Ряд 2: тип, город, цена, комнаты, поиск */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(150px,0.9fr)_minmax(140px,0.9fr)_minmax(200px,1.3fr)_minmax(232px,1.4fr)_auto] lg:items-end">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(150px,0.9fr)_minmax(140px,0.9fr)_minmax(220px,1.3fr)_minmax(240px,1.4fr)] lg:items-end">
           <div>
             <label className={labelClass} htmlFor="hero-object-type">
               Тип недвижимости
@@ -272,12 +271,31 @@ const FilterBar = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* Ряд действий: три явные кнопки вместо одной и текстовой ссылки */}
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
           <button
             type="button"
             onClick={() => navigate(`/catalog?${buildParams().toString()}`)}
-            className={cn(btnClass('primary'), 'h-11 w-full px-8 lg:w-auto')}
+            className={cn(btnClass('primary'), 'h-11 px-8 sm:min-w-[160px]')}
           >
             Найти
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate(`/map?${buildParams().toString()}`)}
+            className={cn(btnClass('secondary'), 'h-11 gap-1.5 px-5')}
+          >
+            <MapPin className="h-4 w-4 shrink-0" />
+            Показать на карте
+          </button>
+          <button
+            type="button"
+            onClick={resetAndBrowseAll}
+            className={cn(btnClass('ghost'), 'h-11 px-5 sm:ml-auto')}
+          >
+            Все предложения
           </button>
         </div>
       </div>
