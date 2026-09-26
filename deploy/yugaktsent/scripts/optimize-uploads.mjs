@@ -21,7 +21,15 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { promisify } from 'node:util';
 
-const run = promisify(execFile);
+const execFileAsync = promisify(execFile);
+/** ImageMagick без ограничений съедает память целиком — на живом сервере это недопустимо */
+const RUN_ENV = {
+  ...process.env,
+  MAGICK_MEMORY_LIMIT: '256MB',
+  MAGICK_MAP_LIMIT: '512MB',
+  MAGICK_THREAD_LIMIT: '1',
+};
+const run = (cmd, args) => execFileAsync(cmd, args, { env: RUN_ENV, maxBuffer: 8 * 1024 * 1024 });
 
 function arg(name, fallback = null) {
   const i = process.argv.indexOf(`--${name}`);
@@ -77,12 +85,29 @@ async function optimize(file) {
   return tmp;
 }
 
-const stats = { seen: 0, processed: 0, skipped: 0, failed: 0, before: 0, after: 0 };
+const stats = { seen: 0, processed: 0, skipped: 0, failed: 0, before: 0, after: 0, resumed: 0 };
 const logLines = [];
+
+/** Прогон долгий и может прерваться — при перезапуске не переделываем сделанное. */
+const done = new Set();
+try {
+  const prev = await fs.readFile(LOG_PATH, 'utf8');
+  for (const line of prev.split('\n')) {
+    const [file] = line.split('\t');
+    if (file && file.startsWith('/')) done.add(file);
+  }
+  if (done.size) console.log(`в журнале уже ${done.size} файлов — они будут пропущены`);
+} catch {
+  // журнала нет — первый запуск
+}
 
 for await (const file of walk(ROOT)) {
   if (stats.processed >= LIMIT) break;
   stats.seen++;
+  if (done.has(file)) {
+    stats.resumed++;
+    continue;
+  }
   let size;
   try {
     size = (await fs.stat(file)).size;
@@ -138,6 +163,7 @@ console.log(
     `просмотрено файлов: ${stats.seen}`,
     `ужато: ${stats.processed}`,
     `пропущено (мелкие или без выигрыша): ${stats.skipped}`,
+    `пропущено как уже обработанные: ${stats.resumed}`,
     `ошибок: ${stats.failed}`,
     `было: ${(stats.before / 1048576).toFixed(0)} МБ → стало: ${(stats.after / 1048576).toFixed(0)} МБ`,
     `экономия: ${saved.toFixed(0)} МБ`,
