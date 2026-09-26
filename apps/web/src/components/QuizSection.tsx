@@ -113,7 +113,7 @@ const QuizSection = () => {
 
   if (submitted) {
     return (
-      <section className="py-8 sm:py-12">
+      <section className="section-y">
         <div className="max-w-[1400px] mx-auto px-4">
           <div className="bg-secondary rounded-xl p-6 sm:p-10 text-center max-w-[600px] mx-auto">
             <div className="w-14 h-14 rounded-full bg-accent flex items-center justify-center mx-auto mb-4">
@@ -129,7 +129,7 @@ const QuizSection = () => {
   }
 
   return (
-    <section className="py-8 sm:py-12">
+    <section className="section-y">
       <div className="max-w-[1400px] mx-auto px-4">
         <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
 

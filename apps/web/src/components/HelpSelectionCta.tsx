@@ -30,7 +30,7 @@ export default function HelpSelectionCta({ pageSlug = '/', settings: settingsPro
   const buttonClass = btnClass('primary', { className: 'shrink-0 w-full sm:w-auto' });
 
   return (
-    <section className="py-5 sm:py-6" aria-labelledby="help-selection-title">
+    <section className="section-y" aria-labelledby="help-selection-title">
       <div className="max-w-[1400px] mx-auto px-4">
         <div
           className={cn(

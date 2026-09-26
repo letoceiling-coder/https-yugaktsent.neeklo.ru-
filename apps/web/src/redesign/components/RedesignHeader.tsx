@@ -30,7 +30,7 @@ const catalogCategories = [
 ];
 
 const navLinkClass =
-  'px-2 py-2 text-[15px] font-medium rounded-lg transition-colors text-[#111827] hover:text-primary';
+  'px-2 py-2 text-[15px] font-medium rounded-lg transition-colors text-foreground hover:text-primary';
 
 const RedesignHeader = () => {
   const { data: siteSettings } = useSiteSettings();
@@ -90,7 +90,7 @@ const RedesignHeader = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#e5e7eb] shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-border shadow-sm">
         <div className="max-w-[1400px] mx-auto px-4 h-16 flex items-center gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 shrink-0 lg:min-w-[140px]">
@@ -102,7 +102,7 @@ const RedesignHeader = () => {
           </Link>
 
           {/* Desktop nav — centered */}
-          <nav className="hidden lg:flex flex-1 min-w-0 items-center justify-center gap-4 xl:gap-8 text-[#111827]">
+          <nav className="hidden lg:flex flex-1 min-w-0 items-center justify-center gap-4 xl:gap-8 text-foreground">
             <div
               ref={catalogRef}
               className="relative"
@@ -114,7 +114,7 @@ const RedesignHeader = () => {
                 className={cn(
                   navLinkClass,
                   'flex items-center gap-1 font-medium',
-                  catalogOpen && 'bg-[#f3f4f6]',
+                  catalogOpen && 'bg-muted',
                 )}
               >
                 Каталог
@@ -181,7 +181,7 @@ const RedesignHeader = () => {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     placeholder="Район, метро, ЖК, улица..."
-                    className="pl-9 h-10 w-full border-[#e5e7eb]"
+                    className="pl-9 h-10 w-full border-border"
                     autoFocus
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -210,10 +210,10 @@ const RedesignHeader = () => {
                 <button
                   type="button"
                   onClick={() => setDesktopSearchOpen(true)}
-                  className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-[#f3f4f6] transition-colors"
+                  className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted transition-colors"
                   aria-label="Поиск"
                 >
-                  <Search className="w-5 h-5 text-[#111827]" />
+                  <Search className="w-5 h-5 text-foreground" />
                 </button>
               )}
             </div>
@@ -297,7 +297,7 @@ const RedesignHeader = () => {
             <button
               type="button"
               onClick={handleHeartClick}
-              className="relative min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-[#f3f4f6]"
+              className="relative min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-muted"
               aria-label="Избранное"
             >
               <Heart className="w-6 h-6" />
@@ -307,10 +307,10 @@ const RedesignHeader = () => {
                 </span>
               ) : null}
             </button>
-            <button type="button" onClick={() => setSearchOpen(!searchOpen)} className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-[#f3f4f6]" aria-label="Поиск">
+            <button type="button" onClick={() => setSearchOpen(!searchOpen)} className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-muted" aria-label="Поиск">
               <Search className="w-6 h-6" />
             </button>
-            <button type="button" onClick={() => setMenuOpen(true)} className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-[#f3f4f6]" aria-label="Меню">
+            <button type="button" onClick={() => setMenuOpen(true)} className="min-w-[44px] min-h-[44px] w-11 h-11 flex items-center justify-center rounded-lg hover:bg-muted" aria-label="Меню">
               <Menu className="w-6 h-6" />
             </button>
           </div>
@@ -360,7 +360,7 @@ const RedesignHeader = () => {
             onClick={() => setMenuOpen(false)}
           />
           <div className="fixed inset-y-0 right-0 z-[60] w-[85vw] max-w-[320px] bg-white flex flex-col shadow-xl lg:hidden animate-in slide-in-from-right duration-[250ms] ease-out">
-          <div className="flex items-center justify-between h-16 px-4 border-b border-[#e5e7eb]">
+          <div className="flex items-center justify-between h-16 px-4 border-b border-border">
             <span className="font-semibold">Меню</span>
             <button onClick={() => setMenuOpen(false)} className="w-10 h-10 flex items-center justify-center"><X className="w-5 h-5" /></button>
           </div>
@@ -369,7 +369,7 @@ const RedesignHeader = () => {
             {catalogCategories.map(item => (
               <div key={item.href}>
                 <Link to={item.href} onClick={() => setMenuOpen(false)}
-                  className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-[#f3f4f6] transition-colors block min-h-[52px] flex items-center">{item.label}</Link>
+                  className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-muted transition-colors block min-h-[52px] flex items-center">{item.label}</Link>
                 {'sub' in item && item.sub && item.sub.map(sub => (
                   <Link key={sub.href} to={sub.href} onClick={() => setMenuOpen(false)}
                     className="py-2 px-8 rounded-xl text-xs text-muted-foreground hover:bg-accent transition-colors block">{sub.label}</Link>
@@ -377,18 +377,18 @@ const RedesignHeader = () => {
               </div>
             ))}
             <div className="h-px bg-border my-2" />
-            <Link to="/catalog?type=apartments&market=new" onClick={() => setMenuOpen(false)} className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-[#f3f4f6] min-h-[52px] flex items-center">Новостройки</Link>
+            <Link to="/catalog?type=apartments&market=new" onClick={() => setMenuOpen(false)} className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-muted min-h-[52px] flex items-center">Новостройки</Link>
             {belgorodRegion ? (
               <Link
                 to={`/catalog?region_id=${belgorodRegion.id}`}
                 onClick={() => setMenuOpen(false)}
-                className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-[#f3f4f6] min-h-[52px] flex items-center"
+                className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-muted min-h-[52px] flex items-center"
               >
                 {belgorodRegion.name ?? 'Белгород'}
               </Link>
             ) : null}
-            <Link to="/agents" onClick={() => setMenuOpen(false)} className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-[#f3f4f6] min-h-[52px] flex items-center">Агенты</Link>
-            <Link to="/contacts" onClick={() => setMenuOpen(false)} className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-[#f3f4f6] min-h-[52px] flex items-center">Контакты</Link>
+            <Link to="/agents" onClick={() => setMenuOpen(false)} className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-muted min-h-[52px] flex items-center">Агенты</Link>
+            <Link to="/contacts" onClick={() => setMenuOpen(false)} className="py-3 px-4 rounded-xl text-lg font-medium hover:bg-muted min-h-[52px] flex items-center">Контакты</Link>
           </nav>
           <div className="mt-auto p-4 border-t border-border space-y-3">
             {phoneMain && phoneHref ? (

@@ -43,7 +43,7 @@ const MobileTabBar = ({ onSearch, onMore, onFavorites }: Props) => {
   const isActive = (path: string) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
-  const tone = (active: boolean) => (active ? 'text-primary' : 'text-[#6b7280]');
+  const tone = (active: boolean) => (active ? 'text-primary' : 'text-muted-foreground');
 
   return (
     <nav

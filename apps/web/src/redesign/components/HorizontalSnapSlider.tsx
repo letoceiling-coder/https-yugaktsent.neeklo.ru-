@@ -96,7 +96,7 @@ const HorizontalSnapSlider = ({
                   onClick={() => scrollTo(i)}
                   className={cn(
                     'h-1.5 rounded-full transition-all',
-                    i === activeIndex ? 'w-4 bg-primary' : 'w-1.5 bg-[#d1d5db]',
+                    i === activeIndex ? 'w-4 bg-primary' : 'w-1.5 bg-border',
                   )}
                 />
               ))}
@@ -159,7 +159,7 @@ const HorizontalSnapSlider = ({
               onClick={() => scrollTo(i)}
               className={cn(
                 'h-1.5 rounded-full transition-all',
-                i === activeIndex ? 'w-4 bg-primary' : 'w-1.5 bg-[#d1d5db]',
+                i === activeIndex ? 'w-4 bg-primary' : 'w-1.5 bg-border',
               )}
             />
           ))}

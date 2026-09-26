@@ -4,11 +4,11 @@ import {
   PRICE_ON_REQUEST,
 } from '@/redesign/lib/display-price';
 
-/** Primary map marker color (TZ Iteration 2) */
-import { BRAND_PRIMARY_HEX } from '@/redesign/lib/button-styles';
+/** Цвет меток карты — акцент бренда, не собственная палитра */
+import { BRAND_PRIMARY_HEX, BRAND_PRIMARY_ACTIVE_HEX } from '@/redesign/lib/button-styles';
 
-export const MARKER_BLUE = BRAND_PRIMARY_HEX;
-export const MARKER_ACTIVE_BLUE = '#1D4ED8';
+export const MARKER_ACCENT = BRAND_PRIMARY_HEX;
+export const MARKER_ACCENT_ACTIVE = BRAND_PRIMARY_ACTIVE_HEX;
 
 export const ZOOM_DOT_MAX = 12;
 export const ZOOM_NAME_MIN = 14;
@@ -52,9 +52,9 @@ type MarkerLayoutOptions = {
 
 /** Yandex templateLayoutFactory HTML for a map marker */
 export function buildMarkerLayoutHtml({ mode, label, isActive }: MarkerLayoutOptions): string {
-  const color = isActive ? MARKER_ACTIVE_BLUE : MARKER_BLUE;
+  const color = isActive ? MARKER_ACCENT_ACTIVE : MARKER_ACCENT;
   const dotSize = mode === 'dot' ? (isActive ? 14 : 12) : 20;
-  const shadow = '0 4px 14px rgba(37, 99, 235, 0.35)';
+  const shadow = '0 4px 14px rgba(23, 79, 68, 0.35)';
 
   if (mode === 'dot') {
     return `<div style="

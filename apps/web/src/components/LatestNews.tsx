@@ -42,7 +42,7 @@ function NewsCard({ n, className }: { n: NewsRow; className?: string }) {
         to={`/news/${encodeURIComponent(n.slug)}`}
         className="flex flex-col flex-1 min-h-0 h-full"
       >
-        <div className="overflow-hidden aspect-video bg-[#f3f4f6] shrink-0">
+        <div className="overflow-hidden aspect-video bg-muted shrink-0">
           {hasImage ? (
             <img
               src={n.imageUrl!}
@@ -90,7 +90,7 @@ const LatestNews = () => {
   const cards = items.map((n) => <NewsCard key={n.id} n={n} />);
 
   return (
-    <section className="py-8 sm:py-12">
+    <section className="section-y">
       <div className="max-w-[1400px] mx-auto px-4">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <h2 className="text-base sm:text-xl font-bold">Последние новости</h2>

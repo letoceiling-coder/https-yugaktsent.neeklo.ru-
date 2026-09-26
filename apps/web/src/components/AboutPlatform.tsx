@@ -144,7 +144,7 @@ const AboutPlatform = ({ pageSlug = '/', settings: settingsProp, preview = false
 
   return (
     <section
-      className={cn('py-8 sm:py-10', aboutPlatformSectionBg(settings.backgroundVariant))}
+      className={cn('section-y', aboutPlatformSectionBg(settings.backgroundVariant))}
       aria-labelledby="about-platform-title"
     >
       <div className="max-w-[1400px] mx-auto px-4">

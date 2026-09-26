@@ -75,7 +75,7 @@ const RegionSelector = ({ regions, selectedRegionId, onSelect, className }: Prop
         <button
           type="button"
           onClick={() => handleSelect(belgorod.id)}
-          className="inline-flex items-center gap-1.5 rounded-full border border-[#F97316]/40 bg-[#FFF7ED] px-3 py-1.5 text-sm font-medium text-[#C2410C] hover:bg-[#FFEDD5] transition-colors shrink-0"
+          className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary/15 shrink-0"
         >
           <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden />
           {regionLabel(belgorod)}

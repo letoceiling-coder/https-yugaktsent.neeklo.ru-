@@ -64,7 +64,7 @@ const RedesignIndex = () => {
       <HeroSearch />
 
       {featured.length > 0 && (
-      <section className="relative z-0 max-w-[1400px] mx-auto px-4 pt-6 pb-6 sm:pb-10">
+      <section className="relative z-0 container-page section-y">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <h2 className="text-base sm:text-xl font-bold">Популярные ЖК</h2>
           <div className="flex items-center gap-2">
@@ -126,7 +126,7 @@ const RedesignIndex = () => {
       <AboutPlatform pageSlug="/" />
 
       {/* Map CTA — compact on mobile */}
-      <section className="max-w-[1400px] mx-auto px-4 pb-6 sm:pb-8">
+      <section className="container-page section-y">
         <Link to="/map" className="block rounded-xl sm:rounded-2xl bg-muted border border-border p-5 sm:p-10 hover:border-primary/30 transition-colors group">
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-accent flex items-center justify-center shrink-0">

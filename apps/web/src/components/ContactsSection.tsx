@@ -38,7 +38,7 @@ const ContactsSection = React.forwardRef<HTMLElement>((_, ref) => {
   const showOverlay = Boolean(officeTitle || address);
 
   return (
-    <section ref={ref} id="contacts" className="py-8 sm:py-12">
+    <section ref={ref} id="contacts" className="section-y">
       <div className="max-w-[1400px] mx-auto px-4">
         <h2 className="text-base sm:text-xl font-bold mb-4 sm:mb-6">
           Свяжитесь с <span className="text-primary">{shortName}</span>

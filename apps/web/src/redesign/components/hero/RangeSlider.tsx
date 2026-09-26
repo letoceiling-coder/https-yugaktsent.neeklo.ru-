@@ -72,7 +72,7 @@ const RangeSlider = ({
         onChange([pair[0] <= min ? null : pair[0], pair[1] >= max ? null : pair[1]]);
       }}
     >
-      <SliderPrimitive.Track className="relative h-1 w-full grow overflow-hidden rounded-full bg-[#e2e8f0]">
+      <SliderPrimitive.Track className="relative h-1 w-full grow overflow-hidden rounded-full bg-border">
         <SliderPrimitive.Range className="absolute h-full bg-primary" />
       </SliderPrimitive.Track>
       <SliderPrimitive.Thumb

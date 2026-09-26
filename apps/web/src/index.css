@@ -28,6 +28,11 @@
     --input: 220 13% 91%;
     --ring: 168 55% 20%;
     --radius: 0.75rem;
+    /* Поверхности из согласованных макетов */
+    --mint: 180 31% 94%;            /* #eaf4f4 — имиджевые блоки */
+    --mint-foreground: 168 40% 16%;
+    --graphite: 214 12% 12%;        /* #1a1d21 — лид-блоки и оверлеи */
+    --graphite-foreground: 0 0% 100%;
     --sidebar-background: 220 20% 10%;
     --sidebar-foreground: 220 10% 78%;
     --sidebar-primary: 168 55% 40%;
@@ -58,6 +63,10 @@
     --border: 220 15% 18%;
     --input: 220 15% 18%;
     --ring: 168 55% 40%;
+    --mint: 168 25% 14%;
+    --mint-foreground: 180 20% 92%;
+    --graphite: 214 12% 10%;
+    --graphite-foreground: 0 0% 100%;
     --sidebar-background: 220 20% 10%;
     --sidebar-foreground: 220 10% 78%;
     --sidebar-primary: 168 55% 40%;
@@ -126,5 +135,71 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* --- Дизайн-система: типографика витрины --- */
+
+  /* Надзаголовок капсом над крупным заголовком: «О КОМПАНИИ», «НАША ИСТОРИЯ» */
+  .text-overline {
+    font-weight: 600;
+    font-size: 0.6875rem;
+    line-height: 1.4;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Заголовок секции витрины */
+  .text-section-title {
+    font-weight: 700;
+    font-size: 1.5rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  @media (min-width: 1024px) {
+    .text-section-title {
+      font-size: 2rem;
+    }
+  }
+
+  /* Крупный заголовок первого экрана */
+  .text-display {
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+  @media (min-width: 640px) {
+    .text-display {
+      font-size: 2.75rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .text-display {
+      font-size: 3.5rem;
+    }
+  }
+
+  /* --- Дизайн-система: ритм секций --- */
+
+  /* Единый вертикальный отступ между секциями витрины */
+  .section-y {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+  @media (min-width: 1024px) {
+    .section-y {
+      padding-top: 5rem;
+      padding-bottom: 5rem;
+    }
+  }
+
+  /* Контейнер витрины: одна ширина на всех страницах */
+  .container-page {
+    width: 100%;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }

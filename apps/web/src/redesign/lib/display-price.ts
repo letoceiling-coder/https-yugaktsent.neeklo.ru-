@@ -126,7 +126,7 @@ export function isPriceFallbackText(displayText: string): boolean {
 }
 
 /** Tailwind class for «Цена по запросу» (spec: #6b7280). */
-export const PRICE_ON_REQUEST_CLASS = 'text-[#6b7280]';
+export const PRICE_ON_REQUEST_CLASS = 'text-muted-foreground';
 
 /** Alias — canonical safe formatter. */
 export const formatPriceSafe = formatDisplayPrice;

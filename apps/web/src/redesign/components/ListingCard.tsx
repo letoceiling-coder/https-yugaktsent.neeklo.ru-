@@ -190,7 +190,7 @@ const ListingCard = ({ listing, variant = 'grid', trustBadges }: Props) => {
     >
       <div
         className={cn(
-          'relative w-full shrink-0 overflow-hidden bg-[#f3f4f6]',
+          'relative w-full shrink-0 overflow-hidden bg-muted',
           isList ? 'sm:w-56 sm:shrink-0 aspect-[4/3] sm:aspect-video' : 'aspect-video w-full',
           isHome && 'rounded-t-[20px]',
         )}

@@ -45,7 +45,7 @@ export const cardVisual = {
   /** ЖК marketplace card */
   complexShell:
     'rounded-[20px] border border-neutral-200/80 bg-card overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-shadow duration-200 hover:shadow-lg',
-  complexMedia: 'relative w-full shrink-0 overflow-hidden rounded-t-[20px] bg-[#f3f4f6]',
+  complexMedia: 'relative w-full shrink-0 overflow-hidden rounded-t-[20px] bg-muted',
   complexMediaAspect16: 'aspect-video',
   complexMediaAspect43: 'aspect-[4/3]',
   complexCoverBadge:
@@ -87,8 +87,8 @@ export function cardBadgeClass(
       emerald: 'bg-emerald-600 text-white',
       amber: 'bg-amber-600 text-white',
       blue: 'bg-primary text-primary-foreground',
-      green: 'bg-[#16A34A] text-white',
-      orange: 'bg-[#EA580C] text-white',
+      green: 'bg-primary text-primary-foreground',
+      orange: 'bg-foreground text-background',
       red: 'bg-red-600 text-white',
       muted: 'bg-muted text-muted-foreground',
     } as const;
@@ -99,8 +99,8 @@ export function cardBadgeClass(
       emerald: 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300',
       amber: 'bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300',
       blue: 'bg-primary/10 text-primary',
-      green: 'bg-[#F0FDF4] text-[#16A34A]',
-      orange: 'bg-[#FFF7ED] text-[#EA580C]',
+      green: 'bg-primary/10 text-primary',
+      orange: 'bg-muted text-foreground',
       red: 'bg-red-50 text-red-800',
       muted: 'bg-muted/80 text-muted-foreground',
     } as const;

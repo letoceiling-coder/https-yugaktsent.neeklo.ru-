@@ -30,7 +30,7 @@ export default function AdditionalFeatures({
   if (items.length === 0) return null;
 
   return (
-    <section className="py-6 sm:py-8" aria-labelledby="platform-tools-title">
+    <section className="section-y" aria-labelledby="platform-tools-title">
       <div className="max-w-[1400px] mx-auto px-4">
         {settings.title ? (
           <h2 id="platform-tools-title" className="text-base font-semibold text-foreground mb-3 sm:mb-4 sm:text-lg">

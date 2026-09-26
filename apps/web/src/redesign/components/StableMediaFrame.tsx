@@ -96,7 +96,7 @@ const StableMediaFrame = ({
   return (
     <div
       className={cn(
-        'relative shrink-0 overflow-hidden bg-[#f3f4f6]',
+        'relative shrink-0 overflow-hidden bg-muted',
         containerClass,
         className,
       )}
@@ -105,7 +105,7 @@ const StableMediaFrame = ({
       {!useFallback ? (
         <>
           {!loaded ? (
-            <div className="absolute inset-0 animate-pulse bg-[#f3f4f6]" aria-hidden="true" />
+            <div className="absolute inset-0 animate-pulse bg-muted" aria-hidden="true" />
           ) : null}
           {isContain ? (
             <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-4">
