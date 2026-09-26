@@ -59,19 +59,35 @@ async function main() {
   });
   console.log('  Feed regions seeded');
 
-  // --- Admin user ---
-  const passwordHash = await bcrypt.hash('admin123!', 12);
-  await prisma.user.upsert({
-    where: { email: 'admin@livegrid.ru' },
-    update: {},
-    create: {
-      email: 'admin@livegrid.ru',
-      fullName: 'Администратор',
-      passwordHash,
-      role: 'admin',
-    },
-  });
-  console.log('  Admin user seeded (admin@livegrid.ru / admin123!)');
+  // --- Администратор ---
+  // Сид выполняется при каждом деплое, поэтому пароля по умолчанию здесь быть не должно:
+  // иначе на проде живёт всем известная учётка. Создаём админа только по явному запросу.
+  const seedAdminEmail = process.env.SEED_ADMIN_EMAIL?.trim();
+  const seedAdminPassword = process.env.SEED_ADMIN_PASSWORD;
+  if (seedAdminEmail && seedAdminPassword) {
+    if (seedAdminPassword.length < 12) {
+      throw new Error('SEED_ADMIN_PASSWORD короче 12 символов — слишком слабый пароль для администратора');
+    }
+    const passwordHash = await bcrypt.hash(seedAdminPassword, 12);
+    await prisma.user.upsert({
+      where: { email: seedAdminEmail },
+      update: {},
+      create: {
+        email: seedAdminEmail,
+        fullName: 'Администратор',
+        passwordHash,
+        role: 'admin',
+      },
+    });
+    console.log(`  Админ создан: ${seedAdminEmail} (пароль из SEED_ADMIN_PASSWORD)`);
+  } else {
+    const adminCount = await prisma.user.count({ where: { role: 'admin' } });
+    console.log(
+      adminCount > 0
+        ? `  Админов в базе: ${adminCount} — сид никого не создаёт`
+        : '  Админ не создан: задайте SEED_ADMIN_EMAIL и SEED_ADMIN_PASSWORD, чтобы завести первого',
+    );
+  }
 
   // --- Site Settings ---
   const settings = [

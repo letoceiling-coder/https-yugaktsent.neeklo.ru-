@@ -9,6 +9,17 @@ import { File } from "node:buffer";
 import { fetchProfitbaseFeed } from "../profitbase-sync/src/profitbaseFeed.js";
 import { LiveGridClient } from "../profitbase-sync/src/livegridClient.js";
 
+/** Учётка админа берётся только из окружения: значений по умолчанию быть не должно. */
+function requireEnv(name) {
+  const v = process.env[name];
+  if (!v) {
+    console.error(`Не задана переменная окружения ${name} — укажите её в .env на сервере`);
+    process.exit(1);
+  }
+  return v;
+}
+
+
 const execFileAsync = promisify(execFile);
 
 async function psql(sql) {
@@ -26,8 +37,8 @@ async function login() {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      email: process.env.LG_ADMIN_EMAIL || "admin@livegrid.ru",
-      password: process.env.LG_ADMIN_PASSWORD || "admin123!",
+      email: requireEnv("LG_ADMIN_EMAIL"),
+      password: requireEnv("LG_ADMIN_PASSWORD"),
     }),
   });
   if (!res.ok) throw new Error(`login failed: ${res.status}`);
@@ -69,7 +80,7 @@ function houseImage(offers) {
 
 async function main() {
   const { base, token } = await login();
-  const lg = new LiveGridClient(base, process.env.LG_ADMIN_EMAIL || "admin@livegrid.ru", process.env.LG_ADMIN_PASSWORD || "admin123!");
+  const lg = new LiveGridClient(base, requireEnv("LG_ADMIN_EMAIL"), requireEnv("LG_ADMIN_PASSWORD"));
   await lg.login();
   let feeds = [];
   try {

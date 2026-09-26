@@ -8,9 +8,13 @@ API="http://localhost:3000/api/v1"
 echo "$(date '+%Y-%m-%d %H:%M:%S') === Cron feed import started ===" >> "$LOG_FILE"
 
 # Login
+# Учётка берётся из окружения: паролю по умолчанию в репозитории не место
+: "${LG_ADMIN_EMAIL:?укажите LG_ADMIN_EMAIL в окружении}"
+: "${LG_ADMIN_PASSWORD:?укажите LG_ADMIN_PASSWORD в окружении}"
+
 TOKEN=$(curl -sf -X POST "$API/auth/login" \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@livegrid.ru","password":"admin123!"}' \
+  -d "{\"email\":\"$LG_ADMIN_EMAIL\",\"password\":\"$LG_ADMIN_PASSWORD\"}" \
   | python3 -c "import sys,json; print(json.load(sys.stdin)['accessToken'])")
 
 if [ -z "$TOKEN" ]; then

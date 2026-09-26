@@ -5,6 +5,17 @@
  */
 import { readFileSync } from "node:fs";
 
+/** Учётка админа берётся только из окружения: значений по умолчанию быть не должно. */
+function requireEnv(name) {
+  const v = process.env[name];
+  if (!v) {
+    console.error(`Не задана переменная окружения ${name} — укажите её в .env на сервере`);
+    process.exit(1);
+  }
+  return v;
+}
+
+
 const envPath = process.argv[2] || "/var/www/yugaktsent-lg/.env";
 const envText = readFileSync(envPath, "utf8");
 const match = envText.match(/^FEEDS_JSON='(.*)'$/m);
@@ -15,8 +26,8 @@ if (!match) {
 
 const feeds = JSON.parse(match[1]);
 const base = (process.env.LG_API_BASE || "http://127.0.0.1:3025/api/v1").replace(/\/$/, "");
-const email = process.env.LG_ADMIN_EMAIL || "admin@livegrid.ru";
-const password = process.env.LG_ADMIN_PASSWORD || "admin123!";
+const email = requireEnv("LG_ADMIN_EMAIL");
+const password = requireEnv("LG_ADMIN_PASSWORD");
 const regionCode = process.env.YUGAKTSENT_REGION_CODE || "anapa";
 
 async function login() {
