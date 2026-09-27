@@ -17,6 +17,7 @@ import ConversionCTABar from '@/redesign/components/ConversionCTABar';
 import ConsultationFlow from '@/redesign/components/ConsultationFlow';
 import ConversionDebugOverlay from '@/redesign/components/ConversionDebugOverlay';
 import { CONVERSION_CTA, type ConsultationContext } from '@/redesign/lib/conversion-cta';
+import { prefersReducedMotion } from '@/redesign/lib/map-sidebar-scroll-utils';
 import ApartmentMediaGallery from '@/redesign/components/ApartmentMediaGallery';
 import ObjectPageActionBar from '@/redesign/components/ObjectPageActionBar';
 import ApartmentPriceTrust from '@/redesign/components/ApartmentPriceTrust';
@@ -390,19 +391,19 @@ const RedesignApartment = () => {
       <div className="max-w-[1400px] mx-auto px-4 py-4 sm:py-6">
         <div className="flex items-center justify-between gap-2 mb-4">
           <nav className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground min-w-0 flex-wrap">
-            <Link to="/" className="hover:text-foreground">Главная</Link>
+            <Link to="/" className="inline-flex min-h-8 items-center hover:text-foreground">Главная</Link>
             <span>/</span>
-            <Link to={catalogUrl} className="hover:text-foreground">Каталог</Link>
+            <Link to={catalogUrl} className="inline-flex min-h-8 items-center hover:text-foreground">Каталог</Link>
             {districtCatalogUrl ? (
               <>
                 <span>/</span>
-                <Link to={districtCatalogUrl} className="hover:text-foreground truncate max-w-[100px] sm:max-w-none">
+                <Link to={districtCatalogUrl} className="inline-flex min-h-8 items-center truncate max-w-[100px] hover:text-foreground sm:max-w-none">
                   {complex.district}
                 </Link>
               </>
             ) : null}
             <span>/</span>
-            <Link to={`/complex/${complex.slug}`} className="hover:text-foreground truncate max-w-[140px] sm:max-w-none">
+            <Link to={`/complex/${complex.slug}`} className="inline-flex min-h-8 items-center truncate max-w-[140px] hover:text-foreground sm:max-w-none">
               {complex.name}
             </Link>
             <span>/</span>

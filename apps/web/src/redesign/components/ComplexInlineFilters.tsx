@@ -85,7 +85,7 @@ export default function ComplexInlineFilters({
             type="button"
             onClick={() => onSort(field)}
             className={cn(
-              'rounded-md border px-2.5 py-1 text-xs font-medium transition-colors',
+              'flex h-9 items-center rounded-lg border px-3.5 text-xs font-medium transition-colors',
               sort.field === field ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:bg-muted/50',
             )}
           >
