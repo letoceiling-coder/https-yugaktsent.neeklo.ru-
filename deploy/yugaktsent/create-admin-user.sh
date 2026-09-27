@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Создание пользователя админки на yugaktsent (без изменений livegrid.ru)
+# Создание пользователя админки на yugaktsent.neeklo.ru
 set -euo pipefail
 ROOT="${DEPLOY_ROOT:-/var/www/yugaktsent-lg}"
 EMAIL="${1:?email required}"

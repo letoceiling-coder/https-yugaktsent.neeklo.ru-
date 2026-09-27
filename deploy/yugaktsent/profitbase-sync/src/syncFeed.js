@@ -157,10 +157,21 @@ async function resolveFeeds(lg) {
   return [];
 }
 
+function requireEnv(name) {
+  const v = process.env[name];
+  if (!v) {
+    throw new Error(
+      `Не задана переменная окружения ${name} — укажите её в .env на сервере`,
+    );
+  }
+  return v;
+}
+
 export async function runSync({ persist } = {}) {
   const base = process.env.LG_API_BASE || "http://127.0.0.1:3025/api/v1";
-  const email = process.env.LG_ADMIN_EMAIL || "admin@livegrid.ru";
-  const password = process.env.LG_ADMIN_PASSWORD || "admin123!";
+  // Учётка только из окружения: значений по умолчанию быть не должно.
+  const email = requireEnv("LG_ADMIN_EMAIL");
+  const password = requireEnv("LG_ADMIN_PASSWORD");
   const stateFile = process.env.STATE_FILE || "./state.json";
 
   const lg = new LiveGridClient(base, email, password);

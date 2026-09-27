@@ -5,7 +5,7 @@
 #
 # Usage:
 #   export API_BASE=https://livegrid.ru/api/v1
-#   export ADMIN_EMAIL=admin@livegrid.ru
+#   export ADMIN_EMAIL=<почта администратора>
 #   export ADMIN_PASSWORD='...'
 #   export REGION=msk
 #   ./scripts/reliability/feed-recovery-run.sh

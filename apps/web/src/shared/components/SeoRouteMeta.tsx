@@ -96,7 +96,7 @@ function buildMeta(
   if (pathname.startsWith('/listing/')) {
     return {
       title: 'Объект недвижимости',
-      description: `Карточка объекта: параметры, фото, цена и контакты на ${siteName}.`,
+      description: `Планировка, площадь, этаж, срок сдачи и цена. Консультация и показ — ${siteName}, Анапа.`,
     };
   }
   if (pathname.startsWith('/complex/')) {
@@ -145,7 +145,11 @@ function buildMeta(
   if (pathname === '/contacts') {
     return {
       title: 'Контакты',
-      description: setting(cms, 'contacts_meta_description', `Контакты ${siteName} и форма обратной связи.`),
+      description: setting(
+        cms,
+        'contacts_meta_description',
+        `Офис ${siteName} в Анапе: адрес на карте, телефон, график работы. Консультация по подбору новостроек бесплатная.`,
+      ),
     };
   }
   if (pathname === '/privacy') {
@@ -157,7 +161,7 @@ function buildMeta(
   if (pathname === '/about') {
     return {
       title: 'О компании',
-      description: `${siteName}: эксперты, сервисы и поддержка клиентов.`,
+      description: `${siteName} — агентство недвижимости в Анапе с 2017 года: подбор новостроек, проверка документов, сопровождение сделки и помощь с ипотекой.`,
     };
   }
   if (pathname === '/selection') {
@@ -207,7 +211,10 @@ export default function SeoRouteMeta() {
   const ogImage = meta.ogImage ?? DEFAULT_OG_IMAGE;
 
   useEffect(() => {
-    const fullTitle = `${meta.title} | ${siteName}`;
+    // Бренд в хвост добавляем только если его ещё нет в самом заголовке
+    const fullTitle = meta.title.toLowerCase().includes(siteName.toLowerCase())
+      ? meta.title
+      : `${meta.title} | ${siteName}`;
     const sp = new URLSearchParams(search);
     if (pathname.startsWith('/catalog')) {
       sp.delete('page');

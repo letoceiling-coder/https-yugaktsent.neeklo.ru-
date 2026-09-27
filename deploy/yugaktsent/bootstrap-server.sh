@@ -6,10 +6,10 @@ set -euo pipefail
 #   bash deploy/yugaktsent/bootstrap-server.sh
 
 DEPLOY_ROOT="${DEPLOY_ROOT:-/var/www/yugaktsent-lg}"
-LG_REPO_URL="${LG_REPO_URL:-https://github.com/letoceiling-coder/livegrid.git}"
+LG_REPO_URL="${LG_REPO_URL:-https://github.com/letoceiling-coder/https-yugaktsent.neeklo.ru-.git}"
 DEPLOY_BRANCH="${DEPLOY_BRANCH:-main}"
 
-echo "=== YugAktsent LiveGrid bootstrap ==="
+echo "=== ЮгАкцент bootstrap ==="
 echo "DEPLOY_ROOT=$DEPLOY_ROOT  branch=$DEPLOY_BRANCH"
 echo ""
 

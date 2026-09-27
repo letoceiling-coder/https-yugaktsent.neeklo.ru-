@@ -13,17 +13,29 @@ if (process.env.NODE_ENV === 'production') {
 
 const prisma = new PrismaClient();
 
+/**
+ * Учётки задаются в окружении — зашитых паролей в репозитории нет:
+ *   DEV_ADMIN_EMAIL=... DEV_ADMIN_PASSWORD=... pnpm db:auth-repair
+ */
+const devEmail = process.env.DEV_ADMIN_EMAIL?.trim();
+const devPassword = process.env.DEV_ADMIN_PASSWORD;
+
+if (!devEmail || !devPassword) {
+  console.error(
+    'Укажите DEV_ADMIN_EMAIL и DEV_ADMIN_PASSWORD в окружении — зашитых учёток здесь нет.',
+  );
+  process.exit(1);
+}
+if (devPassword.length < 12) {
+  console.error('DEV_ADMIN_PASSWORD короче 12 символов.');
+  process.exit(1);
+}
+
 const LOCAL_USERS = [
   {
-    email: 'dsc-23@yandex.ru',
-    password: '123123123',
-    fullName: 'Джон Уик',
-    role: 'admin',
-  },
-  {
-    email: 'admin@livegrid.ru',
-    password: 'admin123!',
-    fullName: 'Администратор',
+    email: devEmail,
+    password: devPassword,
+    fullName: process.env.DEV_ADMIN_NAME?.trim() || 'Администратор',
     role: 'admin',
   },
 ];

@@ -15,7 +15,7 @@ async function waitForApi(maxAttempts = 30) {
     }
     await new Promise((r) => setTimeout(r, 2000));
   }
-  throw new Error("LiveGrid API not ready");
+  throw new Error("API сайта не отвечает");
 }
 
 async function runOnce() {

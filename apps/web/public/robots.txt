@@ -2,4 +2,5 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-Sitemap: https://livegrid.ru/sitemap.xml
+Sitemap: https://yugaktsent.neeklo.ru/api/v1/sitemap/sitemap-index.xml
+Sitemap: https://yugaktsent.neeklo.ru/sitemap.xml

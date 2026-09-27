@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 $ssh = if ($env:LG_SSH) { $env:LG_SSH } else { "root@212.67.9.173" }
 $deployRoot = if ($env:LG_REMOTE_DEPLOY_ROOT) { $env:LG_REMOTE_DEPLOY_ROOT } else { "/var/www/yugaktsent-lg" }
 $branch = if ($env:DEPLOY_BRANCH) { $env:DEPLOY_BRANCH } else { "main" }
-$repo = if ($env:LG_REPO_URL) { $env:LG_REPO_URL } else { "https://github.com/letoceiling-coder/livegrid.git" }
+$repo = if ($env:LG_REPO_URL) { $env:LG_REPO_URL } else { "https://github.com/letoceiling-coder/https-yugaktsent.neeklo.ru-.git" }
 
 $bootstrap = Join-Path $PSScriptRoot "bootstrap-server.sh"
 if (-not (Test-Path $bootstrap)) { throw "Не найден $bootstrap" }

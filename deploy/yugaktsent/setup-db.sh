@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Создаёт PostgreSQL БД, PostGIS и пользователя для yugaktsent LiveGrid.
+# Создаёт PostgreSQL БД, PostGIS и пользователя для yugaktsent.
 DB_NAME="${YUGAKTSENT_DB_NAME:-yugaktsent_lg}"
 DB_USER="${YUGAKTSENT_DB_USER:-yugaktsent_lg}"
 DB_PASS="${YUGAKTSENT_DB_PASS:-$(openssl rand -hex 16)}"

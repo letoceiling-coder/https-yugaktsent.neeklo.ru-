@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Полный деплой LiveGrid на yugaktsent.neeklo.ru (без TrendAgent, без livegrid.ru).
+# Полный деплой ЮгАкцент на yugaktsent.neeklo.ru.
 # Запуск: bash /var/www/yugaktsent-lg/deploy/yugaktsent/deploy-full.sh
 
 PROJECT_DIR="${DEPLOY_ROOT:-/var/www/yugaktsent-lg}"
@@ -11,7 +11,7 @@ NGINX_CONF="/etc/nginx/sites-available/yugaktsent.neeklo.ru.conf"
 NGINX_LINK="/etc/nginx/sites-enabled/yugaktsent.neeklo.ru.conf"
 ECOSYSTEM="$PROJECT_DIR/deploy/yugaktsent/ecosystem.config.js"
 
-echo "=== YugAktsent LiveGrid Deploy ==="
+echo "=== ЮгАкцент: деплой ==="
 echo "Project: $PROJECT_DIR"
 echo ""
 

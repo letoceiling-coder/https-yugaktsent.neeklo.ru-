@@ -38,6 +38,16 @@ if (!pick('DATABASE_URL')) {
   );
 }
 
+// Учётка синхронизации задаётся только в .env: значений по умолчанию
+// здесь быть не должно — раньше тут лежал рабочий пароль.
+for (const key of ['LG_ADMIN_EMAIL', 'LG_ADMIN_PASSWORD']) {
+  if (!pick(key)) {
+    console.warn(
+      `[yugaktsent/ecosystem] WARN: ${key} missing in ${deployRoot}/.env — синхронизация Profitbase не сможет авторизоваться`,
+    );
+  }
+}
+
 const sharedEnv = {
   PUBLIC_SITE_URL: publicSiteUrl,
   NODE_ENV: 'production',
@@ -103,8 +113,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         LG_API_BASE: pick('LG_API_BASE', `http://127.0.0.1:${apiPort}/api/v1`),
-        LG_ADMIN_EMAIL: pick('LG_ADMIN_EMAIL', 'admin@livegrid.ru'),
-        LG_ADMIN_PASSWORD: pick('LG_ADMIN_PASSWORD', 'admin123!'),
+        LG_ADMIN_EMAIL: pick('LG_ADMIN_EMAIL'),
+        LG_ADMIN_PASSWORD: pick('LG_ADMIN_PASSWORD'),
         FEEDS_JSON: pick('FEEDS_JSON'),
         CRON_SCHEDULE: pick('PROFITBASE_CRON', '0 */6 * * *'),
         FEED_SKIP_MEDIA: pick('FEED_SKIP_MEDIA', 'false'),

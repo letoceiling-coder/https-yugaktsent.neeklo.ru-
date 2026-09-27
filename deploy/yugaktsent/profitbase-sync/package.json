@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Profitbase XML → LiveGrid admin API (blocks + manual apartments)",
+  "description": "Profitbase XML → admin API сайта (ЖК и квартиры)",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js --watch-cron",

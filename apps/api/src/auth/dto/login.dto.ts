@@ -3,7 +3,7 @@ import { Transform } from 'class-transformer';
 import { IsEmail, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class LoginDto {
-  @ApiProperty({ required: false, example: 'admin@livegrid.ru' })
+  @ApiProperty({ required: false, example: 'admin@example.com' })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() || undefined : value))
   @IsOptional()
   @IsEmail()
@@ -17,7 +17,7 @@ export class LoginDto {
   @MaxLength(32)
   phone?: string;
 
-  @ApiProperty({ example: 'admin123!' })
+  @ApiProperty({ example: 'your-password' })
   @IsString()
   @MinLength(6)
   password: string;

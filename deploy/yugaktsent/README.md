@@ -1,6 +1,6 @@
-# YugAktsent — отдельный инстанс LiveGrid
+# ЮгАкцент — деплой сайта yugaktsent.neeklo.ru
 
-Деплой на `yugaktsent.neeklo.ru` (сервер `212.67.9.173`), **без изменений на livegrid.ru**.
+Деплой на `yugaktsent.neeklo.ru` (сервер `212.67.9.173`).
 
 ## Особенности
 
