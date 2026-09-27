@@ -129,7 +129,6 @@ const FilterBar = () => {
             <CatalogSearchHintsDropdown
               hints={hints}
               isLoading={hintsLoading}
-              objectType={filters.objectType}
               className="absolute left-0 right-0 top-full z-[60] mt-2 max-h-[min(60vh,420px)] overflow-y-auto"
               onPick={() => {
                 setSearchFocused(false);

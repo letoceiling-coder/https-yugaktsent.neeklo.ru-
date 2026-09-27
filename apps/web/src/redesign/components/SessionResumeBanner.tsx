@@ -51,7 +51,7 @@ export default function SessionResumeBanner({ className }: Props) {
           <Link
             key={a.href}
             to={a.href}
-            className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border bg-background hover:border-primary/40 transition-colors max-w-[200px]"
+            className="inline-flex h-9 items-center gap-1.5 rounded-lg border bg-background px-3 text-xs transition-colors hover:border-primary/40 max-w-[200px]"
           >
             <Icon className="w-3.5 h-3.5 shrink-0 text-primary" />
             <span className="truncate">{a.label}</span>

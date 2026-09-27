@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Menu, X, Phone, Send, Youtube } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -30,6 +30,7 @@ const RedesignHeader = () => {
   const { data: siteSettings } = useSiteSettings();
   const { shortName, logoUrl } = useSiteBrand();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [leadOpen, setLeadOpen] = useState(false);
@@ -213,7 +214,12 @@ const RedesignHeader = () => {
         </div>
       ) : null}
 
-      <MobileTabBar />
+      {/* Нижняя панель без этих обработчиков молча ничего не делала */}
+      <MobileTabBar
+        onSearch={() => navigate('/catalog')}
+        onFavorites={() => navigate('/account/favorites')}
+        onMore={() => setMenuOpen(true)}
+      />
 
       <ConsultationFlow
         open={leadOpen}

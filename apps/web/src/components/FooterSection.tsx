@@ -5,15 +5,7 @@ import { cn } from '@/lib/utils';
 import { setting, settingOptional, useSiteSettings } from '@/redesign/hooks/useSiteSettings';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import { telHref, yandexMapsHref, yandexMapWidgetSrc } from '@/lib/contact-links';
-import {
-  FOOTER_CATALOG_LINKS,
-  FOOTER_COMPANY_LINKS,
-  FOOTER_DEFAULT_ADDRESS,
-  FOOTER_DEFAULT_EMAIL,
-  FOOTER_DEFAULT_HOURS,
-  FOOTER_DEFAULT_MAPS_URL,
-  FOOTER_DEFAULT_PHONE,
-} from '@/components/footer-constants';
+import { FOOTER_CATALOG_LINKS, FOOTER_COMPANY_LINKS } from '@/components/footer-constants';
 
 const footerLinkClass =
   'inline-flex min-h-11 items-center text-sm opacity-80 hover:opacity-100 transition-opacity py-1.5 -my-1.5';

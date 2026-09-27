@@ -8,7 +8,7 @@
     "build": "vite build && node ./scripts/prerender-seo.mjs",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "typecheck:runtime": "tsc -p tsconfig.runtime-integrity.json --noEmit",
     "preview": "vite preview",
     "test": "vitest run",

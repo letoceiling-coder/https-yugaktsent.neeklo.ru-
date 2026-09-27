@@ -501,6 +501,7 @@ const RedesignMap = () => {
   return (
     <div className="flex h-svh flex-col bg-background">
       <RedesignHeader />
+      <h1 className="sr-only">Поиск недвижимости на карте</h1>
       <div className="shrink-0 px-3 pt-2 lg:px-4 print:hidden">
         <SessionResumeBanner />
       </div>
