@@ -144,7 +144,7 @@ const ApartmentMediaGallery = ({ planSrc, finishingSrc, gallerySrcs = [], title 
               <button
                 type="button"
                 onClick={() => setLightboxOpen(true)}
-                className="absolute top-3 right-3 flex items-center gap-1 rounded-lg border border-border/70 bg-background/90 px-2.5 py-1.5 text-xs font-medium backdrop-blur-sm hover:bg-background"
+                className="absolute top-3 right-3 flex items-center gap-1 rounded-lg border border-border/70 bg-background/90 h-9 px-3 text-xs font-medium backdrop-blur-sm hover:bg-background"
               >
                 <Maximize2 className="h-3.5 w-3.5" />
                 На весь экран

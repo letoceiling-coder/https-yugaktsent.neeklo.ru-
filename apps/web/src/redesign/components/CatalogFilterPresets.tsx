@@ -72,7 +72,7 @@ export default function CatalogFilterPresets({
                 )
               }
               className={cn(
-                'shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors min-h-[44px] sm:min-h-[32px] touch-manipulation',
+                'shrink-0 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors min-h-[44px] sm:min-h-[32px] touch-manipulation',
                 active
                   ? 'border-primary bg-primary/10 text-primary'
                   : 'border-border bg-background hover:bg-muted/60',

@@ -496,15 +496,15 @@ const RedesignListingDetail = () => {
         {/* Breadcrumb */}
         <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
           <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
-            <Link to="/" className="hover:text-foreground transition-colors">Главная</Link>
+            <Link to="/" className="inline-flex min-h-8 items-center transition-colors hover:text-foreground">Главная</Link>
             <span>/</span>
-            <Link to="/catalog" className="hover:text-foreground transition-colors">Каталог</Link>
+            <Link to="/catalog" className="inline-flex min-h-8 items-center transition-colors hover:text-foreground">Каталог</Link>
             {regionName ? (
               <>
                 <span>/</span>
                 <Link
                   to={`/catalog?region_id=${data.region!.id}`}
-                  className="hover:text-foreground transition-colors"
+                  className="inline-flex min-h-8 items-center transition-colors hover:text-foreground"
                 >
                   {regionName}
                 </Link>

@@ -492,20 +492,20 @@ const RedesignComplex = () => {
 
       <div className="max-w-[1400px] 2xl:max-w-[1680px] mx-auto px-4 py-4 sm:py-6">
         <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3 min-w-0 flex-wrap">
-            <Link to="/" className="hover:text-foreground shrink-0">Главная</Link>
+            <Link to="/" className="inline-flex min-h-8 shrink-0 items-center hover:text-foreground">Главная</Link>
             <span>/</span>
             {regionId ? (
               <>
-                <Link to={buildCatalogFilterUrl(regionId)} className="hover:text-foreground shrink-0">Каталог</Link>
+                <Link to={buildCatalogFilterUrl(regionId)} className="inline-flex min-h-8 shrink-0 items-center hover:text-foreground">Каталог</Link>
                 {districtCatalogUrl ? (
                   <>
                     <span>/</span>
-                    <Link to={districtCatalogUrl} className="hover:text-foreground truncate max-w-[120px] sm:max-w-none">{complex.district}</Link>
+                    <Link to={districtCatalogUrl} className="inline-flex min-h-8 items-center truncate max-w-[120px] hover:text-foreground sm:max-w-none">{complex.district}</Link>
                   </>
                 ) : null}
               </>
             ) : (
-              <Link to="/catalog" className="hover:text-foreground shrink-0">Каталог</Link>
+              <Link to="/catalog" className="inline-flex min-h-8 shrink-0 items-center hover:text-foreground">Каталог</Link>
             )}
             <span>/</span>
             <span className="text-foreground font-medium truncate">{complex.name}</span>

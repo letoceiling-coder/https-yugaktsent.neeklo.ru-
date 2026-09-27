@@ -92,7 +92,7 @@ const Contacts = () => {
                           href={href}
                           target={href.startsWith('http') ? '_blank' : undefined}
                           rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                          className="mt-1 block text-base font-medium text-foreground transition-colors hover:text-primary"
+                          className="mt-1 inline-flex min-h-11 items-center text-base font-medium text-foreground transition-colors hover:text-primary"
                         >
                           {value}
                         </a>

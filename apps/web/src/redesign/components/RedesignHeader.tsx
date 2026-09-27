@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Menu, X, Send, Youtube } from 'lucide-react';
+import { Menu, X, Phone, Send, Youtube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSiteSettings, settingOptional } from '@/redesign/hooks/useSiteSettings';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
@@ -117,6 +117,25 @@ const RedesignHeader = () => {
           </nav>
 
           <div className="ml-auto flex items-center gap-1 lg:gap-2">
+            {phoneMain ? (
+              <>
+                <a
+                  href={telHref(phoneMain)}
+                  className="hidden items-center gap-2 whitespace-nowrap px-2 text-[15px] font-semibold text-foreground transition-colors hover:text-primary xl:inline-flex"
+                >
+                  <Phone className="h-4 w-4 shrink-0" aria-hidden />
+                  {phoneMain}
+                </a>
+                <a
+                  href={telHref(phoneMain)}
+                  aria-label={`Позвонить ${phoneMain}`}
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted hover:text-primary xl:hidden"
+                >
+                  <Phone className="h-[18px] w-[18px]" />
+                </a>
+              </>
+            ) : null}
+
             <div className="hidden items-center gap-1 lg:flex">{socials}</div>
 
             <button

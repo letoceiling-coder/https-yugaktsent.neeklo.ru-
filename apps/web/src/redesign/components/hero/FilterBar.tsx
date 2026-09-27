@@ -293,7 +293,9 @@ const FilterBar = () => {
           <button
             type="button"
             onClick={resetAndBrowseAll}
-            className={cn(btnClass('ghost'), 'h-11 px-5 sm:ml-auto')}
+            // Вариант ghost в библиотеке принудительно схлопывается в текстовую
+            // ссылку высотой 20 px — здесь нужна полноценная тихая кнопка
+            className="inline-flex h-11 items-center justify-center rounded-xl px-5 text-[15px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:ml-auto"
           >
             Все предложения
           </button>

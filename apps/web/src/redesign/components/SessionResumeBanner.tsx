@@ -61,7 +61,7 @@ export default function SessionResumeBanner({ className }: Props) {
       </div>
       <button
         type="button"
-        className="p-1.5 rounded-md text-muted-foreground hover:text-foreground ml-auto sm:ml-0"
+        className="flex h-10 w-10 items-center justify-center rounded-md text-muted-foreground hover:text-foreground ml-auto sm:ml-0"
         aria-label="Скрыть"
         onClick={() => {
           dismissSessionResume();

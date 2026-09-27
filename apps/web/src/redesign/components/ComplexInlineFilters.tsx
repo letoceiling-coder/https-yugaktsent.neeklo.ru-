@@ -45,7 +45,7 @@ export default function ComplexInlineFilters({
           type="button"
           onClick={() => onRoomFilter(null)}
           className={cn(
-            'shrink-0 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors',
+            'flex h-9 shrink-0 items-center rounded-lg border px-3.5 text-xs font-medium transition-colors',
             roomFilter === null ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:bg-muted/50',
           )}
         >
@@ -57,7 +57,7 @@ export default function ComplexInlineFilters({
             type="button"
             onClick={() => onRoomFilter(roomFilter === r.key ? null : r.key)}
             className={cn(
-              'shrink-0 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors',
+              'flex h-9 shrink-0 items-center rounded-lg border px-3.5 text-xs font-medium transition-colors',
               roomFilter === r.key ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:bg-muted/50',
             )}
           >

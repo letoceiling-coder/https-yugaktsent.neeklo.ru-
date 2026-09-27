@@ -94,11 +94,16 @@ const HorizontalSnapSlider = ({
                   type="button"
                   aria-label={`Слайд ${i + 1}`}
                   onClick={() => scrollTo(i)}
-                  className={cn(
-                    'h-1.5 rounded-full transition-all',
-                    i === activeIndex ? 'w-4 bg-primary' : 'w-1.5 bg-border',
-                  )}
-                />
+                  className="group flex h-10 w-6 items-center justify-center"
+                >
+                  {/* Точка мелкая, но нажимать можно по всей высоте строки */}
+                  <span
+                    className={cn(
+                      'block h-1.5 rounded-full transition-all',
+                      i === activeIndex ? 'w-4 bg-primary' : 'w-1.5 bg-border group-hover:bg-muted-foreground/50',
+                    )}
+                  />
+                </button>
               ))}
             </div>
           ) : null}
@@ -157,11 +162,15 @@ const HorizontalSnapSlider = ({
               type="button"
               aria-label={`Слайд ${i + 1}`}
               onClick={() => scrollTo(i)}
-              className={cn(
-                'h-1.5 rounded-full transition-all',
-                i === activeIndex ? 'w-4 bg-primary' : 'w-1.5 bg-border',
-              )}
-            />
+              className="group flex h-10 w-6 items-center justify-center"
+            >
+              <span
+                className={cn(
+                  'block h-1.5 rounded-full transition-all',
+                  i === activeIndex ? 'w-4 bg-primary' : 'w-1.5 bg-border group-hover:bg-muted-foreground/50',
+                )}
+              />
+            </button>
           ))}
         </div>
       ) : null}
