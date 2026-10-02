@@ -126,8 +126,6 @@ const RedesignIndex = () => {
         <QuizSection />
       </div>
 
-      <AboutPlatform pageSlug="/" />
-
       {/* Карта: полноценный блок, а не узкая полоска с иконкой */}
       <section className="section-y" aria-labelledby="map-cta-title">
         <div className="container-page">
@@ -155,6 +153,8 @@ const RedesignIndex = () => {
           </Link>
         </div>
       </section>
+
+      <AboutPlatform pageSlug="/" />
 
       <ConsultationFlow open={consultOpen} onOpenChange={setConsultOpen} context={consultContext} />
 
