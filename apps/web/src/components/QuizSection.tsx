@@ -137,7 +137,7 @@ const QuizSection = () => {
           <div className="flex-1 bg-secondary rounded-xl p-4 sm:p-6">
             {/* Progress */}
             <div className="flex items-center justify-between mb-4 sm:mb-5">
-              <h2 className="text-base sm:text-xl font-bold">Подберём объект</h2>
+              <h2 className="text-section-title">Подберём объект</h2>
               <span className="text-xs text-muted-foreground font-medium">Шаг {step + 1} из 3</span>
             </div>
 

@@ -67,3 +67,4 @@ deployment/tmp-lg-sync/
 
 # Archived nested workspace (pre-consolidation)
 deployment/tmp-lg-work/
+.gstack/

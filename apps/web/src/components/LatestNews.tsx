@@ -93,7 +93,7 @@ const LatestNews = () => {
     <section className="section-y">
       <div className="max-w-[1400px] mx-auto px-4">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <h2 className="text-base sm:text-xl font-bold">Последние новости</h2>
+          <h2 className="text-section-title">Последние новости</h2>
           <Link to="/news" className={cn(btnClass('secondary'), 'hidden sm:inline-flex')}>
             Все новости
             <ArrowRight className="w-3.5 h-3.5" />

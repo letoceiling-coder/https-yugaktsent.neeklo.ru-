@@ -137,7 +137,7 @@ const PropertyGridSection = ({ title, type }: Props) => {
         <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
           <div className="flex items-center gap-2 min-w-0">
             {isHot && <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-destructive shrink-0" />}
-            <h2 className="text-base sm:text-xl font-bold truncate">{displayTitle}</h2>
+            <h2 className="text-section-title truncate">{displayTitle}</h2>
           </div>
           <div className="hidden sm:flex items-center gap-2 shrink-0">
             {isStart ? (

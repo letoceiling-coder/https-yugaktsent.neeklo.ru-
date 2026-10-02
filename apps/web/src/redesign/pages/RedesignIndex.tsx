@@ -64,7 +64,7 @@ const RedesignIndex = () => {
       {featured.length > 0 && (
       <section className="relative z-0 container-page section-y">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <h2 className="text-base sm:text-xl font-bold">Популярные ЖК</h2>
+          <h2 className="text-section-title">Популярные ЖК</h2>
           <div className="flex items-center gap-2">
             <button
               type="button"
