@@ -87,7 +87,12 @@ const RedesignIndex = () => {
 
         <HorizontalSnapSlider
           mobileItemClass="w-[calc(100vw-72px)]"
-          desktopGridClass="sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-3 lg:gap-4 items-stretch"
+          /* Колонок не больше, чем карточек: две карточки в сетке на четыре
+             выглядели брошенными с пустой половиной ряда */
+          desktopGridClass={cn(
+            'sm:grid-cols-2 md:grid-cols-2 gap-3 md:gap-3 lg:gap-4 items-stretch',
+            featured.length >= 4 ? 'lg:grid-cols-4' : featured.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2',
+          )}
           showDots
           showArrows={false}
         >

@@ -64,13 +64,21 @@ const HeroBanner = () => {
   const active = slides[Math.min(index, total - 1)];
   if (!active) return null;
 
+  /** Фото ни на одном слайде — на всю высоту экрана растягивать нечего. */
+  const hasAnyImage = slides.some((s) => Boolean(s.image));
+
   const arrowClass =
     'absolute top-1/2 z-20 hidden h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full ' +
     'border border-white/30 bg-white/10 text-white backdrop-blur-sm transition-colors hover:bg-white/25 sm:flex';
 
   return (
     <section
-      className="relative h-[calc(100svh-4rem)] min-h-[520px] w-full overflow-hidden lg:h-[calc(100svh-72px)]"
+      className={cn(
+        'relative w-full overflow-hidden',
+        hasAnyImage
+          ? 'h-[calc(100svh-4rem)] min-h-[520px] lg:h-[calc(100svh-72px)]'
+          : 'min-h-[440px] py-16 sm:py-20 lg:min-h-[560px] lg:py-24',
+      )}
       aria-roledescription="carousel"
       aria-label="Баннеры"
       onMouseEnter={() => setPaused(true)}
@@ -108,7 +116,10 @@ const HeroBanner = () => {
               className="h-full w-full"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/90 via-primary to-primary/70" />
+            <div className="absolute inset-0 bg-primary">
+              <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_15%_0%,rgba(255,255,255,0.14),transparent_55%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(90%_70%_at_100%_100%,rgba(0,0,0,0.30),transparent_60%)]" />
+            </div>
           )}
         </div>
       ))}
