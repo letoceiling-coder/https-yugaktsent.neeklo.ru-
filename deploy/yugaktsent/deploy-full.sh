@@ -9,7 +9,6 @@ export DEPLOY_ROOT="$PROJECT_DIR"
 LOG_DIR="/var/log/yugaktsent-lg"
 NGINX_CONF="/etc/nginx/sites-available/yugaktsent.neeklo.ru.conf"
 NGINX_LINK="/etc/nginx/sites-enabled/yugaktsent.neeklo.ru.conf"
-ECOSYSTEM="$PROJECT_DIR/deploy/yugaktsent/ecosystem.config.js"
 
 echo "=== ЮгАкцент: деплой ==="
 echo "Project: $PROJECT_DIR"
@@ -71,14 +70,11 @@ cd deploy/yugaktsent/profitbase-sync
 npm install --omit=dev 2>/dev/null || npm install
 cd "$PROJECT_DIR"
 
-echo "→ Restarting PM2 (API + profitbase-sync)..."
+echo "→ Перезапуск служб (API + синхронизация Profitbase)..."
 export DEPLOY_ROOT="$PROJECT_DIR"
-if pm2 describe yugaktsent-lg-api >/dev/null 2>&1; then
-  pm2 reload "$ECOSYSTEM" --update-env
-else
-  pm2 start "$ECOSYSTEM"
-fi
-pm2 save
+# Окружение пересобираем из .env на каждом деплое: правки в .env должны
+# доезжать до служб без ручных действий.
+bash deploy/yugaktsent/scripts/install-systemd.sh
 
 echo "→ Updating nginx..."
 cp deploy/yugaktsent/nginx.conf "$NGINX_CONF"
@@ -89,7 +85,7 @@ nginx -t && nginx -s reload
 
 echo ""
 echo "=== Deploy complete ==="
-pm2 status | grep -E 'yugaktsent|Name' || pm2 status
+systemctl --no-pager --plain list-units 'yugaktsent-*' | head -5
 sleep 2
 echo "Health:"
 curl -sf "http://127.0.0.1:${API_PORT}/api/v1/health" | head -c 300 || echo "WARN: health check failed"

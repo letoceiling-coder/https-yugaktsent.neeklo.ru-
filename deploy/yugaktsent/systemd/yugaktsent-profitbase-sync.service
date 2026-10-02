@@ -1,0 +1,29 @@
+[Unit]
+Description=ЮгАкцент — синхронизация фида Profitbase
+After=network-online.target yugaktsent-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/yugaktsent-lg/deploy/yugaktsent/profitbase-sync
+# Окружение собирает write-systemd-env.mjs из .env проекта
+EnvironmentFile=/etc/yugaktsent/profitbase-sync.env
+ExecStart=/usr/bin/node src/index.js --watch-cron
+
+Restart=always
+RestartSec=4
+StartLimitIntervalSec=120
+StartLimitBurst=10
+
+MemoryMax=512M
+TimeoutStopSec=10
+KillMode=mixed
+# Фоновая задача не должна мешать API отвечать
+Nice=5
+
+StandardOutput=append:/var/log/yugaktsent-lg/profitbase-sync-out.log
+StandardError=append:/var/log/yugaktsent-lg/profitbase-sync-error.log
+SyslogIdentifier=yugaktsent-profitbase-sync
+
+[Install]
+WantedBy=multi-user.target
