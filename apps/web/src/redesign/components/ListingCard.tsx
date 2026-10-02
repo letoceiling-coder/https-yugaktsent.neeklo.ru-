@@ -110,10 +110,22 @@ function pickImage(l: ApiListingCardRow): string {
   );
 }
 
+/**
+ * Жильё меньше 10 м² не бывает: в фиде у части объектов площадь приходит
+ * ровно единицей — это артефакт импорта, а не планировка. Показывать
+ * «1 м²» в заголовке карточки хуже, чем не показывать площадь вовсе.
+ */
+const MIN_PLAUSIBLE_AREA_M2 = 10;
+
+function plausibleArea(value: unknown): number {
+  const n = num(value);
+  return n >= MIN_PLAUSIBLE_AREA_M2 ? n : 0;
+}
+
 function buildTitle(l: ApiListingCardRow): string {
   switch (l.kind) {
     case 'HOUSE': {
-      const area = num(l.house?.areaTotal);
+      const area = plausibleArea(l.house?.areaTotal);
       return area > 0 ? `Дом · ${area} м²` : 'Дом';
     }
     case 'LAND': {
@@ -122,7 +134,7 @@ function buildTitle(l: ApiListingCardRow): string {
     }
     case 'COMMERCIAL': {
       const t = l.commercial?.commercialType?.trim();
-      const area = num(l.commercial?.area);
+      const area = plausibleArea(l.commercial?.area);
       const head = t || 'Коммерция';
       return area > 0 ? `${head} · ${area} м²` : head;
     }
@@ -135,9 +147,10 @@ function buildTitle(l: ApiListingCardRow): string {
     case 'APARTMENT':
     default: {
       const rooms = l.apartment?.roomType?.name?.trim();
-      const area = num(l.apartment?.areaTotal);
+      const area = plausibleArea(l.apartment?.areaTotal);
       const parts = [rooms, area > 0 ? `${area} м²` : null].filter(Boolean);
-      return parts.length ? parts.join(' · ') : 'Объект';
+      // Нет ни комнатности, ни правдоподобной площади — называем вещь своим именем
+      return parts.length ? parts.join(' · ') : 'Квартира';
     }
   }
 }
