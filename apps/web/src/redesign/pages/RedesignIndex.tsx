@@ -128,20 +128,32 @@ const RedesignIndex = () => {
 
       <AboutPlatform pageSlug="/" />
 
-      {/* Map CTA — compact on mobile */}
-      <section className="container-page section-y">
-        <Link to="/map" className="block rounded-xl sm:rounded-2xl bg-muted border border-border p-5 sm:p-10 hover:border-primary/30 transition-colors group">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-accent flex items-center justify-center shrink-0">
-              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-accent-foreground" />
+      {/* Карта: полноценный блок, а не узкая полоска с иконкой */}
+      <section className="section-y" aria-labelledby="map-cta-title">
+        <div className="container-page">
+          <Link
+            to="/map"
+            className="group block overflow-hidden rounded-[24px] bg-graphite transition-shadow hover:shadow-xl lg:rounded-[32px]"
+          >
+            <div className="grid gap-6 p-8 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-10 lg:p-14">
+              <div>
+                <p className="text-overline text-white/60">Карта</p>
+                <h2 id="map-cta-title" className="text-section-title mt-3 text-white">
+                  Посмотрите, что где стоит
+                </h2>
+                <p className="mt-4 max-w-[520px] text-sm leading-relaxed text-white/70 sm:text-base">
+                  Все жилые комплексы на одной карте: до моря, до центра, до школы.
+                  Фильтры по цене и комнатности работают прямо на карте.
+                </p>
+              </div>
+
+              <span className="inline-flex h-12 shrink-0 items-center gap-2 rounded-xl border border-white/40 px-6 text-[15px] font-medium text-white transition-colors group-hover:bg-white/15">
+                Открыть карту
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </span>
             </div>
-            <div className="min-w-0">
-              <h3 className="font-semibold text-sm sm:text-lg group-hover:text-primary transition-colors">Поиск на карте</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground">Найдите ЖК рядом с метро</p>
-            </div>
-            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground ml-auto" />
-          </div>
-        </Link>
+          </Link>
+        </div>
       </section>
 
       <ConsultationFlow open={consultOpen} onOpenChange={setConsultOpen} context={consultContext} />
