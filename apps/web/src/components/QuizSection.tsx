@@ -144,7 +144,7 @@ const QuizSection = () => {
             {/* Step 1 — Type */}
             {step === 0 && (
               <>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-4">Какой тип недвижимости?</p>
+                <p className="mb-5 text-sm text-muted-foreground sm:text-base">Какой тип недвижимости?</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                   {propertyTypes.map(pt => {
                     const Icon = pt.icon;
@@ -154,10 +154,10 @@ const QuizSection = () => {
                         key={pt.value}
                         onClick={() => setSelectedType(pt.value)}
                         className={cn(
-                          'flex items-center gap-2.5 rounded-xl border-2 p-3 sm:p-4 text-left transition-all touch-manipulation',
+                          'flex min-h-[60px] items-center gap-3 rounded-xl border p-3 text-left transition-colors touch-manipulation sm:p-4',
                           active
-                            ? 'border-primary bg-accent'
-                            : 'border-border bg-background hover:border-primary/30'
+                            ? 'border-primary bg-accent text-accent-foreground shadow-[0_0_0_1px_hsl(var(--primary))]'
+                            : 'border-border bg-background hover:border-primary/40 hover:bg-muted/50'
                         )}
                       >
                         <div className={cn(
@@ -177,21 +177,21 @@ const QuizSection = () => {
             {/* Step 2 — Dynamic params */}
             {step === 1 && selectedType && (
               <>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-4">Уточните параметры</p>
+                <p className="mb-5 text-sm text-muted-foreground sm:text-base">Уточните параметры</p>
                 <div className="space-y-3 sm:space-y-4">
                   {step2Fields[selectedType].map(field => (
                     <div key={field.key}>
-                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{field.label}</label>
+                      <label className="mb-2 block text-sm font-medium text-foreground">{field.label}</label>
                       <div className="flex flex-wrap gap-1.5 sm:gap-2">
                         {field.options.map(opt => (
                           <button
                             key={opt}
                             onClick={() => setParams(p => ({ ...p, [field.key]: opt }))}
                             className={cn(
-                              'px-3 py-2 rounded-lg border text-xs sm:text-sm font-medium transition-all touch-manipulation',
+                              'flex h-10 items-center rounded-lg border px-3.5 text-xs font-medium transition-colors touch-manipulation sm:text-sm',
                               params[field.key] === opt
-                                ? 'border-primary bg-accent text-primary'
-                                : 'border-border bg-background hover:border-primary/30'
+                                ? 'border-primary bg-accent text-accent-foreground shadow-[0_0_0_1px_hsl(var(--primary))]'
+                                : 'border-border bg-background hover:border-primary/40 hover:bg-muted/50'
                             )}
                           >
                             {opt}

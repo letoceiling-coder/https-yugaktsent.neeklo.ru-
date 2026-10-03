@@ -9,6 +9,7 @@ import { useInViewOnce } from '@/shared/hooks/useInViewOnce';
 import { useSiteSettings, settingOptional } from '@/redesign/hooks/useSiteSettings';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import { telHref, yandexMapsHref } from '@/lib/contact-links';
+import officeImage from '@/assets/about-main.jpg';
 
 const Contacts = () => {
   const { data: s } = useSiteSettings();
@@ -19,6 +20,7 @@ const Contacts = () => {
   const address = settingOptional(s, 'address') ?? settingOptional(s, 'contacts_address');
   const workHours = settingOptional(s, 'contacts_work_hours') ?? settingOptional(s, 'work_hours');
   const officeTitle = settingOptional(s, 'office_title') ?? `Офис ${shortName}`;
+  const photo = settingOptional(s, 'contact_block_image') || officeImage;
   const lat = settingOptional(s, 'office_lat');
   const lng = settingOptional(s, 'office_lng');
 
@@ -77,6 +79,18 @@ const Contacts = () => {
               Покажем подборку на большом экране, разберём планировки и документы.
               Консультация и кофе бесплатные — записываться заранее не нужно.
             </p>
+
+            <div className="mt-8 overflow-hidden rounded-[20px] bg-muted">
+              <img
+                src={photo}
+                alt={officeTitle}
+                className="aspect-[16/10] w-full object-cover"
+                loading="lazy"
+                decoding="async"
+                width={640}
+                height={400}
+              />
+            </div>
 
             {rows.length > 0 ? (
               <ul className="mt-8 space-y-5">
