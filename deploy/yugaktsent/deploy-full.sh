@@ -67,7 +67,13 @@ pnpm build:web
 
 echo "→ Installing profitbase-sync dependencies..."
 cd deploy/yugaktsent/profitbase-sync
-npm install --omit=dev 2>/dev/null || npm install
+# npm ci не трогает package-lock.json. npm install его переписывал, и файл
+# становился «изменённым» — следующий git pull --ff-only падал на нём.
+if [ -f package-lock.json ]; then
+  npm ci --omit=dev 2>/dev/null || npm install --omit=dev
+else
+  npm install --omit=dev
+fi
 cd "$PROJECT_DIR"
 
 echo "→ Перезапуск служб (API + синхронизация Profitbase)..."

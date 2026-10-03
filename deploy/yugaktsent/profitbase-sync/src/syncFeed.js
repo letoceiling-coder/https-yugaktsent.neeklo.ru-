@@ -58,7 +58,10 @@ export async function syncFeed(feedConfig, lg, state, feedKey) {
   for (let i = 0; i < offers.length; i++) {
     const offer = offers[i];
     try {
-      const payload = lg.buildApartmentPayload(offer, block.id);
+      // Существующее объявление обновляем даже без площади в фиде:
+      // цена и статус важнее, а площадь в базе уже есть.
+      const isUpdate = Boolean(bucket[offer.externalId]?.listingId);
+      const payload = lg.buildApartmentPayload(offer, block.id, isUpdate);
       if (!payload) {
         result.skipped += 1;
         continue;

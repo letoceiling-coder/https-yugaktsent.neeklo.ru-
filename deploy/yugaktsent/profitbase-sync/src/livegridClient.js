@@ -209,14 +209,21 @@ export class LiveGridClient {
     return map;
   }
 
-  buildApartmentPayload(offer, blockId) {
+  /**
+   * @param {boolean} isUpdate Для существующего объявления площадь
+   *   необязательна, для нового — обязательна по контракту API.
+   */
+  buildApartmentPayload(offer, blockId, isUpdate = false) {
     const vis = OFFER_TO_LISTING[offer.status] ?? OFFER_TO_LISTING.available;
     if (!offer.price || offer.price <= 0) return null;
 
     // Площадь не выдумываем: раньше здесь стояла единица, и 658 объявлений
     // уехали в базу с площадью 1 м², а карточки показывали это рядом с ценой.
-    const areaTotal = offer.area || offer.livingArea || null;
-    if (!areaTotal || areaTotal < 10) return null;
+    const rawArea = offer.area || offer.livingArea || null;
+    const areaTotal = rawArea && rawArea >= 10 ? rawArea : null;
+    // Без площади новое объявление создать нельзя, а у существующего
+    // можно обновить цену и статус, не трогая площадь.
+    if (!areaTotal && !isUpdate) return null;
 
     const roomTypeId =
       offer.rooms != null && this.roomTypeByRooms
@@ -230,7 +237,7 @@ export class LiveGridClient {
       status: vis.status,
       isPublished: vis.isPublished,
       apartment: {
-        areaTotal,
+        areaTotal: areaTotal ?? undefined,
         roomTypeId: roomTypeId ?? undefined,
         areaKitchen: offer.kitchenArea ?? undefined,
         floor: offer.floor ?? undefined,
