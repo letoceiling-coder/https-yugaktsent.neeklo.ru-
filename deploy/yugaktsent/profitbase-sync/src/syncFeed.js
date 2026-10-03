@@ -170,7 +170,56 @@ function requireEnv(name) {
   return v;
 }
 
-export async function runSync({ persist } = {}) {
+/**
+ * Простая блокировка от параллельных прогонов.
+ *
+ * Без неё два запуска (служба по cron и ручной) читают одно состояние,
+ * оба не находят объявления и создают их заново — так в каталоге появились
+ * дубли на 889 лотов. Состояние в файле не спасает: его перезаписывает
+ * тот, кто финишировал последним.
+ */
+async function withLock(stateFile, fn) {
+  const { open, unlink, readFile } = await import("node:fs/promises");
+  const lockPath = `${stateFile}.lock`;
+  const STALE_MS = 30 * 60 * 1000;
+
+  let handle;
+  try {
+    handle = await open(lockPath, "wx");
+  } catch (err) {
+    if (err.code !== "EEXIST") throw err;
+    // Замок мог остаться от упавшего прогона — снимаем, если он протух
+    let stale = true;
+    try {
+      const raw = await readFile(lockPath, "utf8");
+      stale = Date.now() - Number(JSON.parse(raw).startedAt || 0) > STALE_MS;
+    } catch {
+      stale = true;
+    }
+    if (!stale) {
+      console.log("[profitbase-sync] другой прогон уже идёт — пропускаем");
+      return;
+    }
+    console.warn("[profitbase-sync] снимаю протухший замок");
+    await unlink(lockPath).catch(() => {});
+    handle = await open(lockPath, "wx");
+  }
+
+  try {
+    await handle.writeFile(JSON.stringify({ pid: process.pid, startedAt: Date.now() }));
+    await handle.close();
+    return await fn();
+  } finally {
+    await unlink(lockPath).catch(() => {});
+  }
+}
+
+export async function runSync(opts = {}) {
+  const stateFile = process.env.STATE_FILE || "./state.json";
+  return withLock(stateFile, () => runSyncUnlocked(opts));
+}
+
+async function runSyncUnlocked({ persist } = {}) {
   const base = process.env.LG_API_BASE || "http://127.0.0.1:3025/api/v1";
   // Учётка только из окружения: значений по умолчанию быть не должно.
   const email = requireEnv("LG_ADMIN_EMAIL");
