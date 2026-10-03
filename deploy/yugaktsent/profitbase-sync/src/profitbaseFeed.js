@@ -1,6 +1,7 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import { XMLParser } from "fast-xml-parser";
+import { parseDomclickXml, isDomclickXml } from "./domclickFeed.js";
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: "@_" });
 
@@ -121,5 +122,7 @@ export async function fetchProfitbaseFeed(feedUrl) {
   const res = await fetch(feedUrl);
   if (!res.ok) throw new Error(`Failed to download feed ${feedUrl}: HTTP ${res.status}`);
   const xml = await res.text();
-  return parseProfitbaseXml(xml);
+  // Формат определяем по содержимому: выгрузки ДомКлик и обычный фид
+  // Profitbase лежат по одинаковым адресам и различаются только корнем.
+  return isDomclickXml(xml) ? parseDomclickXml(xml) : parseProfitbaseXml(xml);
 }
