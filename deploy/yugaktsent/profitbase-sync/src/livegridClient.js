@@ -218,6 +218,26 @@ export class LiveGridClient {
    * без корпусов срок сдачи показать неоткуда.
    * Повторные вызовы не плодят корпуса — ищем по имени внутри ЖК.
    */
+  /**
+   * API корпусов принимает срок сдачи датой YYYY-MM-DD, а в фидах он приходит
+   * текстом «1 кв. 2027». Переводим в первый месяц квартала: витрина обратно
+   * считает квартал из месяца, так что подпись получается та же.
+   */
+  static deadlineToDate(label) {
+    if (!label) return null;
+    const raw = String(label).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+
+    const q = raw.match(/(\d)\s*кв\.?\s*(\d{4})/i);
+    if (q) {
+      const month = String((Number(q[1]) - 1) * 3 + 1).padStart(2, "0");
+      return `${q[2]}-${month}-01`;
+    }
+    const yearOnly = raw.match(/^(\d{4})$/);
+    if (yearOnly) return `${yearOnly[1]}-01-01`;
+    return null;
+  }
+
   async ensureBuilding(blockId, name, deadlineLabel) {
     if (!name) return null;
     this.buildingsByBlock ??= new Map();
@@ -233,20 +253,21 @@ export class LiveGridClient {
       found = null;
     }
 
+    const deadline = LiveGridClient.deadlineToDate(deadlineLabel);
     const payload = {
       regionId: this.regionId,
       blockId,
       name,
-      deadline: deadlineLabel ?? undefined,
+      deadline: deadline ?? undefined,
     };
 
     try {
       if (found) {
         // Срок сдачи мог измениться между прогонами
-        if (deadlineLabel && found.deadline !== deadlineLabel) {
+        if (deadline && String(found.deadline ?? "").slice(0, 10) !== deadline) {
           found = await this.api(`/admin/buildings/${found.id}`, {
             method: "PATCH",
-            body: { deadline: deadlineLabel },
+            body: { deadline },
           });
         }
       } else {
