@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Menu, X, Phone, Send, Youtube } from 'lucide-react';
+import { Menu, MessageCircle, Phone, Send, Users, X, Youtube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSiteSettings, settingOptional } from '@/redesign/hooks/useSiteSettings';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
@@ -38,6 +38,8 @@ const RedesignHeader = () => {
   // Ссылки на каналы заполняет заказчик в админке; пустые — иконку не рисуем.
   const telegramUrl = settingOptional(siteSettings, 'telegram_url');
   const youtubeUrl = settingOptional(siteSettings, 'youtube_url');
+  const vkUrl = settingOptional(siteSettings, 'vk_url');
+  const maxUrl = settingOptional(siteSettings, 'max_url');
   const phoneMain = settingOptional(siteSettings, 'phone_main');
 
   // Навигация по ссылке из выехавшей панели не должна оставлять её открытой
@@ -56,30 +58,32 @@ const RedesignHeader = () => {
 
   const isActive = (item: (typeof NAV_ITEMS)[number]) => item.match(location.pathname, location.search);
 
+  /**
+   * Каналы связи: рисуем только те, у которых в настройках заполнен адрес.
+   * Иконка, ведущая в никуда, хуже отсутствующей.
+   */
+  const SOCIALS: { url?: string; label: string; icon: typeof Send }[] = [
+    { url: telegramUrl, label: 'Telegram', icon: Send },
+    { url: maxUrl, label: 'MAX', icon: MessageCircle },
+    { url: vkUrl, label: 'ВКонтакте', icon: Users },
+    { url: youtubeUrl, label: 'YouTube', icon: Youtube },
+  ];
+
   const socials = (
     <>
-      {telegramUrl ? (
+      {SOCIALS.filter((s) => s.url).map(({ url, label, icon: Icon }) => (
         <a
-          href={telegramUrl}
+          key={label}
+          href={url}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Telegram"
+          aria-label={label}
+          title={label}
           className="flex h-9 w-9 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted hover:text-primary"
         >
-          <Send className="h-[18px] w-[18px]" />
+          <Icon className="h-[18px] w-[18px]" />
         </a>
-      ) : null}
-      {youtubeUrl ? (
-        <a
-          href={youtubeUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="YouTube"
-          className="flex h-9 w-9 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted hover:text-primary"
-        >
-          <Youtube className="h-[18px] w-[18px]" />
-        </a>
-      ) : null}
+      ))}
     </>
   );
 

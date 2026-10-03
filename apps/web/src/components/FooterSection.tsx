@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Clock, Send, Youtube } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, MessageCircle, Send, Users, Youtube } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { setting, settingOptional, useSiteSettings } from '@/redesign/hooks/useSiteSettings';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
@@ -71,6 +71,16 @@ const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
   const addressVal = settingOptional(s, 'address') ?? settingOptional(s, 'contacts_address');
   const telegramUrl = settingOptional(s, 'telegram_url');
   const youtubeUrl = settingOptional(s, 'youtube_url');
+  const vkUrl = settingOptional(s, 'vk_url');
+  const maxUrl = settingOptional(s, 'max_url');
+
+  /** Каналы связи: рисуем только заполненные, иконка в никуда хуже отсутствующей */
+  const SOCIAL_LINKS = [
+    { url: telegramUrl, label: 'Telegram', Icon: Send },
+    { url: maxUrl, label: 'MAX', Icon: MessageCircle },
+    { url: vkUrl, label: 'ВКонтакте', Icon: Users },
+    { url: youtubeUrl, label: 'YouTube', Icon: Youtube },
+  ];
   const officeLat = settingOptional(s, 'office_lat');
   const officeLng = settingOptional(s, 'office_lng');
 
@@ -157,30 +167,21 @@ const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
           <FooterNavColumn title="Компания" links={FOOTER_COMPANY_LINKS} />
         </div>
 
-        {telegramUrl || youtubeUrl ? (
+        {[telegramUrl, maxUrl, vkUrl, youtubeUrl].some(Boolean) ? (
           <div className="mt-8 flex items-center gap-2 border-t border-primary-foreground/10 pt-6">
-            {telegramUrl ? (
+            {SOCIAL_LINKS.filter((x) => x.url).map(({ url, label, Icon }) => (
               <a
-                href={telegramUrl}
+                key={label}
+                href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Telegram"
+                aria-label={label}
+                title={label}
                 className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/10 transition-colors hover:bg-primary-foreground/20"
               >
-                <Send className="h-[18px] w-[18px]" />
+                <Icon className="h-[18px] w-[18px]" />
               </a>
-            ) : null}
-            {youtubeUrl ? (
-              <a
-                href={youtubeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/10 transition-colors hover:bg-primary-foreground/20"
-              >
-                <Youtube className="h-[18px] w-[18px]" />
-              </a>
-            ) : null}
+            ))}
           </div>
         ) : null}
 
