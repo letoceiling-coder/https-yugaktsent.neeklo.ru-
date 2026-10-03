@@ -213,6 +213,70 @@ export class LiveGridClient {
    * @param {boolean} isUpdate Для существующего объявления площадь
    *   необязательна, для нового — обязательна по контракту API.
    */
+  /**
+   * Корпус со сроком сдачи. Из него карточка ЖК берёт строку «1 кв. 2027»:
+   * без корпусов срок сдачи показать неоткуда.
+   * Повторные вызовы не плодят корпуса — ищем по имени внутри ЖК.
+   */
+  async ensureBuilding(blockId, name, deadlineLabel) {
+    if (!name) return null;
+    this.buildingsByBlock ??= new Map();
+    const cacheKey = `${blockId}:${name}`;
+    if (this.buildingsByBlock.has(cacheKey)) return this.buildingsByBlock.get(cacheKey);
+
+    let found = null;
+    try {
+      const list = await this.api(`/admin/buildings?block_id=${blockId}&per_page=200`);
+      const rows = Array.isArray(list) ? list : (list?.data ?? []);
+      found = rows.find((b) => String(b.name).trim() === String(name).trim()) ?? null;
+    } catch {
+      found = null;
+    }
+
+    const payload = {
+      regionId: this.regionId,
+      blockId,
+      name,
+      deadline: deadlineLabel ?? undefined,
+    };
+
+    try {
+      if (found) {
+        // Срок сдачи мог измениться между прогонами
+        if (deadlineLabel && found.deadline !== deadlineLabel) {
+          found = await this.api(`/admin/buildings/${found.id}`, {
+            method: "PATCH",
+            body: { deadline: deadlineLabel },
+          });
+        }
+      } else {
+        found = await this.api("/admin/buildings", { method: "POST", body: payload });
+      }
+    } catch (err) {
+      console.warn(`[sync] корпус «${name}» не заведён: ${err.message}`);
+      found = null;
+    }
+
+    this.buildingsByBlock.set(cacheKey, found);
+    return found;
+  }
+
+  /**
+   * Обложка ЖК ссылкой на изображение поставщика.
+   * Файл не скачиваем — храним только адрес.
+   */
+  async setBlockCover(blockId, url) {
+    if (!url) return;
+    this.coversSet ??= new Set();
+    if (this.coversSet.has(blockId)) return;
+    this.coversSet.add(blockId);
+    try {
+      await this.api(`/admin/blocks/${blockId}/cover`, { method: "PUT", body: { url } });
+    } catch (err) {
+      console.warn(`[sync] обложка ЖК ${blockId} не поставлена: ${err.message}`);
+    }
+  }
+
   buildApartmentPayload(offer, blockId, isUpdate = false) {
     const vis = OFFER_TO_LISTING[offer.status] ?? OFFER_TO_LISTING.available;
     if (!offer.price || offer.price <= 0) return null;

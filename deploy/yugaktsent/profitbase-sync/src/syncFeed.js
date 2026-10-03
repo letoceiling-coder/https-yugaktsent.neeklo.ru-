@@ -45,6 +45,22 @@ export async function syncFeed(feedConfig, lg, state, feedKey) {
   const skipMedia =
     process.env.FEED_SKIP_MEDIA === "1" || process.env.FEED_SKIP_MEDIA === "true";
 
+  // Корпуса и обложку заводим один раз на фид, до разбора лотов:
+  // из корпусов карточка ЖК берёт срок сдачи, из обложки — фото.
+  const seenBuildings = new Map();
+  for (const offer of offers) {
+    if (!offer.buildingName) continue;
+    if (!seenBuildings.has(offer.buildingName)) {
+      seenBuildings.set(offer.buildingName, offer.completionQuarter ?? null);
+    }
+  }
+  for (const [name, deadline] of seenBuildings) {
+    await lg.ensureBuilding(block.id, name, deadline);
+  }
+
+  const cover = offers.find((o) => o.buildingImage)?.buildingImage;
+  if (cover) await lg.setBlockCover(block.id, cover);
+
   const result = {
     feed: feedKey,
     block: blockName,

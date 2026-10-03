@@ -14,6 +14,7 @@ import { Roles } from '../../auth/decorators';
 import { BlocksService } from './blocks.service';
 import { CreateBlockDto } from './dto/create-block.dto';
 import { QueryBlocksDto } from './dto/query-blocks.dto';
+import { SetBlockCoverDto } from './dto/set-block-cover.dto';
 
 @ApiTags('Admin / Blocks')
 @ApiBearerAuth()
@@ -50,6 +51,13 @@ export class BlocksAdminController {
     @Body() dto: Partial<CreateBlockDto>,
   ) {
     return this.service.update(id, dto);
+  }
+
+  @Put(':id/cover')
+  @Roles('editor')
+  @ApiOperation({ summary: 'Обложка ЖК по внешней ссылке (admin)' })
+  setCover(@Param('id', ParseIntPipe) id: number, @Body() dto: SetBlockCoverDto) {
+    return this.service.setCoverImage(id, dto.url);
   }
 
   @Delete(':id')

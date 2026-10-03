@@ -1170,6 +1170,33 @@ export class BlocksService {
     return updated;
   }
 
+  /**
+   * Обложка ЖК по ссылке из фида. Файл не скачиваем: по решению о хранении
+   * медиа изображения остаются на стороне поставщика, у нас только адрес.
+   * Повторный вызов с тем же адресом ничего не меняет.
+   */
+  async setCoverImage(blockId: number, url: string) {
+    const block = await this.prisma.block.findUnique({ where: { id: blockId } });
+    if (!block) throw new NotFoundException(`ЖК ${blockId} не найден`);
+
+    const existing = await this.prisma.blockImage.findFirst({
+      where: { blockId, kind: 'RENDER' },
+      orderBy: { sortOrder: 'asc' },
+    });
+
+    if (existing) {
+      if (existing.url === url) return existing;
+      return this.prisma.blockImage.update({
+        where: { id: existing.id },
+        data: { url },
+      });
+    }
+
+    return this.prisma.blockImage.create({
+      data: { blockId, url, kind: 'RENDER', sortOrder: 0 },
+    });
+  }
+
   async remove(id: number) {
     await this.findOne(id);
     await this.prisma.block.delete({ where: { id } });
