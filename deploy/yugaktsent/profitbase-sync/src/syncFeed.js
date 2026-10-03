@@ -176,6 +176,9 @@ export async function runSync({ persist } = {}) {
 
   const lg = new LiveGridClient(base, email, password);
   await lg.login();
+  // Справочник типов комнат нужен до разбора лотов: без него комнатность
+  // некуда записать, и прайс по типам квартир в карточке остаётся пустым.
+  await lg.ensureRoomTypes();
 
   const feeds = await resolveFeeds(lg);
   if (!Array.isArray(feeds) || feeds.length === 0) {

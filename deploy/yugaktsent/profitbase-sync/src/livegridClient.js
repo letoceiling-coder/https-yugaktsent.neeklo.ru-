@@ -162,9 +162,66 @@ export class LiveGridClient {
     return data.url || data.publicUrl || data.path;
   }
 
+  /**
+   * Справочник типов комнат: заводим недостающие и держим карту
+   * «число комнат → id». Без неё комнатность не доезжает до базы,
+   * и карточка не может показать прайс по типам квартир.
+   */
+  async ensureRoomTypes() {
+    if (this.roomTypeByRooms) return this.roomTypeByRooms;
+
+    const NAMES = [
+      [0, 'Студия'],
+      [1, '1-комнатная'],
+      [2, '2-комнатная'],
+      [3, '3-комнатная'],
+      [4, '4-комнатная'],
+      [5, '5-комнатная'],
+    ];
+
+    let existing = [];
+    try {
+      existing = (await this.api('/admin/reference/room-types')) ?? [];
+    } catch {
+      existing = [];
+    }
+
+    const byName = new Map(existing.map((r) => [String(r.name).trim().toLowerCase(), r.id]));
+    const map = new Map();
+
+    for (const [rooms, name] of NAMES) {
+      let id = byName.get(name.toLowerCase());
+      if (!id) {
+        try {
+          const created = await this.api('/admin/reference/room-types', {
+            method: 'POST',
+            body: { name, nameOne: name },
+          });
+          id = created?.id;
+        } catch (err) {
+          console.warn(`[sync] не удалось завести тип комнат «${name}»: ${err.message}`);
+        }
+      }
+      if (id) map.set(rooms, id);
+    }
+
+    this.roomTypeByRooms = map;
+    return map;
+  }
+
   buildApartmentPayload(offer, blockId) {
     const vis = OFFER_TO_LISTING[offer.status] ?? OFFER_TO_LISTING.available;
     if (!offer.price || offer.price <= 0) return null;
+
+    // Площадь не выдумываем: раньше здесь стояла единица, и 658 объявлений
+    // уехали в базу с площадью 1 м², а карточки показывали это рядом с ценой.
+    const areaTotal = offer.area || offer.livingArea || null;
+    if (!areaTotal || areaTotal < 10) return null;
+
+    const roomTypeId =
+      offer.rooms != null && this.roomTypeByRooms
+        ? this.roomTypeByRooms.get(Math.min(offer.rooms, 5))
+        : undefined;
 
     return {
       regionId: this.regionId,
@@ -173,7 +230,8 @@ export class LiveGridClient {
       status: vis.status,
       isPublished: vis.isPublished,
       apartment: {
-        areaTotal: offer.area || offer.livingArea || 1,
+        areaTotal,
+        roomTypeId: roomTypeId ?? undefined,
         areaKitchen: offer.kitchenArea ?? undefined,
         floor: offer.floor ?? undefined,
         floorsTotal: offer.floorsTotal ?? undefined,
