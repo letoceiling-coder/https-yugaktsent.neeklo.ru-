@@ -204,11 +204,23 @@ async function withLock(stateFile, fn) {
     handle = await open(lockPath, "wx");
   } catch (err) {
     if (err.code !== "EEXIST") throw err;
-    // Замок мог остаться от упавшего прогона — снимаем, если он протух
+    // Замок мог остаться от упавшего прогона: считаем его протухшим,
+    // если процесса уже нет или он держится дольше получаса.
     let stale = true;
     try {
       const raw = await readFile(lockPath, "utf8");
-      stale = Date.now() - Number(JSON.parse(raw).startedAt || 0) > STALE_MS;
+      const { pid, startedAt } = JSON.parse(raw);
+      const tooOld = Date.now() - Number(startedAt || 0) > STALE_MS;
+      let alive = false;
+      if (pid) {
+        try {
+          process.kill(Number(pid), 0);
+          alive = true;
+        } catch {
+          alive = false;
+        }
+      }
+      stale = tooOld || !alive;
     } catch {
       stale = true;
     }
