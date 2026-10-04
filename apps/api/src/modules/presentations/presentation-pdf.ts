@@ -89,3 +89,23 @@ export function resolveGeoPoint(input: {
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   return { lat, lng };
 }
+
+/**
+ * Заголовок Content-Disposition для имени файла с кириллицей.
+ *
+ * В заголовки HTTP можно писать только latin-1, поэтому слаг вроде
+ * «жк-хозяин-морей» ронял ответ с ERR_INVALID_CHAR, и кнопка «Презентация
+ * PDF» отдавала 500 у всех комплексов с русским адресом. По RFC 5987
+ * настоящее имя уходит в filename*, а в filename кладём безопасный запасной.
+ */
+export function pdfContentDisposition(name: string, fallback: string): string {
+  const safeFallback =
+    fallback
+      .replace(/[^A-Za-z0-9._-]+/g, '-')
+      .replace(/-{2,}/g, '-')
+      .replace(/^-|-$/g, '') || 'presentation';
+  const encoded = encodeURIComponent(`${name}.pdf`).replace(/['()*]/g, (c) =>
+    `%${c.charCodeAt(0).toString(16).toUpperCase()}`,
+  );
+  return `attachment; filename="${safeFallback}.pdf"; filename*=UTF-8''${encoded}`;
+}

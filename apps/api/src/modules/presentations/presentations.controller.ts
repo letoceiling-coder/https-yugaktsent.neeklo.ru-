@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { CurrentUser, OptionalJwtUser, Public } from '../../auth/decorators';
 import { PresentationsService } from './presentations.service';
+import { pdfContentDisposition } from './presentation-pdf';
 
 @ApiTags('Presentations')
 @Controller('presentations')
@@ -28,7 +29,7 @@ export class PresentationsController {
   ) {
     const buf = await this.service.generateListingPdf(listingId, userId);
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=\"listing-${listingId}.pdf\"`);
+    res.setHeader('Content-Disposition', pdfContentDisposition(`obyekt-${listingId}`, `listing-${listingId}`));
     res.setHeader('Content-Length', String(buf.length));
     return new StreamableFile(buf);
   }
@@ -45,7 +46,7 @@ export class PresentationsController {
   ) {
     const buf = await this.service.generatePdf(slug, userId);
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=\"presentation-${slug}.pdf\"`);
+    res.setHeader('Content-Disposition', pdfContentDisposition(`${slug}-prezentaciya`, `presentation-${slug}`));
     res.setHeader('Content-Length', String(buf.length));
     return new StreamableFile(buf);
   }
