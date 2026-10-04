@@ -92,7 +92,9 @@ export function buildCatalogSeoMeta(
         ? `Каталог: ${parts.slice(0, 5).join(' · ')}`
         : parts[0] === 'новостройки'
           ? 'Каталог новостроек и квартир'
-          : `Каталог · ${parts[0]}`;
+          : parts[0] === 'каталог'
+            ? 'Каталог недвижимости'
+            : `Каталог · ${parts[0]}`;
   }
 
   const title = regionPrefix ? `${regionPrefix}${titleBase}` : titleBase;

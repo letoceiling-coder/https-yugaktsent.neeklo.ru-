@@ -275,7 +275,17 @@ export function buildBuildingTopology(
     for (const id of shaft.apartmentIds) aptToShaftId.set(id, shaft.shaftId);
   }
 
-  const floorsDesc = [...sortedFloors].sort((a, b) => b - a);
+  // Этаж без единой квартиры в выгрузке всё равно существует в доме:
+  // пропустить его строкой — значит показать дом ниже, чем он есть.
+  // Диапазон берём сплошной, но с защитой от мусорного номера этажа.
+  const MAX_FLOOR_ROWS = 80;
+  const minFloor = sortedFloors[0] ?? 1;
+  const maxFloor = sortedFloors[sortedFloors.length - 1] ?? minFloor;
+  const contiguous =
+    maxFloor - minFloor + 1 <= MAX_FLOOR_ROWS
+      ? Array.from({ length: maxFloor - minFloor + 1 }, (_, i) => minFloor + i)
+      : [...sortedFloors];
+  const floorsDesc = contiguous.sort((a, b) => b - a);
   const floorTemplates: FloorTemplate[] = floorsDesc.map((floor) => {
     const onFloor = new Map(
       (byFloor.get(floor) ?? []).map((a) => [aptToShaftId.get(a.id)!, a] as const),

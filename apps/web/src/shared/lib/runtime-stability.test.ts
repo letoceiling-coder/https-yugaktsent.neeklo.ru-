@@ -66,7 +66,9 @@ describe('mapApiBlockListRowToResidentialComplex', () => {
     };
     const complex = mapApiBlockListRowToResidentialComplex(row as never);
     expect(complex.images.length).toBeGreaterThan(0);
-    expect(complex.district).toBe('—');
-    expect(complex.subway).toBe('—');
+    // Незаполненное поле отдаём пустой строкой: прочерк в карточке
+    // выглядел как данные, которых на самом деле нет.
+    expect(complex.district).toBe('');
+    expect(complex.subway).toBe('');
   });
 });

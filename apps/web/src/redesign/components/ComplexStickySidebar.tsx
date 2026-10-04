@@ -84,12 +84,15 @@ export default function ComplexStickySidebar({ complex, availableCount, onConsul
             <dd className="font-medium text-right">{deadlineText}</dd>
           </div>
         ) : null}
-        <div className="flex justify-between gap-2">
-          <dt className="text-muted-foreground flex items-center gap-1.5">
-            <Building2 className="w-3.5 h-3.5 shrink-0" /> Застройщик
-          </dt>
-          <dd className="font-medium text-right truncate max-w-[55%]">{complex.builder || '—'}</dd>
-        </div>
+        {/* Строку без значения не рисуем: прочерк в карточке ничего не сообщает */}
+        {complex.builder && complex.builder !== '—' ? (
+          <div className="flex justify-between gap-2">
+            <dt className="text-muted-foreground flex items-center gap-1.5">
+              <Building2 className="w-3.5 h-3.5 shrink-0" /> Застройщик
+            </dt>
+            <dd className="font-medium text-right truncate max-w-[55%]">{complex.builder}</dd>
+          </div>
+        ) : null}
         {availableCount > 0 ? (
           <div className="flex justify-between gap-2">
             <dt className="text-muted-foreground">Свободных кв.</dt>

@@ -110,7 +110,7 @@ function deadlineLabel(b: ApiBlockListRow): string {
   if (b.status === 'COMPLETED') return 'Сдан';
   if (b.status === 'BUILDING') return 'Строится';
   if (b.status === 'PROJECT') return 'Проект';
-  return '—';
+  return '';
 }
 
 function quarterLabel(value: string | Date | null | undefined): string | null {
@@ -118,7 +118,7 @@ function quarterLabel(value: string | Date | null | undefined): string | null {
   const d = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(d.getTime())) return null;
   const quarter = Math.ceil((d.getMonth() + 1) / 3);
-  return `${d.getFullYear()} ${quarter} квартал`;
+  return `${quarter} кв. ${d.getFullYear()}`;
 }
 
 function buildingDeadlineLabel(bg: {
@@ -160,10 +160,10 @@ export function mapApiBlockListRowToResidentialComplex(b: ApiBlockListRow): Resi
     slug: b.slug,
     name: b.name,
     description: b.description?.trim() || 'Описание появится позже.',
-    builder: b.builder?.name ?? '—',
-    district: b.district?.name ?? '—',
-    subway: metro?.subway.name ?? '—',
-    subwayDistance: metro?.distanceTime != null ? `${metro.distanceTime} мин` : '—',
+    builder: b.builder?.name ?? '',
+    district: b.district?.name ?? '',
+    subway: metro?.subway.name ?? '',
+    subwayDistance: metro?.distanceTime != null ? `${metro.distanceTime} мин` : '',
     nearbySubways: (b.subways ?? [])
       .map((x) => ({
         name: x.subway?.name ?? '',
@@ -172,7 +172,7 @@ export function mapApiBlockListRowToResidentialComplex(b: ApiBlockListRow): Resi
       }))
       .filter((x) => x.name.trim().length > 0)
       .sort((a, z) => (a.distanceTime ?? Number.MAX_SAFE_INTEGER) - (z.distanceTime ?? Number.MAX_SAFE_INTEGER)),
-    address: addr || '—',
+    address: addr || '',
     deadline: deadlineLabel(b),
     status: statusFromApi(b.status),
     priceFrom: priceMin,
@@ -436,9 +436,9 @@ export function mapApiBlockDetailToResidentialComplex(
           deadline: raw.deadline
             ? (() => {
                 const d = new Date(raw.deadline);
-                if (Number.isNaN(d.getTime())) return '—';
+                if (Number.isNaN(d.getTime())) return '';
                 const quarter = Math.ceil((d.getMonth() + 1) / 3);
-                return `${d.getFullYear()} ${quarter} квартал`;
+                return `${quarter} кв. ${d.getFullYear()}`;
               })()
             : base.deadline,
           apartments: aptsForB,
@@ -487,7 +487,7 @@ export function mapApiBlockDetailToResidentialComplex(
     listingRows
       .map((x) => x.builder?.name?.trim() ?? '')
       .find((name) => name.length > 0) ?? null;
-  const builder = base.builder === '—' && fallbackBuilder ? fallbackBuilder : base.builder;
+  const builder = !base.builder && fallbackBuilder ? fallbackBuilder : base.builder;
 
   return {
     ...base,

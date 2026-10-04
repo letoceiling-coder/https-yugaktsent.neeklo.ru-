@@ -89,10 +89,10 @@ describe('card-visual complex helpers', () => {
   });
 
   it('emphasizes completion line with quarter', () => {
-    expect(complexCompletionLine(base)).toBe('Сдан — 2 кв. 2029');
+    expect(complexCompletionLine(base)).toBe('Сдан в 2 кв. 2029');
     expect(
       complexCompletionLine({ ...base, status: 'building', deadline: '2027 3 квартал' }),
-    ).toBe('Строится — 3 кв. 2027');
+    ).toBe('Строится, сдача 3 кв. 2027');
   });
 
   it('builds popular completion range without status prefix', () => {
