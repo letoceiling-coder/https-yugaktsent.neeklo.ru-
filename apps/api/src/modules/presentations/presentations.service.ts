@@ -7,12 +7,18 @@ import {
   formatPdfFooterContact,
   formatPdfHeaderAgentLine,
   listingPdfParamRows,
+  formatPdfBrandContacts,
+  formatPdfMoney,
+  PDF_BORDER,
   PDF_BRAND_COLOR,
+  PDF_GRAPHITE,
+  PDF_SURFACE,
   PDF_TEXT_DARK,
   PDF_TEXT_MUTED,
   resolveGeoPoint,
   yandexStaticMapImageUrl,
   type PdfAgentContact,
+  type PdfBrand,
 } from './presentation-pdf';
 import type { ListingPresentationPayload, PresentationPayload } from './presentation.types';
 
@@ -197,62 +203,265 @@ export class PresentationsService {
     };
   }
 
+  /**
+   * Презентация ЖК одним файлом: обложка с фотографией комплекса,
+   * цена и ключевые факты, прайс по комнатности, описание и контакты.
+   *
+   * Рисуем вручную по координатам, а не потоком текста: иначе обложка
+   * во всю ширину страницы и подвал в фирменном цвете не сверстать.
+   */
   async generatePdf(slug: string, creatorUserId?: string): Promise<Buffer> {
     const p = await this.getBySlug(slug);
-    const contact = await this.resolvePdfAgentContact(creatorUserId);
+    const [contact, brand] = await Promise.all([
+      this.resolvePdfAgentContact(creatorUserId),
+      this.loadPdfBrand(),
+    ]);
     const { doc, chunks } = this.createPdfDoc();
-    this.drawPdfBrandHeader(doc, contact);
 
-    doc.font('Bold').fontSize(22).fillColor(PDF_BRAND_COLOR).text(p.name, { align: 'left' });
-    doc.moveDown(0.5);
-    doc.font('Regular').fontSize(11).fillColor('#666666').text('Краткая презентация для клиента');
-    doc.moveDown();
+    const W = doc.page.width;
+    const M = 48;
+    const contentW = W - M * 2;
 
-    doc.fillColor('#000000').fontSize(12);
-    if (p.address) doc.font('Regular').text('Адрес: ' + p.address);
-    if (p.builder) doc.font('Regular').text('Застройщик: ' + p.builder);
-    if (p.metro) doc.font('Regular').text('Метро: ' + p.metro);
-    if (p.deadline) doc.font('Regular').text('Срок сдачи: ' + p.deadline);
-    if (p.availableApartments > 0) {
-      doc.font('Regular').text('Квартир в наличии: ' + p.availableApartments);
+    // ── Обложка ───────────────────────────────────────────────────────────
+    const coverH = 300;
+    const cover = p.imageUrl ? await this.fetchImageBuffer(p.imageUrl) : null;
+    if (cover) {
+      try {
+        doc.image(cover, 0, 0, { cover: [W, coverH], align: 'center', valign: 'center' });
+      } catch {
+        doc.rect(0, 0, W, coverH).fill(PDF_GRAPHITE);
+      }
+    } else {
+      doc.rect(0, 0, W, coverH).fill(PDF_GRAPHITE);
     }
+
+    // Затемнение снизу: белый заголовок читается на любой фотографии
+    doc.save();
+    doc.rect(0, coverH - 170, W, 170).fillOpacity(0.72).fill(PDF_GRAPHITE);
+    doc.restore();
+    doc.save();
+    doc.rect(0, 0, W, 72).fillOpacity(0.45).fill(PDF_GRAPHITE);
+    doc.restore();
+
+    doc.font('Bold').fontSize(13).fillColor('#FFFFFF').text(brand.name, M, 26, { lineBreak: false });
+    if (brand.tagline) {
+      doc.font('Regular').fontSize(8).fillColor('#FFFFFFCC').text(brand.tagline, M, 44, { lineBreak: false });
+    }
+    doc
+      .font('Regular')
+      .fontSize(8)
+      .fillColor('#FFFFFFCC')
+      .text('ПРЕЗЕНТАЦИЯ КОМПЛЕКСА', M, 32, { width: contentW, align: 'right' });
+
+    doc.font('Bold').fontSize(26).fillColor('#FFFFFF').text(p.name, M, coverH - 130, { width: contentW });
+    const subParts = [p.address, p.builder].filter(Boolean) as string[];
+    if (subParts.length > 0) {
+      doc
+        .font('Regular')
+        .fontSize(11)
+        .fillColor('#FFFFFFD9')
+        .text(subParts.join('   ·   '), M, doc.y + 6, { width: contentW });
+    }
+
+    // ── Цена и объём предложения ──────────────────────────────────────────
+    let y = coverH + 32;
     if (p.priceFrom != null) {
-      const range =
+      doc.font('Regular').fontSize(9).fillColor(PDF_TEXT_MUTED).text('СТОИМОСТЬ', M, y, { lineBreak: false });
+      doc.font('Bold').fontSize(24).fillColor(PDF_BRAND_COLOR).text(
         p.priceTo != null && p.priceTo !== p.priceFrom
-          ? `${new Intl.NumberFormat('ru-RU').format(p.priceFrom)} - ${new Intl.NumberFormat('ru-RU').format(p.priceTo)} руб.`
-          : `${new Intl.NumberFormat('ru-RU').format(p.priceFrom)} руб.`;
-      doc.font('Regular').text('Диапазон цен: ' + range);
-    }
-
-    if (p.description?.trim()) {
-      doc.moveDown();
-      doc.font('Bold').fontSize(12).fillColor('#000000').text('Описание:');
-      doc.moveDown(0.3);
-      doc.font('Regular').fontSize(11).fillColor('#1f1f1f').text(p.description.trim(), { align: 'left' });
-    }
-
-    if (p.roomMix.length > 0) {
-      doc.moveDown();
-      doc.font('Bold').fontSize(12).fillColor('#000000').text('Квартиры в наличии:');
-      doc.moveDown(0.3);
-      doc.font('Regular').fontSize(11).fillColor('#1f1f1f');
-      for (const row of p.roomMix.slice(0, 8)) {
-        const priceText =
-          row.priceFrom != null
-            ? `от ${new Intl.NumberFormat('ru-RU').format(row.priceFrom)} руб.`
-            : 'цена по запросу';
-        doc.text(`- ${row.label}: ${row.count} шт., ${priceText}`);
+          ? `от ${formatPdfMoney(p.priceFrom)}`
+          : formatPdfMoney(p.priceFrom),
+        M,
+        y + 14,
+        { width: contentW * 0.6 },
+      );
+      if (p.priceTo != null && p.priceTo !== p.priceFrom) {
+        doc
+          .font('Regular')
+          .fontSize(10)
+          .fillColor(PDF_TEXT_MUTED)
+          .text(`до ${formatPdfMoney(p.priceTo)}`, M, doc.y + 2, { width: contentW * 0.6 });
       }
     }
+    if (p.availableApartments > 0) {
+      doc
+        .font('Bold')
+        .fontSize(24)
+        .fillColor(PDF_TEXT_DARK)
+        .text(String(p.availableApartments), M, y + 14, { width: contentW, align: 'right' });
+      doc
+        .font('Regular')
+        .fontSize(9)
+        .fillColor(PDF_TEXT_MUTED)
+        .text('квартир в продаже', M, y + 44, { width: contentW, align: 'right' });
+    }
 
-    doc.moveDown();
-    doc.font('Regular').fontSize(9).fillColor(PDF_TEXT_MUTED).text('Сформировано: ' + new Date(p.generatedAt).toLocaleString('ru-RU'));
-    this.drawPdfFooterBar(doc, contact);
+    y = Math.max(y + 76, doc.y + 18);
+    doc.moveTo(M, y).lineTo(W - M, y).strokeColor(PDF_BORDER).lineWidth(1).stroke();
+    y += 22;
+
+    // ── Ключевые факты в две колонки ──────────────────────────────────────
+    const facts: Array<[string, string]> = [];
+    if (p.builder) facts.push(['Застройщик', p.builder]);
+    if (p.deadline) facts.push(['Срок сдачи', p.deadline]);
+    if (p.address) facts.push(['Адрес', p.address]);
+    if (p.metro) facts.push(['Транспорт', p.metro]);
+    if (facts.length > 0) {
+      const colW = contentW / 2 - 12;
+      facts.forEach(([label, value], i) => {
+        const cx = M + (i % 2) * (colW + 24);
+        const cy = y + Math.floor(i / 2) * 46;
+        doc.font('Regular').fontSize(8).fillColor(PDF_TEXT_MUTED).text(label.toUpperCase(), cx, cy, {
+          width: colW,
+          lineBreak: false,
+        });
+        doc.font('Bold').fontSize(11).fillColor(PDF_TEXT_DARK).text(value, cx, cy + 13, {
+          width: colW,
+          height: 26,
+          ellipsis: true,
+        });
+      });
+      y += Math.ceil(facts.length / 2) * 46 + 8;
+    }
+
+    // ── Прайс по комнатности ──────────────────────────────────────────────
+    if (p.roomMix.length > 0) {
+      doc.font('Bold').fontSize(12).fillColor(PDF_TEXT_DARK).text('Квартиры в продаже', M, y);
+      y = doc.y + 10;
+
+      const rowH = 26;
+      const rows = p.roomMix.slice(0, 7);
+      rows.forEach((row, i) => {
+        if (i % 2 === 0) doc.rect(M, y - 6, contentW, rowH).fill(PDF_SURFACE);
+        doc.font('Regular').fontSize(10).fillColor(PDF_TEXT_DARK).text(row.label, M + 12, y, {
+          width: contentW * 0.4,
+          lineBreak: false,
+        });
+        doc
+          .font('Regular')
+          .fontSize(10)
+          .fillColor(PDF_TEXT_MUTED)
+          .text(`${row.count} шт.`, M + contentW * 0.45, y, { width: contentW * 0.2, lineBreak: false });
+        doc
+          .font('Bold')
+          .fontSize(10)
+          .fillColor(PDF_BRAND_COLOR)
+          .text(
+            row.priceFrom != null ? `от ${formatPdfMoney(row.priceFrom)}` : 'цена по запросу',
+            M,
+            y,
+            { width: contentW - 12, align: 'right' },
+          );
+        y += rowH;
+      });
+      y += 10;
+    }
+
+    // ── Описание: столько, сколько влезает до подвала ─────────────────────
+    const footerTop = doc.page.height - 86;
+    if (p.description?.trim() && y < footerTop - 70) {
+      doc.font('Bold').fontSize(12).fillColor(PDF_TEXT_DARK).text('О комплексе', M, y);
+      y = doc.y + 6;
+      doc.font('Regular').fontSize(10).fillColor('#374151').text(p.description.trim(), M, y, {
+        width: contentW,
+        height: footerTop - y - 14,
+        ellipsis: true,
+        align: 'left',
+        lineGap: 2,
+      });
+    }
+
+    this.drawPdfBrandFooter(doc, brand, contact, p.slug);
     return this.pdfFinish(doc, chunks);
   }
 
+  /** Реквизиты компании из настроек сайта; выдуманных значений не подставляем. */
+  private async loadPdfBrand(): Promise<PdfBrand> {
+    const keys = [
+      'company_name',
+      'site_tagline',
+      'phone_main',
+      'email',
+      'contacts_email',
+      'address',
+      'contacts_address',
+      'public_site_url',
+      'site_logo_url',
+    ];
+    let map = new Map<string, string>();
+    try {
+      const rows = await this.prisma.siteSetting.findMany({
+        where: { key: { in: keys } },
+        select: { key: true, value: true },
+      });
+      map = new Map(rows.map((r) => [r.key, (r.value ?? '').trim()]));
+    } catch {
+      // Настройки недоступны — печатаем презентацию без реквизитов
+    }
+    const pick = (...k: string[]) => k.map((x) => map.get(x)).find((v) => v && v.length > 0) ?? null;
+
+    const siteUrl = (pick('public_site_url') ?? process.env.PUBLIC_SITE_URL ?? '')
+      .replace(/^https?:\/\//, '')
+      .replace(/\/+$/, '');
+
+    return {
+      name: pick('company_name') ?? 'Агентство недвижимости',
+      tagline: pick('site_tagline'),
+      phone: pick('phone_main'),
+      email: pick('email', 'contacts_email'),
+      address: pick('address', 'contacts_address'),
+      siteUrl: siteUrl.length > 0 ? siteUrl : null,
+      logoUrl: pick('site_logo_url'),
+    };
+  }
+
+  /** Фирменная плашка внизу страницы: контакты компании и менеджера. */
+  private drawPdfBrandFooter(
+    doc: PDFKit.PDFDocument,
+    brand: PdfBrand,
+    contact: PdfAgentContact | null,
+    slug?: string,
+  ): void {
+    const W = doc.page.width;
+    const M = 48;
+    const h = 62;
+    const top = doc.page.height - h;
+
+    doc.rect(0, top, W, h).fill(PDF_BRAND_COLOR);
+
+    const agentLine = formatPdfFooterContact(contact);
+    doc
+      .font('Bold')
+      .fontSize(10)
+      .fillColor('#FFFFFF')
+      .text(agentLine ? `Ваш менеджер: ${agentLine}` : brand.name, M, top + 14, {
+        width: W - M * 2,
+        lineBreak: false,
+      });
+
+    const contacts = formatPdfBrandContacts(brand);
+    if (contacts) {
+      doc
+        .font('Regular')
+        .fontSize(9)
+        .fillColor('#FFFFFFCC')
+        .text(contacts, M, top + 31, { width: W - M * 2, lineBreak: false });
+    }
+
+    const link = brand.siteUrl && slug ? `${brand.siteUrl}/complex/${slug}` : null;
+    doc
+      .font('Regular')
+      .fontSize(8)
+      .fillColor('#FFFFFF99')
+      .text(link ?? new Date().toLocaleDateString('ru-RU'), M, top + 24, {
+        width: W - M * 2,
+        align: 'right',
+        lineBreak: false,
+      });
+  }
+
   private siteBase(): string {
-    return (process.env.PUBLIC_SITE_URL ?? 'https://livegrid.ru').replace(/\/+$/, '');
+    return (process.env.PUBLIC_SITE_URL ?? '').replace(/\/+$/, '');
   }
 
   private toAbsoluteUrl(url: string): string {
@@ -457,15 +666,21 @@ export class PresentationsService {
     });
   }
 
-  private drawPdfBrandHeader(doc: PDFKit.PDFDocument, contact: PdfAgentContact | null): number {
+  private drawPdfBrandHeader(
+    doc: PDFKit.PDFDocument,
+    contact: PdfAgentContact | null,
+    brand: PdfBrand,
+  ): number {
     const left = doc.page.margins.left;
     const right = doc.page.width - doc.page.margins.right;
     const y0 = doc.y;
 
-    doc.font('Bold').fontSize(16).fillColor(PDF_BRAND_COLOR).text('LiveGrid', left, y0, { lineBreak: false });
-    doc.font('Regular').fontSize(8).fillColor(PDF_TEXT_MUTED).text('Платформа недвижимости', left, y0 + 18, {
-      lineBreak: false,
-    });
+    doc.font('Bold').fontSize(16).fillColor(PDF_BRAND_COLOR).text(brand.name, left, y0, { lineBreak: false });
+    if (brand.tagline) {
+      doc.font('Regular').fontSize(8).fillColor(PDF_TEXT_MUTED).text(brand.tagline, left, y0 + 18, {
+        lineBreak: false,
+      });
+    }
 
     const agentLine = formatPdfHeaderAgentLine(contact);
     if (agentLine) {
@@ -486,9 +701,14 @@ export class PresentationsService {
     return doc.y;
   }
 
-  private drawPdfFooterBar(doc: PDFKit.PDFDocument, contact: PdfAgentContact | null): void {
-    const footerLine = formatPdfFooterContact(contact);
-    if (!footerLine) return;
+  private drawPdfFooterBar(
+    doc: PDFKit.PDFDocument,
+    contact: PdfAgentContact | null,
+    brand: PdfBrand,
+  ): void {
+    const agent = formatPdfFooterContact(contact);
+    const line = agent ? `По вопросам: ${agent}` : formatPdfBrandContacts(brand);
+    if (!line) return;
     const left = doc.page.margins.left;
     const right = doc.page.width - doc.page.margins.right;
     const bottom = doc.page.height - doc.page.margins.bottom;
@@ -496,7 +716,7 @@ export class PresentationsService {
       .font('Regular')
       .fontSize(8)
       .fillColor(PDF_TEXT_MUTED)
-      .text(`По вопросам: ${footerLine}`, left, bottom - 28, { width: right - left, align: 'center' });
+      .text(line, left, bottom - 28, { width: right - left, align: 'center' });
   }
 
   private drawPdfParamTable(doc: PDFKit.PDFDocument, rows: ReturnType<typeof listingPdfParamRows>): void {
@@ -519,8 +739,9 @@ export class PresentationsService {
     doc: PDFKit.PDFDocument,
     p: ListingPresentationPayload,
     contact: PdfAgentContact | null,
+    brand: PdfBrand,
   ): Promise<void> {
-    this.drawPdfBrandHeader(doc, contact);
+    this.drawPdfBrandHeader(doc, contact, brand);
     const contentWidth = doc.page.width - doc.page.margins.left - doc.page.margins.right;
     const heroUrl = p.photoUrls[0];
     if (heroUrl) {
@@ -573,7 +794,7 @@ export class PresentationsService {
       }
     }
 
-    this.drawPdfFooterBar(doc, contact);
+    this.drawPdfFooterBar(doc, contact, brand);
   }
 
   async generateListingPdf(listingId: number, creatorUserId?: string): Promise<Buffer> {
@@ -582,10 +803,13 @@ export class PresentationsService {
       select: { ownerUserId: true },
     });
     const p = await this.getListingPresentation(listingId);
-    const contact = await this.resolvePdfAgentContact(creatorUserId, row?.ownerUserId);
+    const [contact, brand] = await Promise.all([
+      this.resolvePdfAgentContact(creatorUserId, row?.ownerUserId),
+      this.loadPdfBrand(),
+    ]);
 
     const { doc, chunks } = this.createPdfDoc();
-    await this.renderListingPdfFirstPage(doc, p, contact);
+    await this.renderListingPdfFirstPage(doc, p, contact, brand);
 
     const fit = { fit: [500, 700] as [number, number] };
 
@@ -594,7 +818,7 @@ export class PresentationsService {
       const url = plans[i];
       const buf = await this.fetchImageBuffer(url);
       doc.addPage();
-      this.drawPdfBrandHeader(doc, contact);
+      this.drawPdfBrandHeader(doc, contact, brand);
       doc.font('Bold').fontSize(13).fillColor(PDF_BRAND_COLOR).text(`Планировка (${i + 1}/${plans.length})`);
       doc.moveDown(0.4);
       if (buf) {
@@ -606,7 +830,7 @@ export class PresentationsService {
       } else {
         doc.font('Regular').fontSize(10).fillColor(PDF_TEXT_MUTED).text('Изображение недоступно по ссылке.');
       }
-      this.drawPdfFooterBar(doc, contact);
+      this.drawPdfFooterBar(doc, contact, brand);
     }
 
     const photos = p.photoUrls.slice(1, 15);
@@ -614,7 +838,7 @@ export class PresentationsService {
       const url = photos[i];
       const buf = await this.fetchImageBuffer(url);
       doc.addPage();
-      this.drawPdfBrandHeader(doc, contact);
+      this.drawPdfBrandHeader(doc, contact, brand);
       doc.font('Bold').fontSize(13).fillColor(PDF_BRAND_COLOR).text(`Фото (${i + 2}/${p.photoUrls.length})`);
       doc.moveDown(0.4);
       if (buf) {
@@ -626,7 +850,7 @@ export class PresentationsService {
       } else {
         doc.font('Regular').fontSize(10).fillColor(PDF_TEXT_MUTED).text('Изображение недоступно по ссылке.');
       }
-      this.drawPdfFooterBar(doc, contact);
+      this.drawPdfFooterBar(doc, contact, brand);
     }
 
     return this.pdfFinish(doc, chunks);

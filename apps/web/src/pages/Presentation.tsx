@@ -1,13 +1,15 @@
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Printer, MapPin, Building2, ExternalLink, CalendarClock } from 'lucide-react';
+import { Printer, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import RedesignHeader from '@/redesign/components/RedesignHeader';
 import FooterSection from '@/components/FooterSection';
 import DownloadPdfButton from '@/shared/components/DownloadPdfButton';
 import { apiGetOrNull } from '@/lib/api';
-
-const PLACEHOLDER = '/placeholder.svg';
+import { settingOptional, useSiteSettings } from '@/redesign/hooks/useSiteSettings';
+import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
+import { telHref } from '@/lib/contact-links';
+import { typo } from '@/shared/lib/typography';
 
 type ApiPresentation = {
   slug: string;
@@ -25,8 +27,35 @@ type ApiPresentation = {
   generatedAt: string;
 };
 
+const money = (v: number) =>
+  `${new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(v)} ₽`;
+
+const Shell = ({ children }: { children: React.ReactNode }) => (
+  <div className="min-h-screen bg-background pb-16 lg:pb-0">
+    <RedesignHeader />
+    <div className="mx-auto max-w-[760px] px-4 py-16 text-center text-sm text-muted-foreground">
+      {children}
+    </div>
+    <FooterSection />
+  </div>
+);
+
+/** Ячейка факта: пустые значения не рисуем, прочерков не придумываем. */
+const Fact = ({ label, value }: { label: string; value: string | null }) =>
+  value ? (
+    <div className="border-t border-border py-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1.5 text-[15px] font-medium leading-snug">{typo(value)}</p>
+    </div>
+  ) : null;
+
 const Presentation = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { data: s } = useSiteSettings();
+  const { shortName } = useSiteBrand();
+  const phone = settingOptional(s, 'phone_main');
 
   const blockQuery = useQuery({
     queryKey: ['presentation', slug],
@@ -34,150 +63,164 @@ const Presentation = () => {
     enabled: Boolean(slug),
   });
 
+  if (!slug) return <Shell>Не указан ЖК</Shell>;
+  if (blockQuery.isPending) return <Shell>Загрузка…</Shell>;
+
   const p = blockQuery.data;
-  const image = p?.imageUrl ?? PLACEHOLDER;
-  const address = p?.address ?? '—';
-  const metroLine = p?.metro ?? '—';
-  const builder = p?.builder ?? '—';
-  const deadline = p?.deadline ?? '—';
-  const formatMoney = (v: number) =>
-    new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(v);
-
-  if (!slug) {
-    return (
-      <div className="min-h-screen bg-background">
-        <RedesignHeader />
-        <div className="max-w-[720px] mx-auto px-4 py-16 text-center text-muted-foreground text-sm">Не указан ЖК</div>
-        <FooterSection />
-      </div>
-    );
-  }
-
-  if (blockQuery.isPending) {
-    return (
-      <div className="min-h-screen bg-background">
-        <RedesignHeader />
-        <div className="max-w-[720px] mx-auto px-4 py-16 text-center text-muted-foreground text-sm">Загрузка…</div>
-        <FooterSection />
-      </div>
-    );
-  }
-
   if (!p) {
     return (
-      <div className="min-h-screen bg-background">
-        <RedesignHeader />
-        <div className="max-w-[720px] mx-auto px-4 py-16 text-center">
-          <p className="text-muted-foreground">Комплекс не найден</p>
-          <Link to="/catalog" className="text-primary text-sm mt-2 inline-block">← В каталог</Link>
-        </div>
-        <FooterSection />
-      </div>
+      <Shell>
+        <p>Комплекс не найден</p>
+        <Link to="/catalog" className="mt-2 inline-block text-primary">
+          В каталог
+        </Link>
+      </Shell>
     );
   }
 
+  const priceLine =
+    p.priceFrom != null
+      ? p.priceTo != null && p.priceTo !== p.priceFrom
+        ? `от ${money(p.priceFrom)}`
+        : money(p.priceFrom)
+      : null;
+
   return (
-    <div className="min-h-screen bg-background pb-16 print:pb-0">
+    <div className="min-h-screen bg-background pb-16 print:pb-0 lg:pb-0">
       <div className="print:hidden">
         <RedesignHeader />
       </div>
-      <article className="max-w-[800px] mx-auto px-4 py-8 print:py-4 print:max-w-none">
-        <div className="print:hidden flex flex-wrap items-center justify-between gap-3 mb-6">
+
+      <article className="mx-auto max-w-[880px] px-4 py-8 print:max-w-none print:px-0 print:py-0">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 print:hidden">
           <Button variant="outline" size="sm" asChild>
             <Link to={`/complex/${p.slug}`}>
-              <ExternalLink className="w-4 h-4 mr-2" />
+              <ExternalLink className="mr-2 h-4 w-4" />
               Страница ЖК
             </Link>
           </Button>
           <div className="flex items-center gap-2">
             <DownloadPdfButton
               apiPath={`/presentations/${encodeURIComponent(p.slug)}/pdf`}
-              filename={`presentation-${p.slug}.pdf`}
+              filename={`${p.slug}-prezentaciya.pdf`}
             />
             <Button type="button" size="sm" onClick={() => window.print()}>
-              <Printer className="w-4 h-4 mr-2" />
+              <Printer className="mr-2 h-4 w-4" />
               Печать
             </Button>
           </div>
         </div>
 
-        <header className="mb-6 print:mb-4">
-          <h1 className="text-2xl sm:text-3xl font-bold print:text-2xl">{p.name}</h1>
-          <p className="text-sm text-muted-foreground mt-1 print:text-foreground">Краткая презентация для клиента</p>
-        </header>
-
-        <div className="rounded-xl overflow-hidden border border-border mb-6 print:border-0 print:rounded-none">
-          <img src={image} alt="" className="w-full max-h-[320px] object-cover print:max-h-[240px]" />
-        </div>
-
-        <section className="mb-8 print:mb-6">
-          <h2 className="text-base font-semibold mb-2">Описание</h2>
-          {p.description?.trim() ? (
-            <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90 whitespace-pre-wrap">
-              {p.description.trim()}
-            </div>
+        {/* Обложка: имя комплекса поверх фотографии, как в печатной версии */}
+        <header className="relative overflow-hidden rounded-[24px] bg-graphite print:rounded-none">
+          {p.imageUrl ? (
+            <img
+              src={p.imageUrl}
+              alt=""
+              className="h-[280px] w-full object-cover sm:h-[360px]"
+              loading="eager"
+            />
           ) : (
-            <p className="text-sm text-muted-foreground">Описание пока не добавлено.</p>
+            <div className="h-[220px] w-full sm:h-[260px]" />
           )}
-        </section>
-
-        <section className="mb-8 print:mb-6">
-          <h2 className="text-base font-semibold mb-2">Квартиры в наличии</h2>
-          <div className="text-sm text-muted-foreground mb-3">
-            {p.availableApartments > 0 ? `Всего: ${p.availableApartments} шт.` : 'Нет активных квартир в продаже.'}
-            {p.priceFrom != null ? (
-              <span className="ml-2">
-                · Цены: от {formatMoney(p.priceFrom)} ₽
-                {p.priceTo != null && p.priceTo !== p.priceFrom ? ` до ${formatMoney(p.priceTo)} ₽` : ''}
-              </span>
+          <div className="absolute inset-x-0 bottom-0 top-1/3 bg-gradient-to-t from-graphite via-graphite/70 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-6 sm:p-9">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">
+              Презентация комплекса · {shortName}
+            </p>
+            <h1 className="mt-3 text-2xl font-bold leading-tight text-white sm:text-4xl">{p.name}</h1>
+            {p.address ? (
+              <p className="mt-2 text-sm text-white/75 sm:text-base">{typo(p.address)}</p>
             ) : null}
           </div>
-          {p.roomMix.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {p.roomMix.map((row) => (
-                <div key={row.label} className="rounded-lg border border-border px-3 py-2 text-sm">
-                  <div className="font-medium">{row.label}</div>
-                  <div className="text-muted-foreground">
-                    {row.count} шт.
-                    {row.priceFrom != null ? ` · от ${formatMoney(row.priceFrom)} ₽` : ''}
-                  </div>
+        </header>
+
+        {(priceLine || p.availableApartments > 0) && (
+          <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
+            {priceLine ? (
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  Стоимость
+                </p>
+                <p className="mt-1 text-3xl font-bold text-primary sm:text-4xl">{priceLine}</p>
+                {p.priceTo != null && p.priceTo !== p.priceFrom ? (
+                  <p className="mt-1 text-sm text-muted-foreground">до {money(p.priceTo)}</p>
+                ) : null}
+              </div>
+            ) : null}
+            {p.availableApartments > 0 ? (
+              <div className="text-right">
+                <p className="text-3xl font-bold sm:text-4xl">{p.availableApartments}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {typo('квартир в продаже')}
+                </p>
+              </div>
+            ) : null}
+          </div>
+        )}
+
+        <div className="mt-8 grid gap-x-10 sm:grid-cols-2">
+          <Fact label="Застройщик" value={p.builder} />
+          <Fact label="Срок сдачи" value={p.deadline} />
+          <Fact label="Адрес" value={p.address} />
+          <Fact label="Транспорт" value={p.metro} />
+        </div>
+
+        {p.roomMix.length > 0 ? (
+          <section className="mt-10">
+            <h2 className="text-lg font-bold">Квартиры в продаже</h2>
+            <div className="mt-4 overflow-hidden rounded-2xl border border-border">
+              {p.roomMix.map((row, i) => (
+                <div
+                  key={row.label}
+                  className={`flex items-center justify-between gap-4 px-5 py-3.5 text-[15px] ${
+                    i % 2 === 0 ? 'bg-muted/40' : 'bg-card'
+                  }`}
+                >
+                  <span className="font-medium">{row.label}</span>
+                  <span className="text-sm text-muted-foreground">{row.count} шт.</span>
+                  <span className="font-semibold text-primary">
+                    {row.priceFrom != null ? `от ${money(row.priceFrom)}` : 'цена по запросу'}
+                  </span>
                 </div>
               ))}
             </div>
-          ) : null}
-        </section>
+          </section>
+        ) : null}
 
-        <section className="space-y-3 text-sm border-t border-border pt-6 print:pt-4">
-          <div className="flex gap-2">
-            <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium">Адрес</p>
-              <p className="text-muted-foreground print:text-foreground">{address}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Building2 className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium">Застройщик</p>
-              <p className="text-muted-foreground print:text-foreground">{builder}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <CalendarClock className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
-            <div>
-              <p className="font-medium">Срок сдачи</p>
-              <p className="text-muted-foreground print:text-foreground">{deadline}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <span className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5 text-center font-bold text-xs">М</span>
-            <div>
-              <p className="font-medium">Метро</p>
-              <p className="text-muted-foreground print:text-foreground">{metroLine}</p>
-            </div>
+        {p.description?.trim() ? (
+          <section className="mt-10">
+            <h2 className="text-lg font-bold">О комплексе</h2>
+            <p className="mt-3 whitespace-pre-wrap text-[15px] leading-relaxed text-muted-foreground">
+              {typo(p.description.trim())}
+            </p>
+          </section>
+        ) : null}
+
+        <section className="mt-10 rounded-[24px] bg-graphite p-6 text-white sm:p-9 print:hidden">
+          <h2 className="text-xl font-bold sm:text-2xl">{typo('Подобрать квартиру в этом ЖК')}</h2>
+          <p className="mt-2 max-w-[460px] text-sm leading-relaxed text-white/70">
+            {typo('Покажем свободные планировки, актуальные цены и условия от застройщика.')}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              to={`/complex/${p.slug}`}
+              className="inline-flex h-12 items-center rounded-xl bg-white px-6 text-[15px] font-semibold text-graphite transition-colors hover:bg-white/90"
+            >
+              Смотреть квартиры
+            </Link>
+            {phone ? (
+              <a
+                href={telHref(phone)}
+                className="inline-flex h-12 items-center rounded-xl border border-white/25 px-6 text-[15px] font-medium text-white/90 transition-colors hover:bg-white/10"
+              >
+                {phone}
+              </a>
+            ) : null}
           </div>
         </section>
       </article>
+
       <div className="print:hidden">
         <FooterSection />
       </div>

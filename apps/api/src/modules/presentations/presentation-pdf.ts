@@ -1,8 +1,33 @@
 import type { ListingPresentationPayload } from './presentation.types';
 
-export const PDF_BRAND_COLOR = '#2563EB';
+/** Фирменный зелёный ЮгАкцента; раньше здесь был синий чужого бренда. */
+export const PDF_BRAND_COLOR = '#174F44';
+export const PDF_GRAPHITE = '#1A1D21';
 export const PDF_TEXT_DARK = '#111827';
 export const PDF_TEXT_MUTED = '#6B7280';
+export const PDF_BORDER = '#E5E7EB';
+export const PDF_SURFACE = '#F4F7F6';
+
+/** Реквизиты бренда для шапки и подвала PDF; берём из настроек сайта. */
+export type PdfBrand = {
+  name: string;
+  tagline: string | null;
+  phone: string | null;
+  email: string | null;
+  address: string | null;
+  siteUrl: string | null;
+  logoUrl: string | null;
+};
+
+/** «12 500 000 ₽» — без копеек и с неразрывными пробелами разрядов. */
+export function formatPdfMoney(value: number): string {
+  return `${new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(Math.trunc(value))} ₽`;
+}
+
+/** Строка контактов компании для подвала: только заполненные поля. */
+export function formatPdfBrandContacts(brand: PdfBrand): string {
+  return [brand.phone, brand.email, brand.siteUrl].filter(Boolean).join('   ·   ');
+}
 
 export type PdfAgentContact = {
   name: string | null;
