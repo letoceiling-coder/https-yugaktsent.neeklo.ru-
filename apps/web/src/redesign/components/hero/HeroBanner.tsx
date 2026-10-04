@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -7,6 +8,16 @@ import ConsultationFlow from '@/redesign/components/ConsultationFlow';
 import { useSiteSettings, settingOptional } from '@/redesign/hooks/useSiteSettings';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import { parseHomeBanners, visibleHomeBanners, type HomeBanner } from '@/redesign/lib/home-banners';
+import { apiGet } from '@/lib/api';
+import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
+import { formatDisplayPrice } from '@/redesign/lib/display-price';
+
+type HeroBlockRow = {
+  slug: string;
+  name: string;
+  images?: { url: string }[];
+  listingPriceMin?: number | string | null;
+};
 
 const AUTOPLAY_MS = 6500;
 /** Ниже этого сдвига палец считаем дрожанием, а не свайпом */
@@ -28,11 +39,44 @@ const HeroBanner = () => {
   const [paused, setPaused] = useState(false);
   const [consultOpen, setConsultOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
+  const { data: regionId } = useDefaultRegionId();
+
+  // Пока баннеры не заведены в админке, листать нечего. Вместо пустого
+  // экрана показываем жилые комплексы с их настоящими фото: это реальные
+  // данные каталога, а не выдуманная заглушка.
+  const { data: blocksData } = useQuery({
+    queryKey: ['blocks', 'hero', regionId],
+    enabled: regionId != null,
+    staleTime: 300_000,
+    queryFn: () =>
+      apiGet<{ data: HeroBlockRow[] }>(
+        `/blocks?region_id=${regionId}&per_page=6&page=1&require_active_listings=true&sort=created_desc`,
+      ),
+  });
 
   const slides = useMemo<HomeBanner[]>(() => {
     const fromSettings = visibleHomeBanners(parseHomeBanners(settingOptional(settings, 'home_banners')));
     if (fromSettings.length > 0) return fromSettings;
-    // Пока слайды не заведены в админке — один экран из общих настроек сайта.
+
+    const withPhoto = (blocksData?.data ?? []).filter((b) => b.images?.[0]?.url && b.slug);
+    if (withPhoto.length > 0) {
+      return withPhoto.slice(0, 5).map((b) => {
+        const priceFrom = formatDisplayPrice(b.listingPriceMin ?? null);
+        return {
+          id: b.slug,
+          image: b.images![0].url,
+          tag: 'Новостройки Анапы',
+          title: b.name,
+          subtitle: priceFrom ? `Квартиры ${priceFrom.toLowerCase().startsWith('от') ? '' : 'от '}${priceFrom}` : '',
+          buttonText: 'Смотреть комплекс',
+          buttonLink: `/complex/${b.slug}`,
+          consultButtonText: 'Получить консультацию',
+          enabled: true,
+        } satisfies HomeBanner;
+      });
+    }
+
+    // Ни баннеров, ни фото у комплексов — один экран из общих настроек.
     return [
       {
         id: 'default',
@@ -46,7 +90,7 @@ const HeroBanner = () => {
         enabled: true,
       },
     ];
-  }, [settings, shortName]);
+  }, [settings, shortName, blocksData]);
 
   const total = slides.length;
   const go = useCallback((next: number) => setIndex(((next % total) + total) % total), [total]);
@@ -201,7 +245,7 @@ const HeroBanner = () => {
             <ChevronRight className="h-6 w-6" />
           </button>
 
-          <div className="absolute inset-x-0 bottom-8 z-20 flex justify-center gap-2 lg:bottom-28">
+          <div className="absolute inset-x-0 bottom-5 z-20 flex justify-center gap-2.5 lg:bottom-28">
             {slides.map((slide, i) => (
               <button
                 key={slide.id}
@@ -209,11 +253,16 @@ const HeroBanner = () => {
                 aria-label={`Слайд ${i + 1}`}
                 aria-current={i === index}
                 onClick={() => go(i)}
-                className={cn(
-                  'h-2 rounded-full transition-all',
-                  i === index ? 'w-8 bg-white' : 'w-2 bg-white/50 hover:bg-white/80',
-                )}
-              />
+                className="flex h-11 w-8 items-center justify-center"
+              >
+                {/* Полоска мелкая, но нажимать можно по всей высоте */}
+                <span
+                  className={cn(
+                    'block h-1.5 rounded-full transition-all',
+                    i === index ? 'w-8 bg-white' : 'w-3 bg-white/50',
+                  )}
+                />
+              </button>
             ))}
           </div>
         </>
