@@ -401,10 +401,15 @@ export class PresentationsService {
           .font('Regular')
           .fontSize(10)
           .fillColor(PDF_TEXT_MUTED)
-          .text(`Свободные планировки и условия застройщика: ${ctaLine}`, M + 20, ctaTop + 42, {
+          .text('Свободные планировки и условия застройщика', M + 20, ctaTop + 42, {
             width: contentW - 40,
             lineBreak: false,
           });
+        doc
+          .font('Bold')
+          .fontSize(10)
+          .fillColor(PDF_BRAND_COLOR)
+          .text(ctaLine, M + 20, ctaTop + 42, { width: contentW - 40, align: 'right', lineBreak: false });
       }
     }
 
