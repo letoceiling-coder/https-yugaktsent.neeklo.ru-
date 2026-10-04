@@ -226,43 +226,51 @@ export class PresentationsService {
     // ── Обложка ───────────────────────────────────────────────────────────
     const coverH = 300;
     const cover = p.imageUrl ? await this.fetchImageBuffer(p.imageUrl) : null;
+    doc.rect(0, 0, W, coverH).fill(PDF_GRAPHITE);
     if (cover) {
+      doc.save();
+      doc.rect(0, 0, W, coverH).clip();
       try {
         doc.image(cover, 0, 0, { cover: [W, coverH], align: 'center', valign: 'center' });
       } catch {
-        doc.rect(0, 0, W, coverH).fill(PDF_GRAPHITE);
+        /* битое фото — остаётся графитовая подложка */
       }
-    } else {
-      doc.rect(0, 0, W, coverH).fill(PDF_GRAPHITE);
+      doc.restore();
     }
 
-    // Затемнение снизу: белый заголовок читается на любой фотографии
+    // Затемнение сверху и снизу: белый текст читается на любой фотографии
     doc.save();
-    doc.rect(0, coverH - 170, W, 170).fillOpacity(0.72).fill(PDF_GRAPHITE);
-    doc.restore();
-    doc.save();
-    doc.rect(0, 0, W, 72).fillOpacity(0.45).fill(PDF_GRAPHITE);
+    doc.fillOpacity(0.72).rect(0, coverH - 150, W, 150).fill(PDF_GRAPHITE);
+    doc.fillOpacity(0.45).rect(0, 0, W, 70).fill(PDF_GRAPHITE);
     doc.restore();
 
-    doc.font('Bold').fontSize(13).fillColor('#FFFFFF').text(brand.name, M, 26, { lineBreak: false });
+    doc.font('Bold').fontSize(13).fillColor('#FFFFFF').text(brand.name, M, 24, { lineBreak: false });
     if (brand.tagline) {
-      doc.font('Regular').fontSize(8).fillColor('#FFFFFFCC').text(brand.tagline, M, 44, { lineBreak: false });
+      doc.font('Regular').fontSize(8).fillColor('#FFFFFF', 0.8).text(brand.tagline, M, 41, {
+        lineBreak: false,
+      });
     }
     doc
       .font('Regular')
       .fontSize(8)
-      .fillColor('#FFFFFFCC')
-      .text('ПРЕЗЕНТАЦИЯ КОМПЛЕКСА', M, 32, { width: contentW, align: 'right' });
+      .fillColor('#FFFFFF', 0.8)
+      .text('ПРЕЗЕНТАЦИЯ КОМПЛЕКСА', M, 28, { width: contentW, align: 'right' });
 
-    doc.font('Bold').fontSize(26).fillColor('#FFFFFF').text(p.name, M, coverH - 130, { width: contentW });
     const subParts = [p.address, p.builder].filter(Boolean) as string[];
+    const nameY = subParts.length > 0 ? coverH - 112 : coverH - 86;
+    doc.font('Bold').fontSize(26).fillColor('#FFFFFF', 1).text(p.name, M, nameY, {
+      width: contentW,
+      height: 68,
+      ellipsis: true,
+    });
     if (subParts.length > 0) {
       doc
         .font('Regular')
         .fontSize(11)
-        .fillColor('#FFFFFFD9')
-        .text(subParts.join('   ·   '), M, doc.y + 6, { width: contentW });
+        .fillColor('#FFFFFF', 0.85)
+        .text(subParts.join('   ·   '), M, coverH - 42, { width: contentW, lineBreak: false });
     }
+    doc.fillOpacity(1);
 
     // ── Цена и объём предложения ──────────────────────────────────────────
     let y = coverH + 32;
@@ -427,6 +435,8 @@ export class PresentationsService {
     const M = 48;
     const h = 62;
     const top = doc.page.height - h;
+    const savedBottom = doc.page.margins.bottom;
+    doc.page.margins.bottom = 0;
 
     doc.rect(0, top, W, h).fill(PDF_BRAND_COLOR);
 
@@ -445,7 +455,7 @@ export class PresentationsService {
       doc
         .font('Regular')
         .fontSize(9)
-        .fillColor('#FFFFFFCC')
+        .fillColor('#FFFFFF', 0.85)
         .text(contacts, M, top + 31, { width: W - M * 2, lineBreak: false });
     }
 
@@ -453,12 +463,14 @@ export class PresentationsService {
     doc
       .font('Regular')
       .fontSize(8)
-      .fillColor('#FFFFFF99')
+      .fillColor('#FFFFFF', 0.6)
       .text(link ?? new Date().toLocaleDateString('ru-RU'), M, top + 24, {
         width: W - M * 2,
         align: 'right',
         lineBreak: false,
       });
+
+    doc.page.margins.bottom = savedBottom;
   }
 
   private siteBase(): string {
