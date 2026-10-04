@@ -87,14 +87,14 @@ const HorizontalSnapSlider = ({
             ))}
           </div>
           {showDots && count > 1 ? (
-            <div className="flex justify-center gap-1.5 mt-3">
+            <div className="flex justify-center mt-2">
               {children.map((_, i) => (
                 <button
                   key={i}
                   type="button"
                   aria-label={`Слайд ${i + 1}`}
                   onClick={() => scrollTo(i)}
-                  className="group flex h-10 w-6 items-center justify-center"
+                  className="group flex h-11 w-9 items-center justify-center"
                 >
                   {/* Точка мелкая, но нажимать можно по всей высоте строки */}
                   <span
@@ -155,14 +155,14 @@ const HorizontalSnapSlider = ({
         ))}
       </div>
       {showDots && count > 1 ? (
-        <div className="flex justify-center gap-1.5 mt-3 lg:mt-4">
+        <div className="flex justify-center mt-2 lg:mt-3">
           {children.map((_, i) => (
             <button
               key={i}
               type="button"
               aria-label={`Слайд ${i + 1}`}
               onClick={() => scrollTo(i)}
-              className="group flex h-10 w-6 items-center justify-center"
+              className="group flex h-11 w-9 items-center justify-center"
             >
               <span
                 className={cn(

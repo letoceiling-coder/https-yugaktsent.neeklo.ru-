@@ -228,7 +228,7 @@ const HeroBanner = () => {
             <ChevronRight className="h-6 w-6" />
           </button>
 
-          <div className="absolute inset-x-0 bottom-5 z-20 flex justify-center gap-2.5 lg:bottom-28">
+          <div className="absolute inset-x-0 bottom-4 z-20 flex justify-center lg:bottom-24">
             {slides.map((slide, i) => (
               <button
                 key={slide.id}
@@ -236,7 +236,7 @@ const HeroBanner = () => {
                 aria-label={`Слайд ${i + 1}`}
                 aria-current={i === index}
                 onClick={() => go(i)}
-                className="flex h-11 w-8 items-center justify-center"
+                className="flex h-11 w-11 items-center justify-center"
               >
                 {/* Полоска мелкая, но нажимать можно по всей высоте */}
                 <span
