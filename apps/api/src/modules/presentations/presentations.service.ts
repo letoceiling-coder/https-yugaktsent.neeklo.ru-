@@ -68,9 +68,10 @@ function normalizeDescription(raw: string | null): string | null {
   return text.length > 0 ? text : null;
 }
 
+/** «1 кв. 2027» — так же, как срок сдачи подписан в карточках каталога. */
 function quarterLabel(value: Date | null | undefined): string | null {
   if (!value || Number.isNaN(value.getTime())) return null;
-  return `${value.getUTCFullYear()} Q${Math.ceil((value.getUTCMonth() + 1) / 3)}`;
+  return `${Math.ceil((value.getUTCMonth() + 1) / 3)} кв. ${value.getUTCFullYear()}`;
 }
 
 function roomLabel(raw: string | null | undefined): string {
@@ -179,7 +180,7 @@ export class PresentationsService {
       deadlineFrom && deadlineTo
         ? deadlineFrom === deadlineTo
           ? deadlineFrom
-          : `${deadlineFrom} - ${deadlineTo}`
+          : `с ${deadlineFrom} до ${deadlineTo}`
         : deadlineFrom ?? null;
     const fallbackBuilder =
       listings
