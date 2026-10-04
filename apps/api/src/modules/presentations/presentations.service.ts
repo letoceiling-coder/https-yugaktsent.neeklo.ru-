@@ -384,9 +384,13 @@ export class PresentationsService {
       });
     }
 
-    const ctaTop = doc.page.height - 62 - 96;
+    // Блок призыва перед подвалом: иначе у комплексов без описания
+    // нижняя половина листа остаётся пустой. Строки кладём друг под друга —
+    // прижатые к правому краю контакты наезжали на длинный подзаголовок.
+    const ctaH = 96;
+    const ctaTop = doc.page.height - 62 - ctaH - 16;
     if (y < ctaTop - 12) {
-      doc.rect(M, ctaTop, contentW, 78).fill(PDF_SURFACE);
+      doc.rect(M, ctaTop, contentW, ctaH).fill(PDF_SURFACE);
       doc
         .font('Bold')
         .fontSize(13)
@@ -395,21 +399,21 @@ export class PresentationsService {
           width: contentW - 40,
           lineBreak: false,
         });
+      doc
+        .font('Regular')
+        .fontSize(10)
+        .fillColor(PDF_TEXT_MUTED)
+        .text('Свободные планировки и актуальные условия застройщика', M + 20, ctaTop + 40, {
+          width: contentW - 40,
+          lineBreak: false,
+        });
       const ctaLine = [brand.phone, brand.email].filter(Boolean).join('   ·   ');
       if (ctaLine) {
         doc
-          .font('Regular')
-          .fontSize(10)
-          .fillColor(PDF_TEXT_MUTED)
-          .text('Свободные планировки и условия застройщика', M + 20, ctaTop + 42, {
-            width: contentW - 40,
-            lineBreak: false,
-          });
-        doc
           .font('Bold')
-          .fontSize(10)
+          .fontSize(11)
           .fillColor(PDF_BRAND_COLOR)
-          .text(ctaLine, M + 20, ctaTop + 42, { width: contentW - 40, align: 'right', lineBreak: false });
+          .text(ctaLine, M + 20, ctaTop + 62, { width: contentW - 40, lineBreak: false });
       }
     }
 
