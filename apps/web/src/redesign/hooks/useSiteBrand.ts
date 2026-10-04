@@ -20,7 +20,9 @@ export function useSiteBrand() {
   const logoLightUrl =
     settingOptional(settings, 'site_logo_light_url') ??
     (logoUrl === DEFAULT_LOGO ? DEFAULT_LOGO_LIGHT : logoUrl);
-  const tagline = settingOptional(settings, 'site_tagline') ?? 'Платформа недвижимости';
+  // Подпись под логотипом задаёт заказчик в админке. Запасного текста нет:
+  // «Платформа недвижимости» — формулировка чужого продукта, а не этого бренда.
+  const tagline = settingOptional(settings, 'site_tagline') ?? null;
 
   const shortName =
     brandName

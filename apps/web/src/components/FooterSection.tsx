@@ -95,9 +95,11 @@ const FooterSection = React.forwardRef<HTMLElement>((_, ref) => {
                 className="h-11 w-auto max-w-[230px] object-contain object-left"
               />
             </Link>
-            <p className="mt-3 max-w-[300px] text-sm leading-relaxed text-primary-foreground/60">
-              {typo(tagline)}
-            </p>
+            {tagline ? (
+              <p className="mt-3 max-w-[300px] text-sm leading-relaxed text-primary-foreground/60">
+                {typo(tagline)}
+              </p>
+            ) : null}
 
             <div className="mt-5 flex flex-col">
               {phoneMain && phoneHref ? (
