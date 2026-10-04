@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ApiConnectionStrip } from '@/components/ApiConnectionStrip';
@@ -15,32 +14,18 @@ import LeadHighlightSection from '@/redesign/components/LeadHighlightSection';
 import FooterSection from '@/components/FooterSection';
 import ConsultationFlow from '@/redesign/components/ConsultationFlow';
 import type { ConsultationContext } from '@/redesign/lib/conversion-cta';
-import { apiGet } from '@/lib/api';
-import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
-import { mapApiBlockListRowToResidentialComplex, type ApiBlockListRow } from '@/redesign/lib/blocks-from-api';
+import { mapApiBlockListRowToResidentialComplex } from '@/redesign/lib/blocks-from-api';
+import { useHomeBlocks } from '@/redesign/hooks/useHomeBlocks';
 import { btnClass } from '@/redesign/lib/button-styles';
 import HorizontalSnapSlider from '@/redesign/components/HorizontalSnapSlider';
+import HomeMapSection from '@/redesign/components/HomeMapSection';
 
 const RedesignIndex = () => {
   const navigate = useNavigate();
   const [consultOpen, setConsultOpen] = useState(false);
   const [consultContext, setConsultContext] = useState<ConsultationContext | null>(null);
-  const { data: regionId } = useDefaultRegionId();
 
-  const blocksFeatured = useQuery({
-    queryKey: ['blocks', 'featured', regionId],
-    queryFn: async () => {
-      const sp = new URLSearchParams();
-      sp.set('region_id', String(regionId));
-      sp.set('per_page', '24');
-      sp.set('page', '1');
-      sp.set('sort', 'created_desc');
-      sp.set('require_active_listings', 'true');
-      return apiGet<{ data: ApiBlockListRow[] }>(`/blocks?${sp}`);
-    },
-    enabled: regionId != null,
-    staleTime: 300_000,
-  });
+  const blocksFeatured = useHomeBlocks();
 
   const featured = useMemo(() => {
     const rows = blocksFeatured.data?.data ?? [];
@@ -126,33 +111,7 @@ const RedesignIndex = () => {
         <QuizSection />
       </div>
 
-      {/* Карта: полноценный блок, а не узкая полоска с иконкой */}
-      <section className="section-y" aria-labelledby="map-cta-title">
-        <div className="container-page">
-          <Link
-            to="/map"
-            className="group block overflow-hidden rounded-[24px] bg-graphite transition-shadow hover:shadow-xl lg:rounded-[32px]"
-          >
-            <div className="grid gap-6 p-8 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-10 lg:p-14">
-              <div>
-                <p className="text-overline text-white/60">Карта</p>
-                <h2 id="map-cta-title" className="text-section-title mt-3 text-white">
-                  Посмотрите, что где стоит
-                </h2>
-                <p className="mt-4 max-w-[520px] text-sm leading-relaxed text-white/70 sm:text-base">
-                  Все жилые комплексы на одной карте: до моря, до центра, до школы.
-                  Фильтры по цене и комнатности работают прямо на карте.
-                </p>
-              </div>
-
-              <span className="inline-flex h-12 shrink-0 items-center gap-2 rounded-xl border border-white/40 px-6 text-[15px] font-medium text-white transition-colors group-hover:bg-white/15">
-                Открыть карту
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </div>
-          </Link>
-        </div>
-      </section>
+      <HomeMapSection />
 
       <AboutPlatform pageSlug="/" />
 

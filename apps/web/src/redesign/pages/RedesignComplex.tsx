@@ -143,7 +143,7 @@ const RedesignComplex = () => {
     if (!complex) return null;
     const priceHint =
       ` ${formatPriceFrom(complex.priceFrom)}`;
-    const desc = `${complex.name}${priceHint} — ${complex.district || complex.address}. Квартиры, планировки и шахматка на ${shortName}.`.slice(
+    const desc = `${complex.name}${priceHint}. ${complex.district || complex.address}. Квартиры, планировки и шахматка на ${shortName}.`.slice(
       0,
       160,
     );
@@ -627,7 +627,7 @@ const RedesignComplex = () => {
               {sectionHeading('Шахматка', activeBuilding?.name || 'Расположение квартир по этажам')}
               {!chessboardEnabled ? (
                 <div className="rounded-xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-                  Прокрутите к разделу или выберите «Шахматка» в меню — данные подгрузятся автоматически
+                  Прокрутите к разделу или выберите «Шахматка» в меню, и данные подгрузятся автоматически
                 </div>
               ) : chessboardQuery.isError ? (
                 <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6 text-center text-sm text-muted-foreground">
@@ -792,7 +792,7 @@ const RedesignComplex = () => {
           ) : null}
 
           <section id="lead" className="scroll-mt-32">
-            {sectionHeading('Получить консультацию', 'Оставьте заявку — менеджер свяжется с вами')}
+            {sectionHeading('Получить консультацию', 'Оставьте заявку, и менеджер свяжется с вами')}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 rounded-xl border border-border bg-card p-5 sm:p-6">
                 <LeadForm

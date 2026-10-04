@@ -37,7 +37,7 @@ export function buildCatalogSeoMeta(
 ): CatalogSeoMeta {
   const siteName = opts?.siteName?.trim() || 'Агентство недвижимости';
   const landing = detectCatalogLanding(filters, opts);
-  const regionPrefix = opts?.regionName?.trim() ? `${opts.regionName.trim()} — ` : '';
+  const regionPrefix = opts?.regionName?.trim() ? `${opts.regionName.trim()} · ` : '';
   const parts: string[] = [];
 
   if (filters.objectType === 'houses') parts.push('дома');
@@ -85,14 +85,14 @@ export function buildCatalogSeoMeta(
   } else if (landing.kind === 'subway' && landing.subway) {
     titleBase = `Недвижимость у метро ${landing.subway}`;
   } else if (landing.kind === 'rooms' && filters.rooms.length === 1) {
-    titleBase = `${ROOM_LABELS[filters.rooms[0]] ?? 'Квартиры'} — каталог`;
+    titleBase = `${ROOM_LABELS[filters.rooms[0]] ?? 'Квартиры'}, каталог`;
   } else {
     titleBase =
       parts.length > 1
         ? `Каталог: ${parts.slice(0, 5).join(' · ')}`
         : parts[0] === 'новостройки'
           ? 'Каталог новостроек и квартир'
-          : `Каталог — ${parts[0]}`;
+          : `Каталог · ${parts[0]}`;
   }
 
   const title = regionPrefix ? `${regionPrefix}${titleBase}` : titleBase;

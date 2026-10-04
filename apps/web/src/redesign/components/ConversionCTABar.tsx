@@ -96,7 +96,7 @@ const ConversionCTABar = ({
               onFallbackConsultation: (fallbackCtx) => onConsultation(fallbackCtx),
             })
           }
-          title={!isAvailable ? 'Телефон недоступен — откроется форма обратного звонка' : undefined}
+          title={!isAvailable ? 'Телефон недоступен, откроется форма обратного звонка' : undefined}
         >
           <PhoneIcon className="shrink-0" />
           {CONVERSION_CTA.phone}

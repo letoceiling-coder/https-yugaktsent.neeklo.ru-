@@ -482,7 +482,7 @@ export function mapApiBlockDetailToResidentialComplex(
       ? base.deadline
       : uniqueQuarters.length === 1
         ? uniqueQuarters[0]
-        : `${uniqueQuarters[0]} — ${uniqueQuarters[uniqueQuarters.length - 1]}`;
+        : `с ${uniqueQuarters[0]} до ${uniqueQuarters[uniqueQuarters.length - 1]}`;
   const fallbackBuilder =
     listingRows
       .map((x) => x.builder?.name?.trim() ?? '')

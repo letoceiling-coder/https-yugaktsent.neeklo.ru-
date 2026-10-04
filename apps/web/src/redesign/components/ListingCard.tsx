@@ -278,7 +278,7 @@ const ListingCard = ({ listing, variant = 'grid', trustBadges }: Props) => {
           <p className={cn(cardVisual.complexCompletion, 'line-clamp-1')}>{completionLine}</p>
         ) : isHome ? (
           <p className={cn(cardVisual.complexCompletion, 'invisible min-h-[1.125rem] select-none')} aria-hidden>
-            —
+            &nbsp;
           </p>
         ) : null}
       </div>

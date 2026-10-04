@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronDown, Search, X, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import RangeSlider from '@/redesign/components/hero/RangeSlider';
+import { formatSliderPrice } from '@/redesign/lib/display-price';
 import type { CatalogFilters, ObjectType, MarketType } from '@/redesign/data/types';
 import {
   COMMERCIAL_TYPE_FILTER_OPTIONS,
@@ -371,6 +372,7 @@ const FilterSidebar = ({
           max={50_000_000}
           step={100_000}
           ariaLabel="Цена, ₽"
+          formatValue={(v) => formatSliderPrice(v, 50_000_000)}
           value={[filters.priceMin ?? null, filters.priceMax ?? null]}
           onChange={([from, to]) =>
             onChange({ ...filters, priceMin: from ?? undefined, priceMax: to ?? undefined })

@@ -67,7 +67,7 @@ export default function ComplexInlineFilters({
       </div>
       {buildingOptions && buildingOptions.length > 1 && onBuildingChange ? (
         <select
-          className="h-9 rounded-lg border border-border bg-background px-2 text-xs max-w-[200px]"
+          className="h-9 rounded-lg border border-border bg-background px-2 text-base md:text-xs max-w-[200px]"
           value={activeBuildingId ?? ''}
           onChange={(e) => onBuildingChange(e.target.value)}
         >

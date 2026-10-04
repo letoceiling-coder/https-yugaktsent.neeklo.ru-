@@ -165,7 +165,7 @@ const ListingPresentation = () => {
         ) : null}
 
         {allPlans.length === 0 && allPhotos.length === 0 ? (
-          <p className="text-sm text-muted-foreground mb-8">Изображений пока нет — загрузите фото и планировки к объявлению.</p>
+          <p className="text-sm text-muted-foreground mb-8">Изображений пока нет. Загрузите фото и планировки к объявлению.</p>
         ) : null}
 
         <section className="space-y-4 text-sm border-t border-border pt-6 print:pt-4">

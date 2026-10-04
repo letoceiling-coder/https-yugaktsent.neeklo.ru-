@@ -28,26 +28,16 @@ const Presentation = lazyWithReload(() => import("./pages/Presentation"));
 const ListingPresentation = lazyWithReload(() => import("./pages/ListingPresentation"));
 const Compare = lazy(() => import("./pages/Compare"));
 const Favorites = lazyWithReload(() => import("./pages/Favorites"));
-const AccountLayout = lazyWithReload(() => import("./account/components/AccountLayout"));
-const AccountFavoritesPage = lazyWithReload(() => import("./account/pages/AccountFavoritesPage"));
-const AccountSavedSearches = lazyWithReload(() => import("./account/pages/AccountSavedSearches"));
-const AccountRecommendationsPage = lazyWithReload(() => import("./account/pages/AccountRecommendationsPage"));
-const AccountHistory = lazyWithReload(() => import("./account/pages/AccountHistory"));
-const AccountNotifications = lazyWithReload(() => import("./account/pages/AccountNotifications"));
-const AccountBillingPage = lazyWithReload(() => import("./account/pages/AccountBillingPage"));
 const PublicAgencyPage = lazyWithReload(() => import("./ecosystem/pages/PublicAgencyPage"));
 const Contacts = lazy(() => import("./pages/Contacts"));
 const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
 const AboutCompany = lazy(() => import("./pages/AboutCompany"));
 const SelectionPage = lazy(() => import("./pages/SelectionPage"));
 const SharedSelectionPage = lazyWithReload(() => import("./pages/SharedSelectionPage"));
-const Profile = lazy(() => import("./pages/Profile"));
 
-// Auth
+// Вход: сайт — лендинг без личных кабинетов, форма нужна только для админки
 const Login = lazy(() => import("./pages/Login"));
-const Register = lazy(() => import("./pages/Register"));
-const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 // News
 const News = lazy(() => import("./pages/News"));
@@ -143,30 +133,25 @@ const AppRoutes = () => (
     <Route path="/map" element={<RedesignMap />} />
     <Route path="/mortgage" element={<Navigate to="/catalog" replace />} />
     <Route path="/compare" element={<Compare />} />
-    <Route path="/favorites" element={<Navigate to="/account/favorites" replace />} />
-    <Route path="/account" element={<RequireAuth><AccountLayout /></RequireAuth>}>
-      <Route path="favorites" element={<AccountFavoritesPage />} />
-      <Route path="recommendations" element={<AccountRecommendationsPage />} />
-      <Route path="saved-searches" element={<AccountSavedSearches />} />
-      <Route path="history" element={<AccountHistory />} />
-      <Route path="notifications" element={<AccountNotifications />} />
-      <Route path="billing" element={<AccountBillingPage />} />
-    </Route>
+    {/* Избранное живёт в localStorage — регистрация для него не нужна */}
+    <Route path="/favorites" element={<Favorites />} />
+    <Route path="/account/*" element={<Navigate to="/favorites" replace />} />
     <Route path="/contacts" element={<Contacts />} />
     <Route path="/about" element={<AboutCompany />} />
     <Route path="/selection" element={<SelectionPage />} />
     <Route path="/selections/:token" element={<SharedSelectionPage />} />
     <Route path="/privacy" element={<Privacy />} />
+    <Route path="/terms" element={<Terms />} />
 
     {/* Ecosystem — public agency/agent profiles */}
     <Route path="/agency/:slug" element={<PublicAgencyPage />} />
 
-    {/* Auth */}
+    {/* Вход только в админку: публичной регистрации на лендинге нет */}
     <Route path="/login" element={<Login />} />
-    <Route path="/register" element={<Register />} />
-    <Route path="/forgot-password" element={<ForgotPassword />} />
-    <Route path="/reset-password" element={<ResetPassword />} />
-    <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+    <Route path="/register" element={<Navigate to="/login" replace />} />
+    <Route path="/forgot-password" element={<Navigate to="/login" replace />} />
+    <Route path="/reset-password" element={<Navigate to="/login" replace />} />
+    <Route path="/profile" element={<Navigate to="/login" replace />} />
 
     {/* News */}
     <Route path="/news" element={<News />} />

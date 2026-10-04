@@ -37,7 +37,7 @@ const RegionPickerPanel = ({ regions, selectedRegionId, onSelect, className }: P
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Поиск региона или города"
-          className="w-full h-11 pl-9 pr-3 rounded-xl border border-border bg-muted/30 text-sm outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/15"
+          className="w-full h-11 pl-9 pr-3 rounded-xl border border-border bg-muted/30 text-base outline-none md:text-sm focus:border-primary/50 focus:ring-2 focus:ring-primary/15"
           autoComplete="off"
           aria-label="Поиск региона или города"
         />

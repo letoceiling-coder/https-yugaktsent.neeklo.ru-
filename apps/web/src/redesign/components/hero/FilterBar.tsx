@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { apiGet } from '@/lib/api';
 import { btnClass } from '@/redesign/lib/button-styles';
 import RangeSlider from '@/redesign/components/hero/RangeSlider';
+import { formatSliderPrice } from '@/redesign/lib/display-price';
 import CatalogSearchHintsDropdown from '@/redesign/components/CatalogSearchHintsDropdown';
 import type { CatalogHints } from '@/redesign/lib/catalog-hints-types';
 import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
@@ -106,7 +107,7 @@ const FilterBar = () => {
 
   const labelClass = 'mb-1 block text-[11px] font-medium uppercase tracking-wide text-muted-foreground';
   const controlClass =
-    'h-11 w-full rounded-xl border border-border bg-background px-3 text-sm outline-none transition-colors focus:border-primary/60';
+    'h-11 w-full rounded-xl border border-border bg-background px-3 text-base outline-none md:text-sm transition-colors focus:border-primary/60';
 
   return (
     <section className="container-page relative z-20 pt-6 lg:-mt-16 lg:pt-0">
@@ -116,7 +117,7 @@ const FilterBar = () => {
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
-            className="h-11 w-full rounded-xl border border-border bg-background pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary/60"
+            className="h-11 w-full rounded-xl border border-border bg-background pl-9 pr-3 text-base outline-none md:text-sm transition-colors focus:border-primary/60"
             placeholder="ЖК, район, улица или застройщик"
             value={filters.search}
             onFocus={() => setSearchFocused(true)}
@@ -236,6 +237,7 @@ const FilterBar = () => {
               max={PRICE_MAX}
               step={PRICE_STEP}
               ariaLabel="Цена, ₽"
+              formatValue={(v) => formatSliderPrice(v, PRICE_MAX)}
               value={[filters.priceMin ?? null, filters.priceMax ?? null]}
               onChange={([from, to]) =>
                 setFilters((prev) => ({

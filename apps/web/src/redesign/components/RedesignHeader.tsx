@@ -69,9 +69,11 @@ const RedesignHeader = () => {
     { url: youtubeUrl, label: 'YouTube', icon: Youtube },
   ];
 
+  const filledSocials = SOCIALS.filter((s) => s.url);
+
   const socials = (
     <>
-      {SOCIALS.filter((s) => s.url).map(({ url, label, icon: Icon }) => (
+      {filledSocials.map(({ url, label, icon: Icon }) => (
         <a
           key={label}
           href={url}
@@ -173,17 +175,17 @@ const RedesignHeader = () => {
             onClick={() => setMenuOpen(false)}
           />
           <nav
-            className="absolute inset-x-0 top-0 max-h-[calc(100vh-4rem)] overflow-y-auto border-b border-border bg-background p-4 shadow-lg"
+            className="absolute inset-x-0 top-0 max-h-[calc(100vh-4rem)] overflow-y-auto border-b border-border bg-background px-4 pb-6 pt-3 shadow-lg"
             aria-label="Мобильное меню"
           >
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col">
               {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.href}
                   to={item.href}
                   className={cn(
-                    'flex min-h-[52px] items-center rounded-xl px-4 py-3 text-lg font-medium transition-colors',
-                    isActive(item) ? 'bg-primary/10 text-primary' : 'hover:bg-muted',
+                    'flex min-h-[52px] items-center rounded-xl px-4 text-[17px] font-medium transition-colors',
+                    isActive(item) ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted',
                   )}
                 >
                   {item.label}
@@ -205,14 +207,35 @@ const RedesignHeader = () => {
             {phoneMain ? (
               <a
                 href={telHref(phoneMain)}
-                className="mt-3 flex min-h-[44px] items-center justify-center text-base font-medium text-foreground"
+                className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-border text-base font-semibold text-foreground"
               >
+                <Phone className="h-4 w-4 shrink-0" aria-hidden />
                 {phoneMain}
               </a>
             ) : null}
 
-            {telegramUrl || youtubeUrl ? (
-              <div className="mt-2 flex items-center justify-center gap-2 border-t border-border pt-3">{socials}</div>
+            {filledSocials.length > 0 ? (
+              <div className="mt-5 border-t border-border pt-4">
+                <p className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  Мы в соцсетях
+                </p>
+                <div className="flex flex-col">
+                  {filledSocials.map(({ url, label, icon: Icon }) => (
+                    <a
+                      key={label}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex min-h-[48px] items-center gap-3 rounded-xl px-2 text-[15px] font-medium text-foreground transition-colors hover:bg-muted"
+                    >
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-primary">
+                        <Icon className="h-[18px] w-[18px]" />
+                      </span>
+                      {label}
+                    </a>
+                  ))}
+                </div>
+              </div>
             ) : null}
           </nav>
         </div>
@@ -221,7 +244,7 @@ const RedesignHeader = () => {
       {/* Нижняя панель без этих обработчиков молча ничего не делала */}
       <MobileTabBar
         onSearch={() => navigate('/catalog')}
-        onFavorites={() => navigate('/account/favorites')}
+        onFavorites={() => navigate('/favorites')}
         onMore={() => setMenuOpen(true)}
       />
 

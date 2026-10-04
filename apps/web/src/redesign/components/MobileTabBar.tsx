@@ -9,7 +9,7 @@ type Props = {
   onSearch: () => void;
   /** Открыть меню «Ещё» */
   onMore: () => void;
-  /** Клик по избранному: гостя уводим на вход */
+  /** Клик по избранному: открыть список (хранится локально, вход не нужен) */
   onFavorites: () => void;
 };
 
@@ -73,7 +73,7 @@ const MobileTabBar = ({ onSearch, onMore, onFavorites }: Props) => {
         <button
           type="button"
           onClick={onFavorites}
-          className={cn(TAB_CLASS, 'relative', tone(isActive('/account/favorites')))}
+          className={cn(TAB_CLASS, 'relative', tone(isActive('/favorites')))}
         >
           <Heart className="h-6 w-6" />
           {favoritesCount > 0 ? (

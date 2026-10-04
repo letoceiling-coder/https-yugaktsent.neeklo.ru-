@@ -100,7 +100,7 @@ export function formatPriceRangeDisplay(
     return formatDisplayPrice(minRub);
   }
   if (minRub !== null && maxRub !== null) {
-    return `${formatDisplayPrice(minRub, { prefix: 'от' })} — ${formatDisplayPrice(maxRub, { prefix: 'до' })}`;
+    return `${formatDisplayPrice(minRub, { prefix: 'от' })} ${formatDisplayPrice(maxRub, { prefix: 'до' })}`;
   }
   if (minRub !== null) return formatDisplayPrice(minRub, { prefix: 'от' });
   if (maxRub !== null) return formatDisplayPrice(maxRub, { prefix: 'до' });
@@ -175,4 +175,18 @@ export function formatPricePerMeterSafe(
 /** cn() helper: muted class when display text is on-request. */
 export function priceFallbackClass(displayText: string, extra?: string): string {
   return isPriceFallbackText(displayText) ? PRICE_ON_REQUEST_CLASS : (extra ?? '');
+}
+
+/**
+ * Короткая подпись для ручки слайдера: «0», «7,5 млн», «50 млн+».
+ * Край диапазона помечаем плюсом — иначе «50 млн» читается как точная граница.
+ */
+export function formatSliderPrice(rub: number, max?: number): string {
+  if (rub <= 0) return '0 ₽';
+  const atMax = max != null && rub >= max;
+  if (rub >= 1_000_000) {
+    const mln = (rub / 1_000_000).toFixed(1).replace(/\.0$/, '').replace('.', ',');
+    return `${mln} млн${atMax ? '+' : ''} ₽`;
+  }
+  return `${Math.round(rub / 1000)} тыс ₽`;
 }

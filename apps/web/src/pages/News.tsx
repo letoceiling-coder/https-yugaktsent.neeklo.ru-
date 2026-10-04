@@ -121,7 +121,7 @@ const News = () => {
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="search"
-                className="h-10 w-full rounded-xl border border-border bg-background pl-9 pr-3 text-sm outline-none transition-colors focus:border-primary/60"
+                className="h-10 w-full rounded-xl border border-border bg-background pl-9 pr-3 text-base outline-none md:text-sm transition-colors focus:border-primary/60"
                 placeholder="Поиск по новостям"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}

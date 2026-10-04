@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -8,16 +7,8 @@ import ConsultationFlow from '@/redesign/components/ConsultationFlow';
 import { useSiteSettings, settingOptional } from '@/redesign/hooks/useSiteSettings';
 import { useSiteBrand } from '@/redesign/hooks/useSiteBrand';
 import { parseHomeBanners, visibleHomeBanners, type HomeBanner } from '@/redesign/lib/home-banners';
-import { apiGet } from '@/lib/api';
-import { useDefaultRegionId } from '@/redesign/hooks/useDefaultRegionId';
+import { useHomeBlocks } from '@/redesign/hooks/useHomeBlocks';
 import { formatDisplayPrice } from '@/redesign/lib/display-price';
-
-type HeroBlockRow = {
-  slug: string;
-  name: string;
-  images?: { url: string }[];
-  listingPriceMin?: number | string | null;
-};
 
 const AUTOPLAY_MS = 6500;
 /** Ниже этого сдвига палец считаем дрожанием, а не свайпом */
@@ -39,20 +30,12 @@ const HeroBanner = () => {
   const [paused, setPaused] = useState(false);
   const [consultOpen, setConsultOpen] = useState(false);
   const touchStartX = useRef<number | null>(null);
-  const { data: regionId } = useDefaultRegionId();
 
   // Пока баннеры не заведены в админке, листать нечего. Вместо пустого
   // экрана показываем жилые комплексы с их настоящими фото: это реальные
-  // данные каталога, а не выдуманная заглушка.
-  const { data: blocksData } = useQuery({
-    queryKey: ['blocks', 'hero', regionId],
-    enabled: regionId != null,
-    staleTime: 300_000,
-    queryFn: () =>
-      apiGet<{ data: HeroBlockRow[] }>(
-        `/blocks?region_id=${regionId}&per_page=6&page=1&require_active_listings=true&sort=created_desc`,
-      ),
-  });
+  // данные каталога, а не выдуманная заглушка. Запрос общий с блоком
+  // «Популярные ЖК» — он уже в кэше, второй раз в сеть не ходим.
+  const { data: blocksData } = useHomeBlocks();
 
   const slides = useMemo<HomeBanner[]>(() => {
     const fromSettings = visibleHomeBanners(parseHomeBanners(settingOptional(settings, 'home_banners')));

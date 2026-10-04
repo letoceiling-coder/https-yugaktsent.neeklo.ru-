@@ -236,7 +236,7 @@ const RedesignCatalog = () => {
   );
   const pageTitle =
     catalogLanding.kind === 'district' || catalogLanding.kind === 'subway'
-      ? catalogSeo.title.replace(regionName ? `${regionName} — ` : '', '')
+      ? catalogSeo.title.replace(regionName ? `${regionName} · ` : '', '')
       : OBJECT_TYPE_TITLE[filters.objectType] ?? OBJECT_TYPE_TITLE.apartments;
 
   const listingsInfinite = useInfiniteQuery({
@@ -603,8 +603,8 @@ const RedesignCatalog = () => {
                 <SelectValue placeholder="Сортировка" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="name_asc">Название А—Я</SelectItem>
-                <SelectItem value="name_desc">Название Я—А</SelectItem>
+                <SelectItem value="name_asc">Название, А → Я</SelectItem>
+                <SelectItem value="name_desc">Название, Я → А</SelectItem>
                 <SelectItem value="created_desc">Сначала новые по дате</SelectItem>
                 <SelectItem value="price_asc">Цена: сначала дешевле</SelectItem>
                 <SelectItem value="price_desc">Цена: сначала дороже</SelectItem>
@@ -653,7 +653,7 @@ const RedesignCatalog = () => {
         <CatalogActiveFilterChips filters={filters} onChange={handleFiltersChange} className="mb-2" />
 
         {!regionId && !regionLoading && (
-          <p className="text-sm text-muted-foreground mb-4">Нет регионов в базе — добавьте регион и ЖК в админке.</p>
+          <p className="text-sm text-muted-foreground mb-4">Нет регионов в базе. Добавьте регион и ЖК в админке.</p>
         )}
 
         {isApartmentMode && marketTabs.length > 1 && (

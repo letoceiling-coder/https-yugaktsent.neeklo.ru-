@@ -33,7 +33,7 @@ const TRUST_CARDS: { icon: typeof FileCheck2; title: string; text: string }[] = 
   {
     icon: KeyRound,
     title: 'Прямые контракты',
-    text: 'Работаем с застройщиками Анапы напрямую — цена та же, что в отделе продаж.',
+    text: 'Работаем с застройщиками Анапы напрямую, цена та же, что в отделе продаж.',
   },
   {
     icon: Percent,

@@ -13,6 +13,11 @@ type Props = {
   debounceMs?: number;
   ariaLabel?: string;
   className?: string;
+  /**
+   * Подпись под ручкой. Если задана — значения видно сразу при перетаскивании,
+   * не дожидаясь, пока отработает дебаунс и обновятся поля «от» и «до».
+   */
+  formatValue?: (value: number) => string;
 };
 
 /**
@@ -28,6 +33,7 @@ const RangeSlider = ({
   debounceMs = 300,
   ariaLabel = 'Диапазон',
   className,
+  formatValue,
 }: Props) => {
   const [local, setLocal] = useState<[number, number]>([value[0] ?? min, value[1] ?? max]);
   const dragging = useRef(false);
@@ -48,9 +54,23 @@ const RangeSlider = ({
     }, debounceMs);
   };
 
+  const thumbClass =
+    'relative block h-5 w-5 rounded-full border-2 border-primary bg-background shadow-[0_1px_4px_rgba(0,0,0,0.18)] transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:shadow-[0_2px_8px_rgba(0,0,0,0.25)]';
+
+  /** Подпись живёт под ручкой и едет вместе с ней, поэтому значение видно всегда. */
+  const caption = (text: string) => (
+    <span className="pointer-events-none absolute left-1/2 top-[calc(100%+6px)] -translate-x-1/2 whitespace-nowrap text-[11px] font-semibold leading-none text-foreground">
+      {text}
+    </span>
+  );
+
   return (
     <SliderPrimitive.Root
-      className={cn('relative flex w-full touch-none select-none items-center py-2', className)}
+      className={cn(
+        'relative flex w-full touch-none select-none items-center py-2',
+        formatValue && 'mb-5',
+        className,
+      )}
       min={min}
       max={max}
       step={step}
@@ -72,17 +92,15 @@ const RangeSlider = ({
         onChange([pair[0] <= min ? null : pair[0], pair[1] >= max ? null : pair[1]]);
       }}
     >
-      <SliderPrimitive.Track className="relative h-1 w-full grow overflow-hidden rounded-full bg-border">
+      <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-border">
         <SliderPrimitive.Range className="absolute h-full bg-primary" />
       </SliderPrimitive.Track>
-      <SliderPrimitive.Thumb
-        aria-label="Цена от"
-        className="block h-4 w-4 rounded-full border-2 border-primary bg-background shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      />
-      <SliderPrimitive.Thumb
-        aria-label="Цена до"
-        className="block h-4 w-4 rounded-full border-2 border-primary bg-background shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      />
+      <SliderPrimitive.Thumb aria-label="Значение от" className={thumbClass}>
+        {formatValue ? caption(formatValue(local[0])) : null}
+      </SliderPrimitive.Thumb>
+      <SliderPrimitive.Thumb aria-label="Значение до" className={thumbClass}>
+        {formatValue ? caption(formatValue(local[1])) : null}
+      </SliderPrimitive.Thumb>
     </SliderPrimitive.Root>
   );
 };

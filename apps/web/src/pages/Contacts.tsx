@@ -77,7 +77,7 @@ const Contacts = () => {
             </h1>
             <p className="mt-4 max-w-[520px] text-sm leading-relaxed text-muted-foreground sm:text-base">
               Покажем подборку на большом экране, разберём планировки и документы.
-              Консультация и кофе бесплатные — записываться заранее не нужно.
+              Консультация и кофе бесплатные, записываться заранее не нужно.
             </p>
 
             <div className="mt-8 overflow-hidden rounded-[20px] bg-muted">
@@ -134,7 +134,7 @@ const Contacts = () => {
                   <MapPin className="h-7 w-7 text-muted-foreground" aria-hidden />
                   <p className="text-sm font-medium">Координаты офиса не заданы</p>
                   <p className="max-w-[320px] text-xs leading-relaxed text-muted-foreground">
-                    Добавьте их в настройках сайта — поля office_lat и office_lng.
+                    Добавьте их в настройках сайта: поля office_lat и office_lng.
                   </p>
                 </div>
               ) : failure ? (

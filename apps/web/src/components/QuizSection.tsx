@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Building2, Home, TreePine, Store, Trees, CheckCircle2 } from 'lucide-react';
 import { apiPost } from '@/lib/api';
+import { typo } from '@/shared/lib/typography';
 
 /* ── Step 1 types ── */
 const propertyTypes = [
@@ -55,6 +56,20 @@ const step2Fields: Record<string, FieldConfig[]> = {
   ],
 };
 
+const STEP_TITLES = ['Какой тип недвижимости?', 'Уточните параметры', 'Куда отправить подборку?'];
+
+/**
+ * Поля ввода держим на 16px: при меньшем кегле Safari на iPhone
+ * зумит страницу в момент фокуса, и вёрстка «уезжает».
+ */
+const inputClass =
+  'h-12 w-full rounded-xl border border-border bg-background px-4 text-base outline-none transition-shadow placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/10';
+
+const chipBase =
+  'rounded-xl border text-sm font-medium transition-all touch-manipulation disabled:opacity-40';
+const chipIdle = 'border-border bg-card text-foreground hover:border-primary/50 hover:bg-muted/40';
+const chipActive = 'border-primary bg-accent text-accent-foreground ring-1 ring-primary';
+
 const QuizSection = () => {
   const queryClient = useQueryClient();
   const [step, setStep] = useState(0);
@@ -70,7 +85,7 @@ const QuizSection = () => {
     step === 0
       ? !!selectedType
       : step === 1
-        ? (step2Fields[selectedType] || []).every(f => !!params[f.key])
+        ? (step2Fields[selectedType] || []).every((f) => !!params[f.key])
         : name.trim().length > 0 && contact.trim().length > 0 && consentAccepted;
 
   const [submitting, setSubmitting] = useState(false);
@@ -86,7 +101,9 @@ const QuizSection = () => {
     setSubmitting(true);
     setError('');
     try {
-      const comment = Object.entries(params).map(([k, v]) => `${k}: ${v}`).join(', ');
+      const comment = Object.entries(params)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(', ');
       await apiPost('/requests', {
         name,
         phone: contact,
@@ -104,24 +121,22 @@ const QuizSection = () => {
   };
 
   const handleNext = () => {
-    if (step === 2) {
-      handleSubmit();
-    } else {
-      setStep(s => s + 1);
-    }
+    if (step === 2) handleSubmit();
+    else setStep((s) => s + 1);
   };
 
   if (submitted) {
     return (
       <section className="section-y">
-        <div className="max-w-[1400px] mx-auto px-4">
-          <div className="bg-secondary rounded-xl p-6 sm:p-10 text-center max-w-[600px] mx-auto">
-            <div className="w-14 h-14 rounded-full bg-accent flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="w-7 h-7 text-primary" />
+        <div className="container-page">
+          <div className="mx-auto max-w-[560px] rounded-[28px] border border-border bg-card px-6 py-12 text-center shadow-sm sm:px-10">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-accent">
+              <CheckCircle2 className="h-8 w-8 text-primary" />
             </div>
-            <h2 className="text-lg sm:text-xl font-bold mb-2">Отлично!</h2>
-            <p className="text-sm text-muted-foreground mb-1">Мы уже подбираем варианты.</p>
-            <p className="text-sm text-muted-foreground">Менеджер свяжется с вами в течение 2 часов.</p>
+            <h2 className="text-xl font-bold sm:text-2xl">Заявка принята</h2>
+            <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+              {typo('Мы уже подбираем варианты. Менеджер свяжется с вами в течение 2 часов.')}
+            </p>
           </div>
         </div>
       </section>
@@ -129,134 +144,169 @@ const QuizSection = () => {
   }
 
   return (
-    <section className="section-y">
-      <div className="max-w-[1400px] mx-auto px-4">
-        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
+    <section className="section-y" aria-labelledby="quiz-title">
+      <div className="container-page">
+        {/* Узкая колонка: анкета читается как один спокойный разговор,
+            а не как панель во всю ширину экрана */}
+        <div className="mx-auto max-w-[760px]">
+          <div className="text-center">
+            <p className="text-overline text-primary">Бесплатно</p>
+            <h2 id="quiz-title" className="text-section-title mt-3">
+              Подберём объект
+            </h2>
+            <p className="mx-auto mt-3 max-w-[460px] text-[15px] leading-relaxed text-muted-foreground">
+              {typo('Три коротких вопроса, и мы пришлём варианты, которые подходят именно вам.')}
+            </p>
+          </div>
 
-          {/* Main quiz card */}
-          <div className="flex-1 bg-secondary rounded-xl p-4 sm:p-6">
-            {/* Progress */}
-            <div className="flex items-center justify-between mb-4 sm:mb-5">
-              <h2 className="text-section-title">Подберём объект</h2>
-              <span className="text-xs text-muted-foreground font-medium">Шаг {step + 1} из 3</span>
+          <div className="mt-8 rounded-[28px] border border-border bg-card p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_12px_40px_-24px_rgba(16,24,40,0.3)] sm:mt-10 sm:p-10 lg:p-12">
+            {/* Прогресс */}
+            <div className="flex items-center gap-4">
+              <div className="flex flex-1 gap-1.5" aria-hidden>
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className={cn(
+                      'h-1 flex-1 rounded-full transition-colors duration-300',
+                      i <= step ? 'bg-primary' : 'bg-border',
+                    )}
+                  />
+                ))}
+              </div>
+              <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
+                {step + 1}&nbsp;/&nbsp;3
+              </span>
             </div>
 
-            {/* Step 1 — Type */}
+            <p className="mt-7 text-lg font-semibold sm:text-xl">{STEP_TITLES[step]}</p>
+
+            {/* Шаг 1 — тип */}
             {step === 0 && (
-              <>
-                <p className="mb-5 text-sm text-muted-foreground sm:text-base">Какой тип недвижимости?</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-                  {propertyTypes.map(pt => {
-                    const Icon = pt.icon;
-                    const active = selectedType === pt.value;
-                    return (
-                      <button
-                        key={pt.value}
-                        onClick={() => setSelectedType(pt.value)}
+              <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {propertyTypes.map((pt) => {
+                  const Icon = pt.icon;
+                  const active = selectedType === pt.value;
+                  return (
+                    <button
+                      key={pt.value}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setSelectedType(pt.value)}
+                      className={cn(
+                        chipBase,
+                        active ? chipActive : chipIdle,
+                        'flex min-h-[104px] flex-col items-start justify-between gap-3 p-4 text-left',
+                      )}
+                    >
+                      <span
                         className={cn(
-                          'flex min-h-[60px] items-center gap-3 rounded-xl border p-3 text-left transition-colors touch-manipulation sm:p-4',
-                          active
-                            ? 'border-primary bg-accent text-accent-foreground shadow-[0_0_0_1px_hsl(var(--primary))]'
-                            : 'border-border bg-background hover:border-primary/40 hover:bg-muted/50'
+                          'flex h-10 w-10 items-center justify-center rounded-xl transition-colors',
+                          active ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground',
                         )}
                       >
-                        <div className={cn(
-                          'w-9 h-9 rounded-lg flex items-center justify-center shrink-0',
-                          active ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                        )}>
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <span className="text-xs sm:text-sm font-medium">{pt.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      <span className="text-[15px] font-medium">{pt.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             )}
 
-            {/* Step 2 — Dynamic params */}
+            {/* Шаг 2 — параметры */}
             {step === 1 && selectedType && (
-              <>
-                <p className="mb-5 text-sm text-muted-foreground sm:text-base">Уточните параметры</p>
-                <div className="space-y-3 sm:space-y-4">
-                  {step2Fields[selectedType].map(field => (
-                    <div key={field.key}>
-                      <label className="mb-2 block text-sm font-medium text-foreground">{field.label}</label>
-                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                        {field.options.map(opt => (
-                          <button
-                            key={opt}
-                            onClick={() => setParams(p => ({ ...p, [field.key]: opt }))}
-                            className={cn(
-                              'flex h-10 items-center rounded-lg border px-3.5 text-xs font-medium transition-colors touch-manipulation sm:text-sm',
-                              params[field.key] === opt
-                                ? 'border-primary bg-accent text-accent-foreground shadow-[0_0_0_1px_hsl(var(--primary))]'
-                                : 'border-border bg-background hover:border-primary/40 hover:bg-muted/50'
-                            )}
-                          >
-                            {opt}
-                          </button>
-                        ))}
-                      </div>
+              <div className="mt-6 space-y-6">
+                {step2Fields[selectedType].map((field) => (
+                  <div key={field.key}>
+                    <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      {field.label}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {field.options.map((opt) => (
+                        <button
+                          key={opt}
+                          type="button"
+                          aria-pressed={params[field.key] === opt}
+                          onClick={() => setParams((p) => ({ ...p, [field.key]: opt }))}
+                          className={cn(
+                            chipBase,
+                            params[field.key] === opt ? chipActive : chipIdle,
+                            'flex h-11 items-center px-4',
+                          )}
+                        >
+                          {opt}
+                        </button>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </>
+                  </div>
+                ))}
+              </div>
             )}
 
-            {/* Step 3 — Contact */}
+            {/* Шаг 3 — контакты */}
             {step === 2 && (
-              <>
-                <p className="text-xs sm:text-sm text-muted-foreground mb-4">Куда отправить подборку?</p>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Ваше имя"
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    className="w-full h-10 sm:h-11 px-4 rounded-xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Телефон или Telegram"
-                    value={contact}
-                    onChange={e => setContact(e.target.value)}
-                    className="w-full h-10 sm:h-11 px-4 rounded-xl border border-border bg-background text-sm outline-none focus:ring-2 focus:ring-primary/30"
-                  />
-                  <PrivacyConsent
-                    checked={consentAccepted}
-                    onCheckedChange={(next) => {
-                      setConsentAccepted(next);
-                      if (next) setConsentError(null);
-                    }}
-                    error={consentError}
-                  />
+              <div className="mt-6 space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Имя
+                    </span>
+                    <input
+                      type="text"
+                      autoComplete="name"
+                      placeholder="Как к вам обращаться"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className={inputClass}
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Телефон или Telegram
+                    </span>
+                    <input
+                      type="tel"
+                      autoComplete="tel"
+                      placeholder="+7 900 000-00-00"
+                      value={contact}
+                      onChange={(e) => setContact(e.target.value)}
+                      className={inputClass}
+                    />
+                  </label>
                 </div>
-              </>
+                <PrivacyConsent
+                  checked={consentAccepted}
+                  onCheckedChange={(next) => {
+                    setConsentAccepted(next);
+                    if (next) setConsentError(null);
+                  }}
+                  error={consentError}
+                />
+              </div>
             )}
 
-            {/* Navigation */}
-            <div className="flex items-center justify-between gap-3 mt-5 sm:mt-6">
+            {error ? <p className="mt-5 text-sm text-destructive">{error}</p> : null}
+
+            <div className="mt-8 flex items-center justify-between gap-3 border-t border-border pt-6">
               <Button
                 type="button"
                 variant="ghost"
                 disabled={step === 0}
-                onClick={() => setStep(s => s - 1)}
-                className="touch-manipulation disabled:opacity-30"
+                onClick={() => setStep((s) => s - 1)}
+                className="h-11 touch-manipulation disabled:opacity-0"
               >
                 Назад
               </Button>
-              {error && <p className="text-xs text-destructive">{error}</p>}
               <Button
                 variant="primary"
                 disabled={!canNext || submitting}
                 onClick={handleNext}
+                className="h-11 min-w-[150px] px-6"
               >
                 {submitting ? 'Отправка…' : step === 2 ? 'Получить подборку' : 'Далее'}
               </Button>
             </div>
           </div>
-
         </div>
       </div>
     </section>

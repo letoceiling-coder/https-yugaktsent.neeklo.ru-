@@ -81,7 +81,7 @@ export default function BuyerInquiryHistory() {
           value={reply}
           onChange={(e) => setReply(e.target.value)}
           placeholder="Дополнить обращение…"
-          className="flex-1 h-11 rounded-lg border px-3 text-sm min-w-0"
+          className="flex-1 h-11 rounded-lg border px-3 text-base md:text-sm min-w-0"
         />
         <button
           type="button"

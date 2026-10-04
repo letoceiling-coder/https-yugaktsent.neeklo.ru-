@@ -218,13 +218,13 @@ export function complexPopularCompletionLine(complex: ResidentialComplex): strin
 export function complexCompletionLine(complex: ResidentialComplex): string | null {
   const quarter = formatCompletionQuarterText(complex.deadline ?? '');
   if (complex.status === 'completed') {
-    return quarter ? `Сдан — ${quarter}` : complex.deadline === 'Сдан' ? 'Сдан' : null;
+    return quarter ? `Сдан в ${quarter}` : complex.deadline === 'Сдан' ? 'Сдан' : null;
   }
   if (complex.status === 'building') {
-    return quarter ? `Строится — ${quarter}` : complex.deadline === 'Строится' ? 'Строится' : null;
+    return quarter ? `Строится, сдача ${quarter}` : complex.deadline === 'Строится' ? 'Строится' : null;
   }
   if (complex.status === 'planned') {
-    return quarter ? `Проект — ${quarter}` : complex.deadline === 'Проект' ? 'Проект' : null;
+    return quarter ? `Проект, сдача ${quarter}` : complex.deadline === 'Проект' ? 'Проект' : null;
   }
   return quarter;
 }

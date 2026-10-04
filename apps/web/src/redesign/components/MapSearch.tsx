@@ -185,7 +185,7 @@ const MapSearch = ({ complexes, activeSlug, onSelect, height = '70vh', compact, 
           className="pointer-events-none absolute inset-x-4 top-4 z-[6] rounded-xl border border-amber-200 bg-amber-50/95 px-3 py-2 text-xs text-amber-900 shadow-sm"
           role="status"
         >
-          У найденных ЖК не заполнены координаты — на карте их пока нет. Список справа работает.
+          У найденных ЖК не заполнены координаты, поэтому на карте их пока нет. Список справа работает.
         </div>
       ) : null}
       {!ready && !failure ? (

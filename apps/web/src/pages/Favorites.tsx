@@ -259,7 +259,7 @@ const Favorites = () => {
             <Heart className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
             <h2 className="text-lg font-semibold mb-2">Сохраняйте объекты для сравнения</h2>
             <p className="text-sm text-muted-foreground mb-6">
-              Нажмите ♥ на карточке в каталоге или на странице квартиры — объекты появятся здесь. Можно собрать
+              Нажмите ♥ на карточке в каталоге или на странице квартиры, и объекты появятся здесь. Можно собрать
               подборку и отправить заявку одним кликом.
             </p>
             <div className="flex flex-col sm:flex-row gap-2 justify-center">

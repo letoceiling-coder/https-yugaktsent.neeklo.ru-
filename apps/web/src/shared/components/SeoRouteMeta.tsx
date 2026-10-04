@@ -76,7 +76,7 @@ function buildMeta(
     const ogImage = settingOptional(cms, 'og_image');
     const defaultTitle = regionName
       ? `Недвижимость в ${regionName}`
-      : `Недвижимость — ${siteName}`;
+      : `Недвижимость в Анапе · ${siteName}`;
     const defaultDesc = regionName
       ? `Каталог жилых комплексов и квартир в ${regionName}: фильтры, карта, избранное и подборки.`
       : `Каталог жилых комплексов и квартир: фильтры, карты, избранное и подборки.`;
@@ -96,7 +96,7 @@ function buildMeta(
   if (pathname.startsWith('/listing/')) {
     return {
       title: 'Объект недвижимости',
-      description: `Планировка, площадь, этаж, срок сдачи и цена. Консультация и показ — ${siteName}, Анапа.`,
+      description: `Планировка, площадь, этаж, срок сдачи и цена. Консультация и показ: ${siteName}, Анапа.`,
     };
   }
   if (pathname.startsWith('/complex/')) {
@@ -112,7 +112,7 @@ function buildMeta(
     };
   }
   if (pathname.startsWith('/map')) {
-    const mapTitle = regionName ? `Поиск на карте — ${regionName}` : 'Поиск на карте';
+    const mapTitle = regionName ? `Поиск на карте · ${regionName}` : 'Поиск на карте';
     const mapDesc = regionName
       ? `Поиск жилых комплексов и объектов в ${regionName} на интерактивной карте.`
       : 'Поиск жилых комплексов и объектов на интерактивной карте.';
@@ -161,7 +161,7 @@ function buildMeta(
   if (pathname === '/about') {
     return {
       title: 'О компании',
-      description: `${siteName} — агентство недвижимости в Анапе с 2017 года: подбор новостроек, проверка документов, сопровождение сделки и помощь с ипотекой.`,
+      description: `${siteName}, агентство недвижимости в Анапе с 2017 года: подбор новостроек, проверка документов, сопровождение сделки и помощь с ипотекой.`,
     };
   }
   if (pathname === '/selection') {

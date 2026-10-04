@@ -4,6 +4,8 @@ import { defaultPublicBrandName } from '@/shared/lib/site-brand-text';
 
 const DEFAULT_BRAND = defaultPublicBrandName();
 const DEFAULT_LOGO = '/logo-yug-aktsent.png';
+/** Тот же знак, но со светлой типографикой: на тёмном подвале основной не читался. */
+const DEFAULT_LOGO_LIGHT = '/logo-yug-aktsent-light.png';
 
 /** Публичное имя бренда и лого из site_settings (white-label). */
 export function useSiteBrand() {
@@ -11,8 +13,13 @@ export function useSiteBrand() {
   const settings = query.data;
 
   const brandName = setting(settings, 'company_name', DEFAULT_BRAND);
-  const siteTitle = setting(settings, 'site_title', `${brandName} — недвижимость`);
+  const siteTitle = setting(settings, 'site_title', `${brandName} · недвижимость`);
   const logoUrl = setting(settings, 'site_logo_url', DEFAULT_LOGO);
+  // Светлый вариант: явно заданный в админке, иначе наш — но только если
+  // основной логотип тоже наш. Чужой логотип подменять своим нельзя.
+  const logoLightUrl =
+    settingOptional(settings, 'site_logo_light_url') ??
+    (logoUrl === DEFAULT_LOGO ? DEFAULT_LOGO_LIGHT : logoUrl);
   const tagline = settingOptional(settings, 'site_tagline') ?? 'Платформа недвижимости';
 
   const shortName =
@@ -27,13 +34,14 @@ export function useSiteBrand() {
     shortName,
     siteTitle,
     logoUrl,
+    logoLightUrl,
     tagline,
   };
 }
 
 export function siteBrandFromMap(settings: Map<string, string> | undefined) {
   const brandName = setting(settings, 'company_name', DEFAULT_BRAND);
-  const siteTitle = setting(settings, 'site_title', `${brandName} — недвижимость`);
+  const siteTitle = setting(settings, 'site_title', `${brandName} · недвижимость`);
   const logoUrl = setting(settings, 'site_logo_url', DEFAULT_LOGO);
   const shortName =
     brandName

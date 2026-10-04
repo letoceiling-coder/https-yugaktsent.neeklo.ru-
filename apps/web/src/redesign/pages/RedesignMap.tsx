@@ -635,7 +635,7 @@ const RedesignMap = () => {
                 {useBlocksMap ? 'Список ЖК' : 'Список объектов'}
               </p>
               <p className="text-[10px] text-muted-foreground">
-                Нажмите строку — метка на карте подсветится
+                Нажмите строку, и метка на карте подсветится
               </p>
               {hasPaginationGap && !catalogFetchError ? (
                 <p className="text-[10px] text-amber-700 dark:text-amber-500 mt-1">

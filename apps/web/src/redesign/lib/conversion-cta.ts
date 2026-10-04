@@ -81,5 +81,5 @@ export function consultationTitle(ctx: ConsultationContext): string {
 }
 
 export function phoneUnavailableMessage(): string {
-  return 'Телефон временно недоступен. Оставьте заявку — мы перезвоним.';
+  return 'Телефон временно недоступен. Оставьте заявку, и мы перезвоним.';
 }

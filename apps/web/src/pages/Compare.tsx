@@ -102,7 +102,7 @@ function buildingsLine(b: ApiBlockDetail | undefined): string {
     .map((x) => {
       const parts = [x.name, x.queue].filter(Boolean).join(', ');
       const dl = formatDeadline(x.deadline);
-      const tail = dl ? ` — ${dl}` : '';
+      const tail = dl ? `, ${dl}` : '';
       return `${parts || 'Корпус'}${tail}`;
     })
     .join('; ');
