@@ -238,11 +238,15 @@ export class PresentationsService {
       doc.restore();
     }
 
-    // Затемнение сверху и снизу: белый текст читается на любой фотографии
-    doc.save();
-    doc.fillOpacity(0.72).rect(0, coverH - 150, W, 150).fill(PDF_GRAPHITE);
-    doc.fillOpacity(0.45).rect(0, 0, W, 70).fill(PDF_GRAPHITE);
-    doc.restore();
+    // Затемнение градиентом, а не сплошной плашкой: ровный край поперёк
+    // фотографии выглядит как брак печати.
+    const bottomShade = doc.linearGradient(0, coverH - 190, 0, coverH);
+    bottomShade.stop(0, PDF_GRAPHITE, 0).stop(0.55, PDF_GRAPHITE, 0.6).stop(1, PDF_GRAPHITE, 0.92);
+    doc.rect(0, coverH - 190, W, 190).fill(bottomShade);
+
+    const topShade = doc.linearGradient(0, 0, 0, 96);
+    topShade.stop(0, PDF_GRAPHITE, 0.6).stop(1, PDF_GRAPHITE, 0);
+    doc.rect(0, 0, W, 96).fill(topShade);
 
     doc.font('Bold').fontSize(13).fillColor('#FFFFFF').text(brand.name, M, 24, { lineBreak: false });
     if (brand.tagline) {
@@ -378,6 +382,30 @@ export class PresentationsService {
         align: 'left',
         lineGap: 2,
       });
+    }
+
+    const ctaTop = doc.page.height - 62 - 96;
+    if (y < ctaTop - 12) {
+      doc.rect(M, ctaTop, contentW, 78).fill(PDF_SURFACE);
+      doc
+        .font('Bold')
+        .fontSize(13)
+        .fillColor(PDF_TEXT_DARK)
+        .text('Подберём квартиру в этом комплексе', M + 20, ctaTop + 20, {
+          width: contentW - 40,
+          lineBreak: false,
+        });
+      const ctaLine = [brand.phone, brand.email].filter(Boolean).join('   ·   ');
+      if (ctaLine) {
+        doc
+          .font('Regular')
+          .fontSize(10)
+          .fillColor(PDF_TEXT_MUTED)
+          .text(`Свободные планировки и условия застройщика: ${ctaLine}`, M + 20, ctaTop + 42, {
+            width: contentW - 40,
+            lineBreak: false,
+          });
+      }
     }
 
     this.drawPdfBrandFooter(doc, brand, contact, p.slug);
