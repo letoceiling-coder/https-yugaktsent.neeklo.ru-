@@ -68,3 +68,7 @@ deployment/tmp-lg-sync/
 # Archived nested workspace (pre-consolidation)
 deployment/tmp-lg-work/
 .gstack/
+
+# Снимки экрана и дампы от проверок в браузере
+.playwright-mcp/
+/*.png
