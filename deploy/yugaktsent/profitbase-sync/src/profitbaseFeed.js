@@ -74,6 +74,29 @@ function offerImages(offer) {
     });
 }
 
+/**
+ * Обложка комплекса: в выгрузке это кадр дома, а не планировка квартиры.
+ * Без неё карточки ЖК со старых фидов оставались без фотографии.
+ */
+function buildingImageOf(images) {
+  const byType = (t) => images.find((i) => (i.type ?? "").split(/\s+/).includes(t))?.url ?? null;
+  return byType("building") ?? byType("house") ?? null;
+}
+
+/**
+ * Срок сдачи корпуса одной строкой: «2 кв. 2027».
+ *
+ * В выгрузке год и квартал лежат в разных полях. Раньше наружу уходил
+ * только номер квартала, и дальше по цепочке он разбирался как дата —
+ * так у «Хозяина Морей» в базе оказался срок сдачи 2001 года.
+ */
+function completionLabel(house) {
+  const year = num(house?.["built-year"]);
+  const quarter = num(house?.["ready-quarter"]);
+  if (!year) return null;
+  return quarter ? `${quarter} кв. ${year}` : String(year);
+}
+
 export function normalizeOffer(offer) {
   const externalId = text(offer["@_internal-id"]) ?? text(offer.number) ?? text(offer.id);
   if (!externalId) return null;
@@ -81,6 +104,7 @@ export function normalizeOffer(offer) {
   const custom = customFields(offer);
   const area = num(offer.area?.value ?? offer.area) ?? num(offer["living-space"]?.value);
 
+  const images = offerImages(offer);
   return {
     externalId: String(externalId),
     number: text(offer.number),
@@ -100,13 +124,14 @@ export function normalizeOffer(offer) {
     buildingName: text(offer.house?.name) ?? custom.Корпус,
     buildingSection: text(offer["building-section"]) ?? custom.Секция,
     floorsTotal: num(offer.house?.["floors-total"]),
-    completionQuarter: text(offer.house?.["ready-quarter"]) ?? custom["Срок сдачи"],
+    completionQuarter: completionLabel(offer.house) ?? custom["Срок сдачи"],
     builtYear: num(offer.house?.["built-year"]),
     buildingState: text(offer.house?.["building-state"]),
     layoutType: custom["Тип планировки"],
     features: custom.Особенности,
     custom,
-    images: offerImages(offer),
+    images,
+    buildingImage: buildingImageOf(images),
   };
 }
 
