@@ -1,6 +1,13 @@
 User-agent: *
 Allow: /
+
+# Служебные разделы: в поиске им делать нечего
 Disallow: /admin
+Disallow: /login
+Disallow: /favorites
+Disallow: /compare
+Disallow: /presentation/
+Disallow: /selections/
 
 Sitemap: https://yugaktsent.neeklo.ru/api/v1/sitemap/sitemap-index.xml
 Sitemap: https://yugaktsent.neeklo.ru/sitemap.xml

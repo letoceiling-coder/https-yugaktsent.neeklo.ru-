@@ -164,6 +164,26 @@ function buildMeta(
       description: `${siteName}, агентство недвижимости в Анапе с 2017 года: подбор новостроек, проверка документов, сопровождение сделки и помощь с ипотекой.`,
     };
   }
+  if (pathname.startsWith('/presentation/')) {
+    return {
+      title: 'Презентация комплекса',
+      description: `Цены, сроки сдачи и планировки комплекса одним файлом от ${siteName}.`,
+      noindex: true,
+    };
+  }
+  if (pathname === '/terms') {
+    return {
+      title: 'Пользовательское соглашение',
+      description: `Условия использования сайта ${siteName}.`,
+    };
+  }
+  if (pathname === '/compare') {
+    return {
+      title: 'Сравнение объектов',
+      description: 'Сравнение выбранных жилых комплексов по цене, срокам и характеристикам.',
+      noindex: true,
+    };
+  }
   if (pathname === '/selection') {
     return {
       title: 'Подбор объекта',
