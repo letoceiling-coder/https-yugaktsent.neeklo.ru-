@@ -149,11 +149,21 @@ export class LiveGridClient {
     const form = new FormData();
     form.append("file", new File([buf], filename, { type: contentType }));
 
-    const uploadRes = await fetch(`${this.baseUrl}/admin/media/upload`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${this.token}` },
-      body: form,
-    });
+    // Прогон по большому фиду идёт дольше, чем живёт токен. В api()
+    // переавторизация уже была, а загрузка файлов ходила мимо неё —
+    // и со второго часа все картинки отваливались по 401.
+    const send = () =>
+      fetch(`${this.baseUrl}/admin/media/upload`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${this.token}` },
+        body: form,
+      });
+
+    let uploadRes = await send();
+    if (uploadRes.status === 401) {
+      await this.login();
+      uploadRes = await send();
+    }
     if (!uploadRes.ok) {
       const t = await uploadRes.text();
       throw new Error(`upload failed: HTTP ${uploadRes.status} ${t.slice(0, 200)}`);
